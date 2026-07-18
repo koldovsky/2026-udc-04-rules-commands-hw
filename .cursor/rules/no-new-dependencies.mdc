@@ -1,0 +1,33 @@
+---
+description: "Zero new runtime dependencies — the app stays library-free; only vitest/typescript in devDeps"
+globs: "app/package.json,app/**/*.ts"
+alwaysApply: true
+---
+
+# No new dependencies
+
+## Context
+
+`app/package.json` has NO runtime dependencies and only `typescript` + `vitest`
+as devDependencies. The whole point of the exercise is a small, self-contained
+app: state via the in-house store (`app/src/store.ts`), strings via the
+in-house lib (`app/src/lib/text.ts`). Adding packages defeats both.
+
+## Rule
+
+- NEVER run `npm install <package>` or add entries to `dependencies` /
+  `devDependencies` in `app/package.json`.
+- If a task seems to need a library (state, string utils, ids, dates), solve it
+  with the existing in-house code or plain TypeScript instead.
+- If a dependency truly seems unavoidable, STOP and ask the user first —
+  explain what and why; do not install preemptively.
+- Never modify `app/package-lock.json` by hand.
+
+## How to verify
+
+1. `git diff app/package.json app/package-lock.json` is empty.
+2. `dependencies` in `app/package.json` is still absent/empty;
+   `devDependencies` still lists only `typescript` and `vitest`.
+3. No `import` from a package name in `app/src` production code (only
+   relative `./` imports). Sole exception: `vitest` imports inside
+   `app/src/**/*.test.ts` files.

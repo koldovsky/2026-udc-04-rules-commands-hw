@@ -1,0 +1,32 @@
+---
+description: "In-house text lib — its API is exactly slugify, truncate, normalizeSpaces; never invent helpers"
+globs: "app/**/*.ts"
+alwaysApply: false
+---
+
+# Custom lib: app/src/lib/text.ts has a fixed API
+
+## Context
+
+`app/src/lib/text.ts` is a CUSTOM in-house library, not lodash/underscore.
+Agents tend to hallucinate helpers (`capitalize`, `camelCase`, `deburr`) that
+do not exist there. This rule documents the real surface.
+
+## Rule
+
+- The entire supported API of `app/src/lib/text.ts` is exactly:
+  - `slugify(input: string): string` — "Buy Milk!" → "buy-milk"
+  - `truncate(input: string, maxLength: number, suffix?: string): string` —
+    `maxLength` INCLUDES the suffix (default `"…"`)
+  - `normalizeSpaces(input: string): string` — collapse inner whitespace, trim
+- NEVER call any other function from this module — it does not exist.
+- NEVER import lodash, underscore, or another string-utils package instead.
+- If a new helper is genuinely needed: add it to `text.ts` explicitly, with a
+  JSDoc comment and a colocated test in `text.test.ts` — never assume it.
+
+## How to verify
+
+1. Every import from `lib/text` names only `slugify`, `truncate`, or
+   `normalizeSpaces` (or a helper you just added WITH its test).
+2. `grep -rE "lodash|underscore" app/src app/package.json` — zero matches.
+3. `cd app && npm run typecheck` passes (a hallucinated import fails it).

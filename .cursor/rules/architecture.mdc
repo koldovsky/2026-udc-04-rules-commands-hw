@@ -1,0 +1,38 @@
+---
+description: "Custom store architecture — all state changes go through dispatch/reducer, never a state library"
+globs: "app/**/*.ts"
+alwaysApply: true
+---
+
+# Architecture: custom store, golden path
+
+## Context
+
+State is managed by a small in-house store in `app/src/store.ts`
+(`createStore()` returning `{ getState, dispatch, subscribe }`). It is
+deliberately NOT Redux, Zustand, MobX, or Jotai. The full architecture is
+described in `materials/architecture-brief.md`.
+
+## Rule
+
+- All state changes MUST go through `store.dispatch(action)` — there is no
+  other sanctioned way to change state.
+- The golden path to add new behavior:
+  1. Add a variant to the `Action` discriminated union in `app/src/types.ts`.
+  2. Handle it in `app/src/reducer.ts`.
+  3. Add an action creator in `app/src/actions.ts`.
+  4. Add a colocated `*.test.ts`.
+- UI/consumers call action creators from `app/src/actions.ts`; NEVER construct
+  action objects by hand at the call site.
+- Reads go through selectors in `app/src/selectors.ts` (`visibleTasks`,
+  `remainingCount`), not by poking at `state.tasks` directly.
+- NEVER add or suggest Redux, Zustand, MobX, Jotai, Recoil, or any other state
+  library. Do not "modernize" the store engine.
+
+## How to verify
+
+1. `grep -rE "redux|zustand|mobx|jotai|recoil" app/src app/package.json` — zero matches.
+2. Every new `Action` variant added in `types.ts` has a matching `case` in
+   `reducer.ts` and a creator in `actions.ts`.
+3. No file outside `store.ts` reassigns state; changes appear only as
+   `dispatch(...)` calls.

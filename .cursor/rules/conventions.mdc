@@ -1,0 +1,33 @@
+---
+description: "Code style conventions — named exports, no any/@ts-ignore, immutability, kebab-case files"
+globs: "app/**/*.ts"
+alwaysApply: true
+---
+
+# Code conventions
+
+## Context
+
+The app compiles with TypeScript strict mode (`noUncheckedIndexedAccess` is on,
+see `app/tsconfig.json`). Existing code (`app/src/reducer.ts`,
+`app/src/actions.ts`, `app/src/selectors.ts`) uses named exports and immutable
+updates; new code must match.
+
+## Rule
+
+- Named exports ONLY. NEVER use `export default`.
+- NEVER use `any`, `@ts-ignore`, or `@ts-expect-error`. Fix the types instead.
+- State updates are immutable: use spread, `map`, `filter` — NEVER mutate
+  objects or arrays in place (no `task.done = ...`, no `tasks.push(...)`).
+- File names are kebab-case (`text-utils.ts` style); types/interfaces are
+  PascalCase.
+- Do not add a linter/formatter config — lint is deliberately not configured
+  in this sample.
+
+## How to verify
+
+1. `grep -rn "export default" app/src` — zero matches.
+2. `grep -rnE "\bany\b|@ts-ignore|@ts-expect-error" app/src` — zero matches.
+3. `cd app && npm run typecheck` passes.
+4. In the reducer, every `case` returns a new object; no assignment to
+   `state.*` anywhere.
