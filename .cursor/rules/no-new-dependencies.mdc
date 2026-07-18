@@ -28,5 +28,6 @@ in-house lib (`app/src/lib/text.ts`). Adding packages defeats both.
 1. `git diff app/package.json app/package-lock.json` is empty.
 2. `dependencies` in `app/package.json` is still absent/empty;
    `devDependencies` still lists only `typescript` and `vitest`.
-3. No new `import` from a package name (only relative `./` imports) in
-   `app/src`.
+3. No `import` from a package name in `app/src` production code (only
+   relative `./` imports). Sole exception: `vitest` imports inside
+   `app/src/**/*.test.ts` files.

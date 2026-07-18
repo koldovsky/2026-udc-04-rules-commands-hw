@@ -59,7 +59,7 @@ less disciplined:
 
 ## Conclusion
 
-The rules changed behaviour, but less dramatically than expected — the gap
+The rules changed behavior, but less dramatically than expected — the gap
 showed up in **discipline and verification**, not architecture. The reason:
 this codebase's inline comments (`PROTECTED CORE`, "deliberately NOT Redux")
 already act as embedded rules, so scenario B still found the golden path.

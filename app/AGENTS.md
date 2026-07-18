@@ -12,7 +12,7 @@ dependencies.
 
 ## Structure
 
-```
+```text
 src/
   types.ts       # PROTECTED: domain types + Action union + initialState
   store.ts       # PROTECTED: custom store — createStore(): getState/dispatch/subscribe

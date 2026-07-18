@@ -5,7 +5,7 @@
 **Same prompt used in both:** the change request from `materials/ab-task.md`
 (add a `priority` field + a way to change it through the normal state flow),
 verbatim — the same prompt as the A/B validation. Before the Codex run,
-`app/src` was reset to the seeded state; afterwards it was restored to the
+`app/src` was reset to the seeded state; afterward it was restored to the
 committed rules-ON result.
 
 ## Did the rules / AGENTS.md get picked up?

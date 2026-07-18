@@ -8,7 +8,8 @@ behavior: $ARGUMENTS
 1. Read the target file(s) and the rules in `.cursor/rules/` first.
 2. Apply only convention-level fixes:
    - convert default exports to named exports;
-   - remove `any` / `@ts-ignore` by fixing the actual types;
+   - remove `any` / `@ts-ignore` / `@ts-expect-error` by fixing the actual
+     types;
    - replace in-place mutation with immutable spread / `map` / `filter`;
    - route direct `state.tasks` reads through `app/src/selectors.ts`;
    - replace hand-built action objects with creators from `app/src/actions.ts`;

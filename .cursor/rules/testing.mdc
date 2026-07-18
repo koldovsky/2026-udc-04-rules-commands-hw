@@ -28,4 +28,5 @@ Tests use vitest and live next to the code they test: `app/src/reducer.test.ts`,
 
 1. New behavior in `src/X.ts` has a matching `src/X.test.ts` change.
 2. `cd app && npm test` is green (all files, no skipped tests).
-3. `grep -rE "from ['\"]jest|mocha" app` — zero matches.
+3. `grep -rE "from ['\"](@jest/|jest|mocha)" app` — zero matches (also
+   catches scoped packages like `@jest/globals`).

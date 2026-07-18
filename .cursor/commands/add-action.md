@@ -22,4 +22,5 @@ order:
    green before you finish.
 
 Constraints (from `.cursor/rules/`): do not modify `app/src/store.ts`; no new
-npm dependencies; no `any` / `@ts-ignore`; named exports only.
+npm dependencies; no `any` / `@ts-ignore` / `@ts-expect-error`; named exports
+only.
