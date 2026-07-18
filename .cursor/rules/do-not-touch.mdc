@@ -1,0 +1,33 @@
+---
+description: "Protected core — store.ts and types.ts must not be modified without explicit approval"
+globs: "app/src/store.ts,app/src/types.ts"
+alwaysApply: true
+---
+
+# Protected core: do not touch
+
+## Context
+
+`app/src/store.ts` (the dispatch/notify engine) and `app/src/types.ts` (core
+types + the `Action` union) are load-bearing: the reducer, action creators,
+selectors, and tests all depend on their exact shapes. Careless edits ripple
+through the whole app.
+
+## Rule
+
+- NEVER modify `app/src/store.ts`. Feature work belongs in `reducer.ts`,
+  `actions.ts`, and `selectors.ts`.
+- Do not change `app/src/types.ts` except for the two sanctioned extensions:
+  adding a new variant to the `Action` union, or adding a field to a domain
+  type when the task explicitly requires it.
+- Any other change to these two files requires explicit approval from the user
+  FIRST — ask before editing, and say which lines you want to change and why.
+- NEVER rewrite, reformat, or "clean up" these files as a side effect of
+  another task.
+
+## How to verify
+
+1. `git diff app/src/store.ts` is empty in the final change set.
+2. `git diff app/src/types.ts` shows only additions (new `Action` variant /
+   new field), no removed or rewritten lines.
+3. `cd app && npm test` — the seeded `store.test.ts` still passes untouched.

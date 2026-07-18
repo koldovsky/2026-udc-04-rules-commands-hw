@@ -1,0 +1,31 @@
+---
+description: "Testing — colocated *.test.ts with vitest, AAA pattern, tests required for new behavior"
+globs: "app/**/*.test.ts,app/src/**/*.ts"
+alwaysApply: false
+---
+
+# Testing
+
+## Context
+
+Tests use vitest and live next to the code they test: `app/src/reducer.test.ts`,
+`app/src/store.test.ts`, `app/src/lib/text.test.ts`. They run with
+`cd app && npm test` (`vitest run`).
+
+## Rule
+
+- Every new action / reducer case / selector / lib function gets a test in a
+  colocated `*.test.ts` file (same directory as the code under test).
+- Use vitest (`describe` / `it` / `expect`) — NEVER add jest, mocha, or any
+  other test framework.
+- Structure each test as Arrange–Act–Assert: build the input state, perform
+  one operation, assert on the result.
+- Reducer tests must also assert immutability where relevant (the original
+  state object is not mutated).
+- Never delete or weaken existing tests to make a change pass; fix the code.
+
+## How to verify
+
+1. New behavior in `src/X.ts` has a matching `src/X.test.ts` change.
+2. `cd app && npm test` is green (all files, no skipped tests).
+3. `grep -rE "from ['\"]jest|mocha" app` — zero matches.
