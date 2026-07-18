@@ -48,5 +48,5 @@ The generalized `AGENTS.md` proved genuinely portable: a second tool that has
 never seen the Cursor rules picked it up automatically and followed the
 golden path end-to-end. The gap that remained (fewer tests, unpinned action
 naming) maps exactly to detail that lives only in `.cursor/rules/` —
-i.e. the baseline carries the architecture, tool-specific rule files add the
+i.e., the baseline carries the architecture, tool-specific rule files add the
 discipline.

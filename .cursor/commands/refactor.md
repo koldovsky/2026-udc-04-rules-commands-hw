@@ -2,6 +2,8 @@
 description: "Refactor a file to project conventions without changing behavior; tests must stay green"
 ---
 
+# /refactor
+
 Refactor the following file(s) to project conventions, WITHOUT changing
 behavior: $ARGUMENTS
 

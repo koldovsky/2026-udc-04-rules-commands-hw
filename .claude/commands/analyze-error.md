@@ -2,6 +2,8 @@
 description: "Diagnose a TypeScript or test error and propose a proper fix — never @ts-ignore"
 ---
 
+# /analyze-error
+
 Analyze this error from the task-board app and propose a fix: $ARGUMENTS
 
 1. Reproduce it: run `cd app && npm run typecheck` and `npm test`; quote the

@@ -2,6 +2,8 @@
 description: "Add a new store action end-to-end: Action variant → reducer case → action creator → test"
 ---
 
+# /add-action
+
 Add a new action to the task-board store for: $ARGUMENTS
 
 Follow the golden path from `materials/architecture-brief.md`, in this exact

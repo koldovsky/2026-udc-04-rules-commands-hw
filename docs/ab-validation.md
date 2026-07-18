@@ -63,7 +63,7 @@ The rules changed behavior, but less dramatically than expected — the gap
 showed up in **discipline and verification**, not architecture. The reason:
 this codebase's inline comments (`PROTECTED CORE`, "deliberately NOT Redux")
 already act as embedded rules, so scenario B still found the golden path.
-The rules earned their keep at the margin: with them ON the agent treated
+The rules earned their keep at the margin: with them ON, the agent treated
 `types.ts` as guarded (additions only, said so out loud), added double the
 test coverage including an immutability check required by `testing.mdc`, and
 checked its own work against the rule set. Takeaway: rules matter most where
