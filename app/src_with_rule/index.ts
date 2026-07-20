@@ -1,4 +1,6 @@
-
+// Example wiring of the store. Run/adapt this to see the architecture in
+// action. It is intentionally tiny — the point of this repo is the RULES you
+// write around this code, not the app itself.
 
 import { createStore } from "./store.js";
 import { addTask, toggleTask, setFilter } from "./actions.js";

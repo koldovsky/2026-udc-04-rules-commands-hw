@@ -1,0 +1,34 @@
+---
+description: "Dependencies — no new npm packages without explicit approval"
+globs: "app/**"
+alwaysApply: false
+---
+
+# Dependencies — no new packages without permission
+
+## Context
+
+`app/` is a tiny seeded task board with a fixed, minimal dependency set
+(TypeScript + vitest). The architecture brief and homework guardrails forbid
+“modernizing” the store with Redux/Zustand/etc. or pulling in lodash-style libs
+when `app/src/lib/text.ts` already covers the needed text helpers. New packages
+change the project’s contract and grading surface — they need an explicit ask.
+
+## Rule
+
+- DO NOT add, upgrade, or remove npm dependencies unless the user **explicitly**
+  approves
+- NEVER run `npm install <package>`, edit `app/package.json` / lockfile for new
+  libs, or introduce Redux, Zustand, MobX, lodash, or similar “fixes”
+- Prefer the in-house store (`app/src/store.ts`) and `app/src/lib/text.ts` over
+  installing a library that does the same job
+- If a dependency seems required, **stop and ask** before changing
+  `package.json` or the lockfile
+
+## How to verify
+
+1. Diff does not change `app/package.json` dependencies/devDependencies unless
+   the user approved it
+2. Grep `app/` for new third-party imports that are not already in
+   `package.json` — zero matches
+3. `cd app && npm test` still runs with the existing lockfile / install

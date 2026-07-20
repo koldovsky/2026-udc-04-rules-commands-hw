@@ -1,0 +1,31 @@
+---
+description: "Protected core — do not edit store.ts or types.ts without explicit approval"
+alwaysApply: true
+---
+
+# Do not touch — protected core
+
+## Context
+
+`app/src/store.ts` (dispatch/notify engine) and `app/src/types.ts` (`AppState`,
+`Task`, `Action` union, `initialState`) are the load-bearing contract for the
+whole app. Casual edits ripple through reducer, actions, selectors, and tests.
+Normal feature work extends `reducer.ts` / `actions.ts` / `selectors.ts`, not
+these two files — unless the user explicitly approves a core change.
+
+## Rule
+
+- Treat `app/src/store.ts` and `app/src/types.ts` as **protected**
+- DO NOT edit them unless the user **explicitly** asks or approves
+- For new behavior: prefer `reducer.ts` + `actions.ts` (+ selectors/tests)
+- If a change *requires* touching the `Action` union or `Task` shape, stop and
+  ask first — or only proceed when the user clearly requested that domain change
+- NEVER change the public signatures of `createStore` or existing action creators
+  when extending the app — only add to them
+
+## How to verify
+
+1. Diff does not modify `app/src/store.ts` unless the user approved it
+2. Diff touches `app/src/types.ts` only when the requested feature needs a new
+   `Action` variant or domain field — and not the store engine
+3. `createStore` still exposes `getState` / `dispatch` / `subscribe` unchanged
