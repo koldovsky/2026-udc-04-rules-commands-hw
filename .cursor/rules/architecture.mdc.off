@@ -1,0 +1,34 @@
+---
+description: "Custom store architecture — state changes only via dispatch + Action union"
+globs: "app/**"
+alwaysApply: false
+---
+
+# Architecture — custom store
+
+## Context
+
+This app uses an in-house store in `app/src/store.ts` (`createStore` →
+`getState` / `dispatch` / `subscribe`), not Redux, Zustand, MobX, or Jotai.
+Domain types and the `Action` discriminated union live in `app/src/types.ts`.
+New behavior is handled in `app/src/reducer.ts`; consumers use creators from
+`app/src/actions.ts` and reads from `app/src/selectors.ts`.
+
+## Rule
+
+- Change state **only** through `store.dispatch(action)` — never mutate
+  `state` / `state.tasks` in place
+- To add behavior: extend the `Action` union in `app/src/types.ts` → handle it
+  in `app/src/reducer.ts` → add a creator in `app/src/actions.ts`
+- Prefer selectors (`visibleTasks`, `remainingCount`) for reads instead of
+  reaching into `state.tasks` ad hoc
+- NEVER install or import Redux, Zustand, MobX, Jotai, or similar state libs
+- DO NOT rewrite `createStore` to match another library’s API
+
+## How to verify
+
+1. Grep `app/` for `from "redux"`, `from "zustand"`, `from "mobx"`, `from "jotai"` — zero matches
+2. New features go through an `Action` variant + `reducer` case, not direct
+   assignment like `state.tasks.push(...)` or `task.done = true`
+3. UI/call sites call action creators (e.g. `addTask`) and `dispatch`, not
+   hand-built objects that bypass the union

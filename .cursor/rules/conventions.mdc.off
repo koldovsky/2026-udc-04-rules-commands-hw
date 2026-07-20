@@ -1,0 +1,30 @@
+---
+description: "TypeScript conventions — named exports, no any, immutable updates, kebab-case"
+globs: "app/**/*.ts"
+alwaysApply: false
+---
+
+# Conventions
+
+## Context
+
+`app/` is strict TypeScript (`noUncheckedIndexedAccess` is on). Existing modules
+(`actions.ts`, `selectors.ts`, `reducer.ts`, `lib/text.ts`) use named exports and
+immutable reducer updates. New code must match that style so the custom store
+stays predictable and type-safe.
+
+## Rule
+
+- Use **named exports only** — no `export default`
+- NEVER use `any` or `@ts-ignore` / `@ts-expect-error` to silence type errors
+- Update state **immutably** in the reducer (spread / `map` / `filter`); never
+  mutate objects or arrays in place
+- File names: **kebab-case** (e.g. `text-utils.ts`); types/interfaces: PascalCase
+- Prefer existing patterns in the file you edit over inventing a new style
+
+## How to verify
+
+1. Grep `app/src` for `export default`, `: any`, `as any`, `@ts-ignore`,
+   `@ts-expect-error` — zero matches in new/changed code
+2. Reducer tests still pass immutability checks (`cd app && npm test`)
+3. New files under `app/src` use kebab-case names

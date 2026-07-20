@@ -1,0 +1,31 @@
+---
+description: "Testing — colocated vitest *.test.ts with AAA pattern"
+globs: "app/**/*.test.ts"
+alwaysApply: false
+---
+
+# Testing
+
+## Context
+
+Tests live next to the code they cover as `*.test.ts` and use **vitest**
+(`describe` / `it` / `expect`). Examples: `app/src/reducer.test.ts`,
+`app/src/store.test.ts`, `app/src/lib/text.test.ts`. Run with
+`cd app && npm test`. Lint is not configured in this sample.
+
+## Rule
+
+- Add or update a **colocated** `*.test.ts` next to the module under test
+- Use vitest APIs only (`describe`, `it`, `expect`) — do not introduce Jest or
+  other runners
+- Structure cases with the **AAA** pattern: Arrange → Act → Assert
+- Cover new reducer actions / creators with at least one happy-path test;
+  prefer also checking immutability where state changes
+- Keep existing tests green; do not delete or weaken them to make a change pass
+
+## How to verify
+
+1. New tests sit beside the source (e.g. `foo.ts` → `foo.test.ts`), not in a
+   separate `__tests__` tree
+2. `cd app && npm test` is green after the change
+3. Each new test has a clear arrange/act/assert flow (setup → call → expect)

@@ -1,4 +1,10 @@
-
+// Minimal custom state store — dispatch + subscribe.
+//
+// PROTECTED CORE. This is the ONLY sanctioned way state changes in this app.
+// It is deliberately NOT Redux / Zustand / MobX / Jotai — do not "modernize"
+// it by swapping in a library. To change behavior, add actions in types.ts
+// and handle them in reducer.ts; you should almost never need to edit the
+// dispatch/notify engine below.
 
 import type { Action, AppState, Listener } from "./types.js";
 import { initialState } from "./types.js";

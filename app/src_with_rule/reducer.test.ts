@@ -4,7 +4,7 @@ import {
   addTask,
   removeTask,
   setFilter,
-  setTaskPriority,
+  setPriority,
   toggleTask,
 } from "./actions.js";
 import { initialState, type AppState } from "./types.js";
@@ -35,10 +35,12 @@ describe("reducer", () => {
     expect(removed.tasks).toEqual([]);
   });
 
-  it("sets a task's priority", () => {
+  it("sets a task's priority immutably", () => {
     const withTask = reducer(initialState, addTask("a", "A"));
-    const next = reducer(withTask, setTaskPriority("a", "high"));
-    expect(next.tasks[0]?.priority).toBe("high");
+    const prioritized = reducer(withTask, setPriority("a", "high"));
+    expect(prioritized.tasks[0]?.priority).toBe("high");
+    expect(prioritized).not.toBe(withTask);
+    expect(withTask.tasks[0]?.priority).toBe("normal");
   });
 
   it("sets the filter", () => {

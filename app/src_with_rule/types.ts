@@ -1,4 +1,8 @@
-
+// Core domain and action types for the task board.
+//
+// PROTECTED CORE: these types are the contract that the store, reducer, and
+// action creators all depend on. Changing a shape here ripples everywhere —
+// treat this file as a "do-not-touch without approval" zone in your rules.
 
 export type TaskId = string;
 
@@ -27,7 +31,7 @@ export type Action =
   | { type: "task/added"; payload: { id: TaskId; title: string } }
   | { type: "task/toggled"; payload: { id: TaskId } }
   | { type: "task/removed"; payload: { id: TaskId } }
-  | { type: "task/priority-set"; payload: { id: TaskId; priority: Priority } }
+  | { type: "task/prioritized"; payload: { id: TaskId; priority: Priority } }
   | { type: "filter/set"; payload: { filter: Filter } };
 
 export const initialState: AppState = {
