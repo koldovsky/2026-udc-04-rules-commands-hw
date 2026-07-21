@@ -1,0 +1,23 @@
+---
+globs: app/src/lib/**
+alwaysApply: false
+---
+
+# Custom lib API
+
+## Context
+
+Use custom lib in current repo instead of popular external libraries
+
+## Rule
+
+- Use existing API in custom lib from `app/src/lib/text.ts`. Current API contains the following methods: 
+    - `slugify(input: string): string`
+    - `truncate(input: string, maxLength: number, suffix?: string): string`
+    - `normalizeSpaces(input: string): string`
+- The API in `app/src/lib/text.ts` does not have the following methods: `capitalize`, `camelCase` etc.
+- If you need more utility methods for working with text, add them to `app/src/lib/text.ts` instead of adding a new dependency to the project
+
+## How to verify
+
+- for working with text, existing methods from `app/src/lib/text.ts` are used instead of methods from external libraries

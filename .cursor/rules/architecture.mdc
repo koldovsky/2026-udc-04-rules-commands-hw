@@ -1,0 +1,23 @@
+---
+globs: app/**
+alwaysApply: false
+---
+
+# Storage mechanism
+
+## Context
+
+A custom store mechanism is utilized instead of popular libraries (e.g., Redux/Zustand/MobX)
+
+## Rule
+
+- state is managed by a CUSTOM STORE and not a library. It is NOT Redux, Zustand, MobX, or Jotai — do not "modernize" it by swapping in a library
+- state is updated only via `store.dispatch(action)` (check `app/src/store.ts`)
+- **The golden path to extend the app:** add an `Action` variant in `types.ts` →
+handle it in `reducer.ts` → add an action creator in `actions.ts` → add a
+colocated test. Never mutate state directly; never reach for a state library.
+
+## How to verify
+
+- grep for direct state mutation — should find zero
+- no `redux`/`zustand`/`mobx`/`jotai` imports exist
