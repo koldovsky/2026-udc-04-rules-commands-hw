@@ -1,0 +1,38 @@
+---
+description: "Selectors module conventions — pure derivations from AppState, no side effects"
+globs: "app/src/selectors.ts"
+alwaysApply: false
+---
+
+# Selectors Module
+
+## Context
+
+`app/src/selectors.ts` contains pure functions that derive computed data from
+`AppState`. UI/components call selectors instead of reaching into state
+properties directly. This keeps read logic centralized and testable.
+
+## Rule
+
+- Every selector MUST be a **pure function**: `(state: AppState) => T`.
+- Selectors MUST NOT dispatch actions, mutate state, or produce side effects.
+- Selectors MUST NOT import the store — they receive state as an argument.
+- New read-derived logic (filtering, counting, searching, sorting) belongs here,
+  not inline in UI code.
+- Name selectors after **what they return**, not what they do internally:
+  `visibleTasks`, `remainingCount` — not `filterTasks`, `countRemaining`.
+- DO NOT add caching/memoization unless profiling proves it's needed.
+
+### Existing selectors:
+
+| Selector | Signature | Returns |
+|----------|-----------|---------|
+| `visibleTasks` | `(state: AppState) => Task[]` | Tasks filtered by current `state.filter` |
+| `remainingCount` | `(state: AppState) => number` | Count of tasks where `done === false` |
+
+## How to verify
+
+1. `grep -n "import.*store" app/src/selectors.ts` — zero matches (no store import).
+2. Every exported function takes `state: AppState` as its first parameter.
+3. `grep -n "dispatch\|\.push\|\.splice" app/src/selectors.ts` — zero matches (no side effects).
+4. Selectors are tested in `selectors.test.ts` with plain state objects (no store instantiation needed).

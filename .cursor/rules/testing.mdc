@@ -1,0 +1,34 @@
+---
+description: "Testing conventions — colocated test files, vitest, AAA pattern"
+globs: "app/**/*.test.ts"
+alwaysApply: false
+---
+
+# Testing Conventions
+
+## Context
+
+Tests live alongside the code they test (colocated `*.test.ts` files, e.g.
+`reducer.test.ts` next to `reducer.ts`). The test runner is **vitest** — do not
+use Jest, Mocha, or other frameworks.
+
+## Rule
+
+- Test files MUST be colocated with their source: `foo.ts` → `foo.test.ts` in
+  the same directory.
+- Use **vitest** (`import { describe, it, expect } from "vitest"`).
+- DO NOT install or import Jest, Mocha, Jasmine, or any other test framework.
+- Follow the **AAA pattern** in every test:
+  1. **Arrange** — set up initial state / inputs.
+  2. **Act** — call the function under test.
+  3. **Assert** — check the result with `expect(...)`.
+- Separate the three sections with a blank line for readability.
+- Test names should describe behavior, not implementation:
+  `"removes the task with matching id"` not `"calls filter correctly"`.
+
+## How to verify
+
+1. `find app/src -name "*.test.ts"` — every test file lives next to its source.
+2. `grep -rn "from \"jest\"\|from \"mocha\"" app/` — zero matches.
+3. Open any test file — each `it(...)` block has clear Arrange / Act / Assert sections.
+4. `npx vitest run` passes without errors.
