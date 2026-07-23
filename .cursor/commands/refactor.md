@@ -4,6 +4,8 @@ description: "Refactor selected code to follow project conventions"
 
 Do the following for: $ARGUMENTS
 
+Follow .cursor/rules/ before editing.
+
 1. Refactor the selected code to match project conventions (named exports,
    kebab-case filenames, TypeScript strictness, immutable updates).
 2. Do not change behavior or edit protected core files (`app/src/store.ts`,
