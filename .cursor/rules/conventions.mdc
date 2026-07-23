@@ -1,0 +1,26 @@
+---
+description: "Project conventions: exports, typing, immutability, filenames"
+globs: "app/**/*.ts"
+alwaysApply: false
+---
+
+# Conventions
+
+## Context
+
+The seed app enforces strict TypeScript usage and a handful of naming and
+style conventions that keep the codebase consistent and easy to review.
+
+## Rule
+
+- Use named exports only (no default exports).
+- Avoid `any` and `@ts-ignore` — TypeScript should be strict.
+- Reducer updates must be immutable: use spread, map, filter; do not mutate
+  objects/arrays in place.
+- Files should be kebab-case; types and interfaces use PascalCase.
+
+## How to verify
+
+1. Search for `export default` in `app/` — should be none.
+2. Run `npm run typecheck` in `app/` and expect no errors.
+3. Grep reducer files for assignment to `task.` or `state.` patterns that imply mutation.

@@ -1,0 +1,23 @@
+---
+description: "Testing conventions: colocated tests, vitest, AAA"
+globs: "app/**/*.test.ts"
+alwaysApply: false
+---
+
+# Testing
+
+## Context
+
+Tests are colocated with implementation and use vitest. Follow AAA (Arrange,
+Act, Assert) in new tests to keep them readable and focused.
+
+## Rule
+
+- Add tests in `app/src/*.test.ts` for any behavior change.
+- Use vitest globals (`describe`, `it`, `expect`) and the AAA pattern.
+- Keep tests deterministic and avoid network or time dependencies.
+
+## How to verify
+
+1. `cd app && npm test` passes.
+2. New tests are colocated in `app/src` and follow AAA structure.
