@@ -1,0 +1,36 @@
+---
+description: "Custom store architecture — state changes only via store.dispatch(action)"
+globs: "app/**"
+alwaysApply: false
+---
+
+# Architecture: Custom Store Pattern
+
+## Context
+
+This app uses a minimal custom state store (`app/src/store.ts`) with a
+dispatch/subscribe engine. State flows unidirectionally:
+action creators → `store.dispatch(action)` → reducer → new state → listeners.
+
+This is NOT Redux, Zustand, MobX, Jotai, or any third-party state library.
+Do not "modernize" it by introducing one.
+
+## Rule
+
+- ALL state changes MUST go through `store.dispatch(action)`.
+- NEVER mutate `state` directly — the reducer returns a new object/array.
+- New actions: first add a variant to the `Action` union in `app/src/types.ts`,
+  then handle it in `app/src/reducer.ts`, then add an action creator in
+  `app/src/actions.ts`.
+- UI/components read state via selectors (`app/src/selectors.ts`), never by
+  reaching into `state.tasks` or `state.filter` directly.
+- DO NOT import or install Redux, Zustand, MobX, Jotai, or any external state
+  management library.
+- DO NOT add middleware, thunks, sagas, or async dispatch wrappers to the store.
+
+## How to verify
+
+1. `grep -r "state\." app/src/ --include="*.ts" | grep -v "state\." | grep "="` — no direct mutations outside the reducer.
+2. `grep -rE "redux|zustand|mobx|jotai|recoil" app/` — should find zero matches.
+3. Every new action type appears in `types.ts` Action union AND has a case in `reducer.ts`.
+4. `grep -r "store.dispatch" app/src/` confirms dispatch is the only write path.

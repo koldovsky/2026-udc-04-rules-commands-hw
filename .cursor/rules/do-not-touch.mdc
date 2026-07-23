@@ -1,0 +1,28 @@
+---
+description: "Protected core files — store.ts and types.ts require explicit approval before edits"
+globs: ""
+alwaysApply: true
+---
+
+# Do Not Touch: Protected Core Files
+
+## Context
+
+`app/src/store.ts` is the dispatch/subscribe engine and `app/src/types.ts`
+defines the `Action` union, `AppState`, and domain types. These files are the
+contract everything else depends on. Accidental changes ripple across the whole
+app and break existing tests.
+
+## Rule
+
+- DO NOT modify `app/src/store.ts` without explicit user approval.
+- DO NOT modify `app/src/types.ts` without explicit user approval.
+- If a task requires changes to these files, ASK the user first and explain
+  what change is needed and why.
+- Adding new action variants to `types.ts` is the most common legitimate
+  edit — even then, confirm before writing.
+
+## How to verify
+
+1. `git diff --name-only` — `app/src/store.ts` and `app/src/types.ts` should NOT appear unless the user explicitly approved the change.
+2. Check conversation history for explicit approval before any edit to these files.

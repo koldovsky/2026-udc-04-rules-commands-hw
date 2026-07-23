@@ -1,0 +1,32 @@
+---
+description: "Code style conventions — named exports, no any, immutable updates, kebab-case files"
+globs: "app/**/*.ts"
+alwaysApply: false
+---
+
+# Code Conventions
+
+## Context
+
+Consistent style across `app/` keeps the codebase readable and prevents common
+TypeScript foot-guns. These conventions are enforced project-wide.
+
+## Rule
+
+- Use **named exports** exclusively — no `export default`.
+- NEVER use `any` or `@ts-ignore`. Use proper types, generics, or `unknown`
+  with narrowing.
+- State updates in the reducer MUST be **immutable** — spread (`...`) into new
+  objects/arrays instead of mutating in place (`push`, `splice`, direct
+  assignment to `state.x`).
+- File names MUST be **kebab-case**: `my-feature.ts`, NOT `myFeature.ts` or
+  `MyFeature.ts`.
+- Prefer `const` over `let`; never use `var`.
+- Functions that derive data from state belong in `selectors.ts`.
+
+## How to verify
+
+1. `grep -rn "export default" app/` — should find zero matches.
+2. `grep -rn ": any" app/src/ --include="*.ts"` and `grep -rn "@ts-ignore" app/src/` — both zero.
+3. `grep -rn "\.push\|\.splice\|state\.\w\+ =" app/src/reducer.ts` — zero direct mutations.
+4. `find app/src -name "*.ts" | grep -v node_modules | grep "[A-Z]"` — no PascalCase or camelCase filenames.

@@ -1,0 +1,41 @@
+---
+description: "Documents the real API of app/src/lib/text.ts — prevents hallucinating non-existent helpers"
+globs: "app/src/lib/**"
+alwaysApply: false
+---
+
+# Custom Library: app/src/lib/text.ts
+
+## Context
+
+`app/src/lib/text.ts` is a small in-house text utility module. It is NOT lodash,
+underscore, or any third-party library. Its public surface is exactly three
+functions — nothing more.
+
+## Rule
+
+### Functions that EXIST (use these freely):
+
+| Function | Signature | Purpose |
+|----------|-----------|---------|
+| `slugify` | `(input: string) => string` | URL/anchor-safe slug: `"Buy Milk!"` → `"buy-milk"` |
+| `truncate` | `(input: string, maxLength: number, suffix?: string) => string` | Shorten to `maxLength` chars including suffix (default `"…"`) |
+| `normalizeSpaces` | `(input: string) => string` | Collapse internal whitespace + trim: `"  a   b "` → `"a b"` |
+
+### Functions that DO NOT EXIST (never import or call):
+
+- `capitalize` — does NOT exist
+- `camelCase` — does NOT exist
+- `kebabCase` — does NOT exist (use `slugify` if you need kebab output)
+- `deburr` — does NOT exist
+- `pad` / `padStart` / `padEnd` — does NOT exist (use native `String.prototype`)
+- `startCase` / `titleCase` — does NOT exist
+
+- If you need a helper that doesn't exist, add it to `text.ts` explicitly.
+- DO NOT assume or hallucinate exports that are not listed above.
+
+## How to verify
+
+1. `grep -c "^export function" app/src/lib/text.ts` — should return exactly 3.
+2. Any import from `./lib/text` or `../lib/text` uses only `slugify`, `truncate`, or `normalizeSpaces`.
+3. `npx tsc --noEmit` — no "module has no exported member" errors for text.ts imports.
