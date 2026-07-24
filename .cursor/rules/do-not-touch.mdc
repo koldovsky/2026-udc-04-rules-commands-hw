@@ -1,0 +1,26 @@
+---
+description: "Protect store and core types"
+globs: "app/src/store.ts, app/src/types.ts"
+alwaysApply: true
+---
+
+# Do not touch protected core
+
+## Context
+
+`app/src/store.ts` (dispatch/subscribe engine) and `app/src/types.ts` (domain
+shapes and Action union) are load-bearing files. Changes here should be
+additive and done with explicit approval.
+
+## Rule
+
+- Never rewrite or refactor `app/src/store.ts`.
+- Make only small, additive changes to `app/src/types.ts` (e.g., add new
+  Action variants or optional fields) following the golden path.
+- If editing these files is necessary, provide a clear explanation and get
+  approval.
+
+## How to verify
+
+1. Any PR touching either file should include an explicit justification.
+2. `alwaysApply: true` means assistants should enforce this rule by default.

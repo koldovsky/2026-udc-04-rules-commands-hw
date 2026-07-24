@@ -1,0 +1,30 @@
+---
+description: "Custom store and extension path"
+globs: "app/**"
+alwaysApply: false
+---
+
+# Architecture — custom store
+
+## Context
+
+The project uses a tiny in-house store (`app/src/store.ts`) and a discriminated
+`Action` union in `app/src/types.ts`. New behaviors must be added via the
+Action union and handled in `app/src/reducer.ts`. This preserves the intended
+architecture and keeps the store engine untouched.
+
+## Rule
+
+- Do not replace the custom store with Redux, Zustand, MobX, or other state
+  libraries.
+- To add behavior: extend `Action` in `app/src/types.ts`, handle it in
+  `app/src/reducer.ts` (immutably), and expose an action creator in
+  `app/src/actions.ts`.
+- Add a colocated test that exercises the new action.
+
+## How to verify
+
+1. Confirm no imports of `redux`, `zustand`, `mobx`, or similar in `app/`.
+2. New features appear as an Action variant in `app/src/types.ts` and a
+   corresponding case in `app/src/reducer.ts`.
+3. `app/src/store.ts` remains unchanged (unless explicit approval is given).

@@ -1,0 +1,25 @@
+---
+description: "Document the real API of app/src/lib/text.ts"
+globs: "app/src/lib/**"
+alwaysApply: false
+---
+
+# Custom in-house text library
+
+## Context
+
+`app/src/lib/text.ts` is a small in-house helper library. Its API is fixed
+for the purposes of the exercise and should be trusted when writing rules.
+
+## Rule
+
+- The library exposes exactly: `slugify`, `truncate`, `normalizeSpaces` with
+  the signatures in `app/src/lib/text.ts`.
+- Do not assume or call helpers that do not exist (e.g., `capitalize`,
+  `camelCase`). If a helper is needed, add it explicitly to this library and
+  include a test.
+
+## How to verify
+
+1. Open `app/src/lib/text.ts` and confirm the three exported functions.
+2. Grep assistant suggestions for calls to nonexistent helpers and flag them.

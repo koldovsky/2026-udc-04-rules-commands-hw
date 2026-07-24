@@ -1,0 +1,25 @@
+---
+description: "Prevent adding new npm dependencies without approval"
+globs: "package.json, app/package.json"
+alwaysApply: false
+---
+
+# No new dependencies without approval
+
+## Context
+
+This starter repo is small and self-contained. Adding new npm packages can
+mask design issues and complicate grading.
+
+## Rule
+
+- Do not add new dependencies to `package.json` or `app/package.json` unless
+  explicitly approved.
+- Prefer implementing small utilities in `app/src/lib/` instead of pulling a
+  dependency.
+
+## How to verify
+
+1. Check `git diff -- package.json` and `git diff -- app/package.json` for new
+   entries.
+2. Run `npm install` only if a dependency change is approved.
