@@ -1,0 +1,51 @@
+---
+paths:
+  - "app/src/lib/**/*"
+---
+
+# Custom Lib (lib/text.ts)
+
+## Context
+
+`app/src/lib/text.ts` is an in-house text utility file, not lodash/underscore.
+It is easy for an AI to assume common lodash-style helpers exist here — they
+don't.
+
+## Rule
+
+- The **entire** supported API of `app/src/lib/text.ts` is:
+  - `slugify(input: string): string`
+  - `truncate(input: string, maxLength: number, suffix?: string): string`
+  - `normalizeSpaces(input: string): string`
+- Do NOT call or assume the existence of `capitalize`, `camelCase`, `deburr`,
+  `kebabCase`, `pad`, or any other lodash/underscore-style helper on this
+  module — they are not implemented.
+- Need something not on that list? Add it explicitly to `lib/text.ts` with its
+  own colocated test in `lib/text.test.ts` — don't import lodash instead.
+- Do not change the existing three signatures; only add new exports.
+
+## How to verify
+
+1. Check each imported **name**, not the whole import line — a mixed
+   `import { slugify, capitalize }` contains an allowed name, so a line-level
+   `grep -v` would filter it out and hide `capitalize`. `rg -U` also spans
+   multi-line imports, matches both quote styles, and matches the specifier
+   whether it's written as `lib/text`, `./text`, or `../lib/text` (any path
+   ending in `text`/`text.js`), so a local import from inside `lib/` itself
+   (e.g. `lib/text.test.ts` importing `./text.js`) isn't missed:
+   `rg -UNoP --no-filename "import\s+(?:type\s+)?\{([^}]*)\}\s+from\s+['\"][^'\"]*/text(?:\.js)?['\"]" app/src -g '*.ts' -r '$1' | tr ',' '\n' | sed -E 's/^[[:space:]]*(type[[:space:]]+)?([A-Za-z_][A-Za-z0-9_]*)[[:space:]]+as[[:space:]]+[A-Za-z_][A-Za-z0-9_]*[[:space:]]*$/\2/' | grep -oE '[A-Za-z_][A-Za-z0-9_]*' | grep -vE '^(slugify|truncate|normalizeSpaces|type)$'`
+   returns nothing — each `name as alias` specifier is collapsed to just
+   `name` before checking, so a benign alias (`slugify as s`) no longer needs
+   manual eyeballing, while a disallowed name hidden behind an
+   allowed-looking alias (`capitalize as slugify`) still surfaces
+   `capitalize`.
+2. Named imports aren't the only way in — `import * as text from '.../text.js'`
+   has no `{ }` list for check 1 to inspect, so a forbidden call surfaces only
+   as member access (`text.capitalize(...)`) later in the file. Resolve each
+   namespace alias, then check what's called on it:
+   `for a in $(rg -oNP --no-filename "import\s+\*\s+as\s+([A-Za-z_][A-Za-z0-9_]*)\s+from\s+['\"][^'\"]*/text(?:\.js)?['\"]" app/src -g '*.ts' -r '$1' | sort -u); do rg -oNP --no-filename "\b${a}\.([A-Za-z_][A-Za-z0-9_]*)\s*\(" app/src -g '*.ts' -r '$1'; done | grep -vE '^(slugify|truncate|normalizeSpaces)$'`
+   returns nothing — no namespace-imported call uses a name outside the
+   allowed three, regardless of what alias the import used.
+3. `app/src/lib/text.ts` exports exactly `slugify`, `truncate`,
+   `normalizeSpaces`, plus any new function added with its own test.
+4. No `lodash`/`underscore` dependency appears in `app/package.json`.
