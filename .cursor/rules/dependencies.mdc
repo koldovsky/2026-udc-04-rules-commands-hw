@@ -1,0 +1,18 @@
+---
+globs: app/src/**/*.ts
+alwaysApply: false
+---
+
+# External dependencies rule
+
+## Context
+
+Do not introduce new dependencies if not approved
+
+## Rule
+
+- If you want to introduce a new npm package to the repo, ask for permission to add it and block until the permission is explicilty granted by the human user
+
+## How to verify
+
+- no new npm packages added without user approval

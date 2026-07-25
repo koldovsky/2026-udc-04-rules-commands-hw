@@ -1,0 +1,23 @@
+---
+globs: app/**/*.ts
+alwaysApply: false
+---
+
+# Code conventions
+
+## Context
+
+Maintain a general code style in the repo.
+
+## Rule
+
+- TypeScript strict (`noUncheckedIndexedAccess` is on) — no `any`, no `@ts-ignore`.
+- **Named exports only** (no default exports).
+- **Immutable** state updates in the reducer (spread/`map`/`filter`, never mutate).
+- Tests are **colocated** `*.test.ts` using **vitest**; `cd app && npm test`.
+- Files: kebab-case (`text-utils` style); types/interfaces PascalCase.
+
+## How to verify
+
+- all tests are in `app` and pass with `npm test`
+- all mentioned rules in above are complied

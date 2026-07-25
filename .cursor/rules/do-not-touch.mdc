@@ -1,0 +1,19 @@
+---
+alwaysApply: true
+---
+
+# Files that should not be touched
+
+## Context
+
+`app/src/store.ts` (the dispatch/notify engine) and `app/src/types.ts` (the core
+types + `Action` union) are load-bearing. Changing them ripples through the
+whole app.
+
+## Rule
+
+- Never modify `app/src/store.ts` and `app/src/types.ts` unless the modification was explicitly approved
+
+## How to verify
+
+- no new changes in `app/src/store.ts` and `app/src/types.ts` unless such changes were approved

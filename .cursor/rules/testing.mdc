@@ -1,0 +1,19 @@
+---
+globs: app/**/*.test.ts
+alwaysApply: false
+---
+
+# Test-related rules
+
+## Context
+
+Maintain similar testing approach
+
+## Rule
+
+- Tests are **colocated** `*.test.ts` using **vitest**
+- Utilise AAA (Arrange, Act, Assert) pattern
+
+## How to verify
+
+- all tests are in `app` and pass with `npm test`
