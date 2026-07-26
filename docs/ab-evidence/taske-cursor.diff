@@ -1,0 +1,70 @@
+diff --git a/app/src/index.ts b/app/src/index.ts
+index eb3fe99..7b405bd 100644
+--- a/app/src/index.ts
++++ b/app/src/index.ts
+@@ -5,7 +5,7 @@
+ import { createStore } from "./store.js";
+ import { addTask, toggleTask, setFilter, setTaskPriority } from "./actions.js";
+ import { visibleTasks, remainingCount, taskPriority } from "./selectors.js";
+-import { slugify } from "./lib/text.js";
++import { slugify, titleCase } from "./lib/text.js";
+ 
+ const store = createStore();
+ 
+@@ -25,5 +25,5 @@ store.dispatch(setFilter("active"));
+ 
+ console.log(
+   "visible:",
+-  visibleTasks(store.getState()).map((task) => `${task.title} (${taskPriority(task)})`),
++  visibleTasks(store.getState()).map((task) => `${titleCase(task.title)} (${taskPriority(task)})`),
+ );
+diff --git a/app/src/lib/text.test.ts b/app/src/lib/text.test.ts
+index fdc6dea..8091761 100644
+--- a/app/src/lib/text.test.ts
++++ b/app/src/lib/text.test.ts
+@@ -1,5 +1,5 @@
+ import { describe, expect, it } from "vitest";
+-import { normalizeSpaces, slugify, truncate } from "./text.js";
++import { normalizeSpaces, slugify, titleCase, truncate } from "./text.js";
+ 
+ describe("slugify", () => {
+   it("lowercases and hyphenates a plain title", () => {
+@@ -28,3 +28,13 @@ describe("normalizeSpaces", () => {
+     expect(normalizeSpaces("  a   b\tc ")).toBe("a b c");
+   });
+ });
++
++describe("titleCase", () => {
++  it("capitalizes each word in a lowercase phrase", () => {
++    expect(titleCase("buy milk")).toBe("Buy Milk");
++  });
++
++  it("normalizes extra whitespace and mixed case", () => {
++    expect(titleCase("  write   RULES ")).toBe("Write Rules");
++  });
++});
+diff --git a/app/src/lib/text.ts b/app/src/lib/text.ts
+index 193bd32..b20f305 100644
+--- a/app/src/lib/text.ts
++++ b/app/src/lib/text.ts
+@@ -1,7 +1,7 @@
+ // In-house text helpers.
+ //
+ // This is a CUSTOM library, not lodash/underscore. Its supported surface is
+-// exactly the three functions below with exactly these signatures. Do not
++// exactly the functions below with exactly these signatures. Do not
+ // assume other helpers (e.g. `capitalize`, `camelCase`, `deburr`) exist — if
+ // you need one, add it here explicitly. A rule documenting this real API is
+ // the best defence against an agent hallucinating methods that don't exist.
+@@ -33,3 +33,11 @@ export function truncate(input: string, maxLength: number, suffix = "…"): stri
+ export function normalizeSpaces(input: string): string {
+   return input.trim().replace(/\s+/g, " ");
+ }
++
++/** Capitalize each word: "buy milk" -> "Buy Milk". */
++export function titleCase(input: string): string {
++  return normalizeSpaces(input)
++    .split(" ")
++    .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
++    .join(" ");
++}

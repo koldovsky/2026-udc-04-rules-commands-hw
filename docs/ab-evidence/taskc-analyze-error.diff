@@ -1,0 +1,45 @@
+diff --git a/app/src/selectors.test.ts b/app/src/selectors.test.ts
+index bc24eb4..11036cd 100644
+--- a/app/src/selectors.test.ts
++++ b/app/src/selectors.test.ts
+@@ -1,7 +1,7 @@
+ import { describe, expect, it } from "vitest";
+ import { reducer } from "./reducer.js";
+ import { addTask, setTaskPriority } from "./actions.js";
+-import { taskPriority } from "./selectors.js";
++import { taskPriority, topTaskTitle } from "./selectors.js";
+ import { initialState } from "./types.js";
+ 
+ describe("taskPriority", () => {
+@@ -16,3 +16,14 @@ describe("taskPriority", () => {
+     expect(task && taskPriority(task)).toBe("high");
+   });
+ });
++
++describe("topTaskTitle", () => {
++  it("returns the title of the first visible task", () => {
++    const state = reducer(initialState, addTask("a", "A"));
++    expect(topTaskTitle(state)).toBe("A");
++  });
++
++  it("returns undefined when nothing is visible", () => {
++    expect(topTaskTitle(initialState)).toBeUndefined();
++  });
++});
+diff --git a/app/src/selectors.ts b/app/src/selectors.ts
+index 345cf31..1f04781 100644
+--- a/app/src/selectors.ts
++++ b/app/src/selectors.ts
+@@ -24,6 +24,12 @@ export function taskPriority(task: Task): Priority {
+   return task.priority ?? DEFAULT_PRIORITY;
+ }
+ 
++// Undefined when nothing is visible under the current filter — callers decide
++// what to show instead, so the selector stays a pure read helper.
++export function topTaskTitle(state: AppState): string | undefined {
++  return visibleTasks(state)[0]?.title;
++}
++
+ export function remainingCount(state: AppState): number {
+   return state.tasks.filter((task) => !task.done).length;
+ }

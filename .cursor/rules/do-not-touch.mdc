@@ -1,0 +1,30 @@
+---
+description: "Protected core: app/src/store.ts and app/src/types.ts need explicit approval before any edit"
+globs: "app/src/**"
+alwaysApply: true
+---
+
+# Protected Core
+
+## Context
+
+app/src/store.ts is the dispatch/notify engine; app/src/types.ts holds AppState, Task, the
+Action union, initialState and Listener. app/src/actions.ts, reducer.ts, selectors.ts and
+store.ts all import that contract, so a shape change reaches every reducer and store test.
+
+## Rule
+
+- app/src/store.ts and app/src/types.ts are protected: NEVER edit either unless the user approves that exact file in the same turn.
+- CARVE-OUT: once approved, an app/src/types.ts edit MAY ONLY ADD — append an Action variant, or add a Task field such as priority — nothing else.
+- NEVER remove, rename, reorder, retype or narrow an existing types.ts member; prefer an optional field (`priority?`) so reducer.ts:17 and reducer.test.ts:36 still typecheck.
+- Treat app/src/store.ts as off-limits for feature work: route new behavior onto the golden path in architecture.mdc instead of editing the engine.
+- NEVER change these signatures: createStore(preloaded: AppState = initialState): Store (store.ts:19), Store.getState / dispatch / subscribe, Listener.
+- STOP if a task seems to need a protected file: name the file, the exact lines and why, then wait; never edit first and say so later.
+- NEVER delete, weaken, or rewrite an existing test to make a change pass.
+
+## How to verify
+
+1. `git diff HEAD --name-only -- app/src/store.ts app/src/types.ts` -> prints nothing, unless the edit was explicitly approved.
+2. `git diff HEAD -U0 -- app/src/types.ts | grep -c '^-[^-]' || true` -> prints 0, so an approved types.ts edit only added lines.
+3. `grep -n 'export function createStore' app/src/store.ts` -> one hit on line 19, signature unchanged.
+4. `cd app && npm test` -> 20 passed in 4 files (9 reducer, 4 store, 5 text, 2 selectors).

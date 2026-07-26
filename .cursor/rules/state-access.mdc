@@ -1,0 +1,30 @@
+---
+description: "Action creators and selectors are the only entry points for writing and reading state"
+globs: "app/src/*.ts"
+alwaysApply: false
+---
+
+# State Access Boundary
+
+## Context
+
+app/src/actions.ts owns the write vocabulary: addTask, toggleTask, setTaskPriority,
+removeTask, setFilter. app/src/selectors.ts owns the read vocabulary: visibleTasks,
+taskPriority, remainingCount. Payload shapes live only in the Action union in
+app/src/types.ts, so call sites like app/src/index.ts never encode them.
+
+## Rule
+
+- Build every dispatched action with an app/src/actions.ts creator; NEVER hand-write an action object literal at a call site (dispatch path: architecture.mdc).
+- Read state through an app/src/selectors.ts selector; DO NOT filter, count, or map state.tasks inline outside selectors.ts and reducer.ts.
+- Name action types lowercase "domain/event" and copy the closest sibling: task events are past tense, but filter/set stays imperative (app/src/types.ts:38). NEVER SCREAMING_SNAKE.
+- Carry action data in a nested payload object, even single-field ones like payload: { id }; NEVER hoist fields to the action top level.
+- Give each Action variant exactly one creator whose declared return type is the wide `Action` union, with parameters ordered as the payload fields.
+- Keep creators and selectors pure: no store import, no dispatch, no I/O, no throwing - the same input always yields the same result.
+
+## How to verify
+
+1. `grep -rnE '\{ *type: "' app/src | grep -vE 'app/src/(types|actions)\.ts' || echo clean` → prints `clean`: only the union and the creators build action objects.
+2. `grep -c 'export function' app/src/actions.ts; grep -cE 'type: "' app/src/types.ts; grep -c 'payload: {' app/src/types.ts` → prints the SAME number three times (`5` today): one creator and one nested payload per variant.
+3. `grep -rnE '(getState\(\)|state)\.tasks\.(filter|map|reduce)\(' app/src --include='*.ts' | grep -vE 'selectors\.ts|reducer\.ts' || echo clean` → prints `clean`.
+4. `grep -oE '"[a-z]+/[a-z]+"' app/src/types.ts` → prints one domain/event string per Action variant (5 today); then `cd app && npm run --silent typecheck` → exits 0 with no output.

@@ -1,0 +1,31 @@
+---
+description: "Custom state store: the only path state changes, and how to add new behavior (app/src/store.ts, reducer.ts, types.ts)"
+globs: "app/**"
+alwaysApply: false
+---
+
+# State Architecture
+
+## Context
+
+app/src/store.ts is a hand-written store, not a library wrapper. createStore returns
+{ getState, dispatch, subscribe } and notifies a Set<Listener> after every dispatch.
+State is reassigned in exactly one place, app/src/store.ts:29. All domain transitions
+live in app/src/reducer.ts, keyed by the Action union in app/src/types.ts.
+
+## Rule
+
+- Change state only via store.dispatch(action) with an action from a creator in app/src/actions.ts.
+- Grow behavior in order: new Action variant in app/src/types.ts -> case in reducer.ts -> creator in actions.ts -> colocated *.test.ts.
+- Keep reducer(state, action): AppState pure and exhaustive - one case per Action variant, plus the `default:` arm at app/src/reducer.ts:48 returning state unchanged.
+- Read via store.getState() and NEVER cache a state object - app/src/store.ts:29 reassigns it on every dispatch; read/write vocabulary lives in state-access.mdc.
+- NEVER replace the custom store with a state-management library or hook-based state - it IS the architecture here; banned packages live in dependencies.mdc.
+- NEVER call reducer() from production code outside app/src/store.ts - store.ts:29 is the single mutation point (editing it: do-not-touch.mdc); colocated *.test.ts DO call it directly, as testing.mdc requires.
+- NEVER reassign state outside app/src/store.ts:29.
+
+## How to verify
+
+1. `grep -rnE '"[a-z-]*(redux|zustand|mobx|jotai|recoil|immer)"' app/src app/package.json | wc -l` -> prints 0; the quoted form skips the prose at store.ts:4.
+2. `grep -rn 'reducer(' app/src --include='*.ts' | grep -v test | wc -l` -> prints 2 (definition reducer.ts:10, call store.ts:29).
+3. `grep -cE 'type: "' app/src/types.ts; grep -c 'case "' app/src/reducer.ts` -> two equal numbers (currently 5 and 5).
+4. `cd app && npm test && npm run typecheck` -> 20 tests pass in 4 files, then tsc --noEmit reports no errors.

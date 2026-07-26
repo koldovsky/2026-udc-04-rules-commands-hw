@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { reducer } from "./reducer.js";
-import { addTask, removeTask, setFilter, toggleTask } from "./actions.js";
+import { addTask, removeTask, setFilter, setTaskPriority, toggleTask } from "./actions.js";
 import { initialState, type AppState } from "./types.js";
 
 describe("reducer", () => {
@@ -36,5 +36,25 @@ describe("reducer", () => {
     const state: AppState = { tasks: [{ id: "a", title: "A", done: false }], filter: "all" };
     const next = reducer(state, toggleTask("missing"));
     expect(next.tasks[0]?.done).toBe(false);
+  });
+
+  it("sets a task's priority", () => {
+    const withTask = reducer(initialState, addTask("a", "A"));
+    const prioritized = reducer(withTask, setTaskPriority("a", "high"));
+    expect(prioritized.tasks[0]?.priority).toBe("high");
+  });
+
+  it("does not mutate the previous state when setting priority", () => {
+    const withTask = reducer(initialState, addTask("a", "A"));
+    const prioritized = reducer(withTask, setTaskPriority("a", "low"));
+    expect(withTask.tasks[0]?.priority).toBeUndefined();
+    expect(prioritized.tasks[0]).not.toBe(withTask.tasks[0]);
+  });
+
+  it("leaves every field unchanged for an unknown id priority change", () => {
+    const state: AppState = { tasks: [{ id: "a", title: "A", done: false }], filter: "all" };
+    const next = reducer(state, setTaskPriority("missing", "high"));
+    expect(next).toEqual(state);
+    expect(next.tasks[0]?.priority).toBeUndefined();
   });
 });
