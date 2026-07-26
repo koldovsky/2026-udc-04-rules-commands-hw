@@ -3,8 +3,8 @@
 // write around this code, not the app itself.
 
 import { createStore } from "./store.js";
-import { addTask, toggleTask, setFilter } from "./actions.js";
-import { visibleTasks, remainingCount } from "./selectors.js";
+import { addTask, toggleTask, setFilter, setTaskPriority } from "./actions.js";
+import { visibleTasks, remainingCount, taskPriority } from "./selectors.js";
 import { slugify } from "./lib/text.js";
 
 const store = createStore();
@@ -16,12 +16,14 @@ store.subscribe((state) => {
 });
 
 const buyMilk = slugify("Buy Milk");
+const writeRules = slugify("Write rules");
 store.dispatch(addTask(buyMilk, "Buy Milk"));
-store.dispatch(addTask(slugify("Write rules"), "Write rules"));
+store.dispatch(addTask(writeRules, "Write rules"));
 store.dispatch(toggleTask(buyMilk));
+store.dispatch(setTaskPriority(writeRules, "high"));
 store.dispatch(setFilter("active"));
 
 console.log(
   "visible:",
-  visibleTasks(store.getState()).map((task) => task.title),
+  visibleTasks(store.getState()).map((task) => `${task.title} (${taskPriority(task)})`),
 );
