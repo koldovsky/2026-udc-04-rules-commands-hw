@@ -17,14 +17,15 @@ vitest 2.1. No framework, no UI, no build step — Node 22+ only.
 ```
 app/
 ├── src/
-│   ├── types.ts        AppState, Task, TaskId, Filter, Action union, initialState  [PROTECTED]
+│   ├── types.ts        AppState, Task, TaskId, Filter, Priority, Action union, initialState  [PROTECTED]
 │   ├── store.ts        createStore() -> { getState, dispatch, subscribe }          [PROTECTED]
 │   ├── reducer.ts      pure (state, action) => newState — where the domain grows
-│   ├── actions.ts      action creators: addTask, toggleTask, removeTask, setFilter
-│   ├── selectors.ts    pure read helpers: visibleTasks, remainingCount
+│   ├── actions.ts      action creators: addTask, toggleTask, setTaskPriority, removeTask, setFilter
+│   ├── selectors.ts    pure read helpers: visibleTasks, taskPriority, remainingCount
 │   ├── index.ts        example wiring of the store (demo, not production entry)
 │   ├── lib/text.ts     in-house text lib, fixed API (see below)
-│   └── *.test.ts       colocated tests (reducer.test.ts, store.test.ts, lib/text.test.ts)
+│   └── *.test.ts       colocated tests (reducer.test.ts, store.test.ts, selectors.test.ts,
+│                       lib/text.test.ts)
 ├── package.json
 └── tsconfig.json
 ```
@@ -52,9 +53,11 @@ the architecture this repo is about.
 - `store.dispatch(action)` is the **only** sanctioned way state changes. Never
   assign to state, never mutate `state.tasks`, never expose a setter.
 - `Action` in `types.ts` is a **discriminated union** on `type`
-  (`"task/added"`, `"task/toggled"`, `"task/removed"`, `"filter/set"`).
-  Nothing outside that union may be dispatched.
-- Reads go through `selectors.ts`, not `state.tasks` directly.
+  (`"task/added"`, `"task/toggled"`, `"task/removed"`, `"task/prioritized"`,
+  `"filter/set"`). Nothing outside that union may be dispatched.
+- Reads go through `selectors.ts`, not `state.tasks` directly. `Task.priority` is
+  optional and an absent value means `"normal"` — resolve it with the
+  `taskPriority` selector instead of reading the field.
 
 **Golden path to extend the app** — all four steps, in order:
 

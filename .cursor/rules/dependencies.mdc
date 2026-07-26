@@ -25,5 +25,5 @@ package.json exists in this repo. Every import in app/src is relative or `from "
 
 1. `grep -n '"dependencies"' app/package.json || echo "no dependencies block"` -> prints `no dependencies block`; the leading quote stops `"devDependencies"` matching.
 2. `grep -A4 '"devDependencies"' app/package.json` -> typescript and vitest only; `git diff HEAD --name-only -- app/package.json app/package-lock.json` -> empty unless approved.
-3. `grep -rnE 'from "[a-z@]' app/src` -> exactly 3 hits, all `from "vitest"` in test files; every other import in app/src is relative.
+3. `grep -rnE 'from "[a-z@]' app/src` -> one hit per test file (4 today), all `from "vitest"`; every other import in app/src is relative.
 4. `grep -oE '"(test|test:watch|typecheck)"' app/package.json` -> those three; `grep -qE '"(lint|build|format|start)"' app/package.json || echo "no lint/build/format/start script"` -> prints that message.

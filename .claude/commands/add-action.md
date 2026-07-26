@@ -9,7 +9,7 @@ invent a shortcut such as a setter on the store or a second store.
 
 1. **Ask before touching the protected core.** `app/src/types.ts` is protected;
    get explicit approval in this turn before editing it. Once approved the edit
-   may ONLY ADD — append a variant to the `Action` union (`app/src/types.ts:27-31`)
+   may ONLY ADD — append a variant to the `Action` union (`app/src/types.ts:33-38`)
    and, if the feature needs one, an optional field on `Task`. NEVER rename,
    reorder, retype, or narrow an existing member.
 2. **Name the action `"domain/event"`, lowercase**, copying the closest sibling:
@@ -17,7 +17,7 @@ invent a shortcut such as a setter on the store or a second store.
    filter stays imperative (`filter/set`). NEVER SCREAMING_SNAKE. Keep the payload
    shape inside the union — call sites must never encode it.
 3. **Handle it in `app/src/reducer.ts`**, in a new `case` placed before the
-   `default:` arm at `app/src/reducer.ts:38`. Update immutably: spread, `map`,
+   `default:` arm at `app/src/reducer.ts:48`. Update immutably: spread, `map`,
    `filter` — never `push`, `splice`, `sort`, or field assignment. The reducer
    stays pure and exhaustive.
 4. **Add a named-export creator in `app/src/actions.ts`** with an explicit

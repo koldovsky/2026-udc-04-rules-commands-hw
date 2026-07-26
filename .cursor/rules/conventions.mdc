@@ -9,7 +9,7 @@ alwaysApply: false
 ## Context
 
 app/tsconfig.json runs `strict` with `noUncheckedIndexedAccess`, so every index access is
-possibly-undefined. app/src has zero default exports and zero `any`, all 11 exported
+possibly-undefined. app/src has zero default exports and zero `any`, all 13 exported
 functions declare a return type, and every relative import already ends in `.js`
 (app/src/index.ts:5-8, app/src/reducer.ts:8). New code matches that baseline.
 

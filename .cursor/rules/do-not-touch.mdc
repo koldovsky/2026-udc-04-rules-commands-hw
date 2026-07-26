@@ -27,4 +27,4 @@ store.ts all import that contract, so a shape change reaches the 10 reducer/stor
 1. `git diff HEAD --name-only -- app/src/store.ts app/src/types.ts` -> prints nothing, unless the edit was explicitly approved.
 2. `git diff HEAD -U0 -- app/src/types.ts | grep -c '^-[^-]' || true` -> prints 0, so an approved types.ts edit only added lines.
 3. `grep -n 'export function createStore' app/src/store.ts` -> one hit on line 19, signature unchanged.
-4. `cd app && npm test` -> 15 passed (6 reducer, 4 store, 5 text).
+4. `cd app && npm test` -> 20 passed in 4 files (9 reducer, 4 store, 5 text, 2 selectors).
