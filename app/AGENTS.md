@@ -34,7 +34,7 @@ app/
 Run from `app/`:
 
 ```bash
-npm test            # vitest run — 15 tests, must stay green
+npm test            # vitest run — 20 tests, must stay green
 npm run test:watch  # vitest watch mode
 npm run typecheck   # tsc --noEmit
 ```
@@ -97,7 +97,7 @@ Do not call them. If one is genuinely needed, add it here explicitly with a test
   or add a local helper.
 - **Do not change public signatures** of `createStore`, the action creators, or
   the `lib/text.ts` functions — only add alongside them.
-- **Do not break existing tests.** 15 tests are green; keep them green without
+- **Do not break existing tests.** 20 tests are green; keep them green without
   editing them to fit new behavior.
 
 ## How to verify

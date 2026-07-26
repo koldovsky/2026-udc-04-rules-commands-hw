@@ -26,7 +26,7 @@ tests its only consumer is app/src/index.ts - slugify imported at :8, called at 
 
 ## How to verify
 
-1. `grep -n '^export function' app/src/lib/text.ts` -> exactly 3 lines: slugify:10, truncate:22, normalizeSpaces:33.
+1. `grep -n '^export function' app/src/lib/text.ts` -> at least the 3 originals, signatures unchanged (slugify:10, truncate:22, normalizeSpaces:33 today). More lines are OK only if each extra one was added here on purpose, with a test; never as a replacement for one of the three.
 2. `grep -rnE '\b(capitalize|camelCase|kebabCase|startCase|deburr)\(' app/src` -> no output; the call form skips the comment at text.ts:5.
 3. `grep -rnE '(from "|require\()(lodash|underscore|ramda)' app/src app/package.json` -> no output; text.ts:3 names lodash in prose only.
 4. `cd app && npm test -- src/lib/text.test.ts && npm run typecheck` -> 5 tests pass, then tsc --noEmit prints nothing.

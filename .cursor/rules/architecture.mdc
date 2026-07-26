@@ -26,5 +26,5 @@ live in app/src/reducer.ts, keyed by the Action union in app/src/types.ts.
 
 1. `grep -rnE '"[a-z-]*(redux|zustand|mobx|jotai|recoil|immer)"' app/src app/package.json | wc -l` -> prints 0; the quoted form skips the prose at store.ts:4.
 2. `grep -rn 'reducer(' app/src --include='*.ts' | grep -v test | wc -l` -> prints 2 (definition reducer.ts:10, call store.ts:29).
-3. `grep -cE 'type: "' app/src/types.ts; grep -c 'case "' app/src/reducer.ts` -> two equal numbers (currently 4 and 4).
-4. `cd app && npm test && npm run typecheck` -> 15 tests pass in 3 files, then tsc --noEmit reports no errors.
+3. `grep -cE 'type: "' app/src/types.ts; grep -c 'case "' app/src/reducer.ts` -> two equal numbers (currently 5 and 5).
+4. `cd app && npm test && npm run typecheck` -> 20 tests pass in 4 files, then tsc --noEmit reports no errors.

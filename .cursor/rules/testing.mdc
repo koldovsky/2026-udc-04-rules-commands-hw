@@ -8,8 +8,9 @@ alwaysApply: false
 
 ## Context
 
-Tests are colocated *.test.ts run by `cd app && npm test` (vitest run): 15 tests in
-3 files — app/src/reducer.test.ts, app/src/store.test.ts, app/src/lib/text.test.ts.
+Tests are colocated *.test.ts run by `cd app && npm test` (vitest run): 20 tests in
+4 files — app/src/reducer.test.ts, app/src/store.test.ts, app/src/selectors.test.ts,
+app/src/lib/text.test.ts.
 No vitest.config.* exists here, so vitest globals are OFF at run time, yet
 app/tsconfig.json lists types ["vitest/globals"], so tsc accepts a bare describe.
 
@@ -26,8 +27,8 @@ app/tsconfig.json lists types ["vitest/globals"], so tsc accepts a bare describe
 
 ## How to verify
 
-1. `(cd app && npm test) && find app/src -name '*.test.ts' | wc -l` — 15 tests in 3 files pass, then prints 3.
-2. `grep -rn 'from "vitest"' app/src` — one explicit import line per test file (3 today).
+1. `(cd app && npm test) && find app/src -name '*.test.ts' | wc -l` — 20 tests in 4 files pass, then prints 4.
+2. `grep -rn 'from "vitest"' app/src` — one explicit import line per test file (4 today).
 3. `grep -rnE '^\s*test\(|it\("should|// *(Arrange|Act|Assert)\b' app/src || echo clean` — prints `clean`.
 4. `grep -rnE 'beforeEach|afterEach|toMatchSnapshot' app/src || echo clean` — prints `clean`.
 5. `grep -nE 'immutability|unknown id' app/src/reducer.test.ts` — hits on lines 12 and 35, the two anchors cited above.
