@@ -99,17 +99,37 @@ literal actions поза types.ts+actions.ts → clean
 
 ## Як відтворити (обидва запуски)
 
-**Правила ON (запуск A):** нічого не робити — `.cursor/rules/*.mdc` на місці,
-`@`-імпорти в кореневому `CLAUDE.md` активні.
+**Правила ON (запуск A):** робочий стан репо на коміті `07b3803` —
+`.cursor/rules/*.mdc` на місці, `@`-імпорти в кореневому `CLAUDE.md` активні.
 
-**Правила OFF (запуск B)** — вимкнути треба ЧОТИРИ джерела, не одне:
+**Правила OFF (запуск B):** окремий git worktree на стартовому коміті
+`e8a230b`, ДО того як правила з'явилися в репо:
 
-1. `.cursor/rules/*.mdc` → `*.mdc.off` (Cursor більше їх не бачить);
-2. сім `@.cursor/rules/...` імпортів у кореневому `CLAUDE.md` закоментувати —
-   інакше Claude Code читає правила далі й порівняння безглузде;
-3. `app/CLAUDE.md` відсунути — він імпортує `app/AGENTS.md`, а там ті самі
-   guardrails (PROTECTED files, no deps, named exports, immutability);
-4. кореневий `AGENTS.md` і `app/AGENTS.md` відсунути — Claude Code читає
-   `AGENTS.md` теж.
+```bash
+git worktree add --detach <шлях>/run-b e8a230b
+ln -s <репо>/app/node_modules <шлях>/run-b/app/node_modules   # щоб npm test працював
+```
 
-Скрипт для перемикання: `scratchpad/toggle-rules.sh off` / `... on`.
+Чому worktree, а не перейменування `.mdc` → `.mdc.off` у головному репо:
+вимкнути довелося б ЧОТИРИ джерела, і пропустити одне легко —
+
+1. `.cursor/rules/*.mdc` (шлях правил Cursor);
+2. сім `@.cursor/rules/...` імпортів у кореневому `CLAUDE.md` — інакше Claude
+   Code читає правила далі й порівняння безглузде;
+3. `app/CLAUDE.md` — імпортує `app/AGENTS.md` з тими самими guardrails
+   (PROTECTED files, no deps, named exports, immutability);
+4. кореневий `AGENTS.md` — Claude Code читає `AGENTS.md` теж.
+
+На коміті `e8a230b` нічого з цього не існує: `.cursor/` відсутній, а
+`app/AGENTS.md` — розмиті чотири рядки («write clean, readable code», «follow
+the style already in the file», «don't break the existing tests»), без жодної
+згадки про dispatch, імутабельність чи protected files. Головне репо при
+цьому не торкається, тому графовані файли не під ризиком і відкат не потрібен.
+
+**Чесне застереження про baseline B.** Стартовий кореневий `AGENTS.md` усе ще
+містить один рядок з конвенціями: «named exports only, no `any`/`@ts-ignore`,
+immutable state updates, state changes only via `store.dispatch(action)`».
+Я його НЕ вилучав — це справжній стан репо до домашки, тобто консервативний
+тест. Якщо різниця ON/OFF видна навіть попри цю підсказку, правила тим
+переконливіші; якщо B все одно порушить саме ці чотири пункти — це окремий
+висновок про різницю між «згадкою в прозі» і «правилом з How to verify».
