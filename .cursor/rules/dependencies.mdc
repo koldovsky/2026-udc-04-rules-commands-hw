@@ -1,0 +1,29 @@
+---
+description: "No new npm dependencies without approval; the real script surface is test / test:watch / typecheck only"
+globs: "app/**"
+alwaysApply: true
+---
+
+# Dependencies And Scripts
+
+## Context
+
+app/package.json has no `dependencies` block and exactly two devDependencies:
+typescript ^5.6.0 and vitest ^2.1.0. No ESLint, Prettier, bundler config, or root
+package.json exists in this repo. Every import in app/src is relative or `from "vitest"`.
+
+## Rule
+
+- NEVER run npm install / npm i / npm add, or edit dependencies, devDependencies, or package-lock.json, without same-turn user approval.
+- Reach for what already exists before a package: the standard library, app/src/lib/text.ts (custom-lib.mdc), the hand-written app/src/store.ts.
+- Never add, non-exhaustive: redux, zustand, mobx, jotai, immer, lodash, ramda, uuid, nanoid, date-fns, jest, ts-node, eslint, prettier.
+- Run npm only from app/, never the repo root: npm test (vitest run), npm run test:watch, npm run typecheck (tsc --noEmit).
+- DO NOT invent, suggest as existing, or silently add a lint, build, format, or start script.
+- Propose a genuinely required package as name + why + what it replaces, then wait for the user.
+
+## How to verify
+
+1. `grep -n '"dependencies"' app/package.json || echo "no dependencies block"` -> prints `no dependencies block`; the leading quote stops `"devDependencies"` matching.
+2. `grep -A4 '"devDependencies"' app/package.json` -> typescript and vitest only; `git diff HEAD --name-only -- app/package.json app/package-lock.json` -> empty unless approved.
+3. `grep -rnE 'from "[a-z@]' app/src` -> exactly 3 hits, all `from "vitest"` in test files; every other import in app/src is relative.
+4. `grep -oE '"(test|test:watch|typecheck)"' app/package.json` -> those three; `grep -qE '"(lint|build|format|start)"' app/package.json || echo "no lint/build/format/start script"` -> prints that message.

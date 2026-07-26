@@ -1,0 +1,33 @@
+---
+description: "Vitest conventions for colocated *.test.ts files in app/src"
+globs: "app/**/*.test.ts"
+alwaysApply: false
+---
+
+# Testing Conventions
+
+## Context
+
+Tests are colocated *.test.ts run by `cd app && npm test` (vitest run): 15 tests in
+3 files — app/src/reducer.test.ts, app/src/store.test.ts, app/src/lib/text.test.ts.
+No vitest.config.* exists here, so vitest globals are OFF at run time, yet
+app/tsconfig.json lists types ["vitest/globals"], so tsc accepts a bare describe.
+
+## Rule
+
+- Colocate each test with its module: app/src/reducer.ts -> app/src/reducer.test.ts. DO NOT add __tests__/ or top-level tests/.
+- Import helpers explicitly: import { describe, expect, it } from "vitest"; add vi for subscriber spies only, never to mock app modules.
+- Use it(), never test(), and name it-cases as lowercase behavioral sentences without "should": it("adds a task as not done").
+- Wrap each symbol under test in one describe named exactly after it: describe("reducer"), describe("createStore"), describe("slugify").
+- Keep arrange/act/assert (AAA) implicit: 2-6 statements, no blank-line sections, no AAA section comments — seeded tests are comment-free.
+- Drive the reducer through action creators: reducer(initialState, addTask("a", "A")) — tests obey the no-literal-actions rule in state-access.mdc.
+- Cover a new reducer case with three it()s: happy path, immutability (reducer.test.ts:12), unknown-id no-op (reducer.test.ts:35).
+- Index with optional chaining in assertions (next.tasks[0]?.done, per conventions.mdc); NEVER add beforeEach, factories, or snapshots.
+
+## How to verify
+
+1. `(cd app && npm test) && find app/src -name '*.test.ts' | wc -l` — 15 tests in 3 files pass, then prints 3.
+2. `grep -rn 'from "vitest"' app/src` — one explicit import line per test file (3 today).
+3. `grep -rnE '^\s*test\(|it\("should|// *(Arrange|Act|Assert)\b' app/src || echo clean` — prints `clean`.
+4. `grep -rnE 'beforeEach|afterEach|toMatchSnapshot' app/src || echo clean` — prints `clean`.
+5. `grep -nE 'immutability|unknown id' app/src/reducer.test.ts` — hits on lines 12 and 35, the two anchors cited above.

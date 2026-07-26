@@ -1,0 +1,32 @@
+---
+description: "app/src/lib/text.ts is an in-house lib with exactly three functions - never invent helpers"
+globs: "app/src/lib/**"
+alwaysApply: false
+---
+
+# In-House Text Lib
+
+## Context
+
+app/src/lib/text.ts is an in-house lib, not lodash: its header comment names
+three plausible-but-absent helpers as the risk (text.ts:5). The supported surface
+is three exported functions, all covered by app/src/lib/text.test.ts. Outside
+tests its only consumer is app/src/index.ts - slugify imported at :8, called at :18.
+
+## Rule
+
+- Use only text.ts's three exports: slugify(input), truncate(input, maxLength, suffix = "…"), normalizeSpaces(input) - all return string.
+- Expect slugify to trim, lowercase, turn non-alphanumeric runs into "-" and strip edge hyphens: "Buy Milk!" -> "buy-milk".
+- Pass truncate a maxLength that INCLUDES the suffix; it returns input unchanged if it fits. normalizeSpaces trims and collapses runs to one space.
+- NEVER call or import capitalize, camelCase, kebabCase, startCase or deburr - they do not exist in this lib.
+- Add a genuinely missing helper to text.ts itself, beside its siblings, with a one-line jsdoc; never a util package (dependencies.mdc).
+- Cover every new helper in app/src/lib/text.test.ts (case style: testing.mdc) and state in your reply that you extended the API.
+- NEVER change an existing signature, parameter order, or truncate's default suffix "…" - add a new function instead.
+- Keep every function pure - no I/O, logging, throwing or module-level state; the same input always yields the same string.
+
+## How to verify
+
+1. `grep -n '^export function' app/src/lib/text.ts` -> exactly 3 lines: slugify:10, truncate:22, normalizeSpaces:33.
+2. `grep -rnE '\b(capitalize|camelCase|kebabCase|startCase|deburr)\(' app/src` -> no output; the call form skips the comment at text.ts:5.
+3. `grep -rnE '(from "|require\()(lodash|underscore|ramda)' app/src app/package.json` -> no output; text.ts:3 names lodash in prose only.
+4. `cd app && npm test -- src/lib/text.test.ts && npm run typecheck` -> 5 tests pass, then tsc --noEmit prints nothing.
