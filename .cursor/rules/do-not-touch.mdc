@@ -10,7 +10,7 @@ alwaysApply: true
 
 app/src/store.ts is the dispatch/notify engine; app/src/types.ts holds AppState, Task, the
 Action union, initialState and Listener. app/src/actions.ts, reducer.ts, selectors.ts and
-store.ts all import that contract, so a shape change reaches the 10 reducer/store tests.
+store.ts all import that contract, so a shape change reaches every reducer and store test.
 
 ## Rule
 

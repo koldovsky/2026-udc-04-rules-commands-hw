@@ -2,6 +2,8 @@
 description: "Add a new Action variant end-to-end: types.ts union -> reducer case -> action creator -> colocated test"
 ---
 
+# /add-action
+
 Add a new state transition to the task board for: $ARGUMENTS
 
 Walk the app's golden path in this exact order — do not skip a step, and do not

@@ -31,4 +31,4 @@ app/tsconfig.json lists types ["vitest/globals"], so tsc accepts a bare describe
 2. `grep -rn 'from "vitest"' app/src` — one explicit import line per test file (4 today).
 3. `grep -rnE '^\s*test\(|it\("should|// *(Arrange|Act|Assert)\b' app/src || echo clean` — prints `clean`.
 4. `grep -rnE 'beforeEach|afterEach|toMatchSnapshot' app/src || echo clean` — prints `clean`.
-5. `grep -nE 'immutability|unknown id' app/src/reducer.test.ts` — hits on lines 12 and 35, the two anchors cited above.
+5. `grep -nE 'immutability|unknown id' app/src/reducer.test.ts` — includes the two anchors cited above (lines 12 and 35), plus one pair per reducer case added since.

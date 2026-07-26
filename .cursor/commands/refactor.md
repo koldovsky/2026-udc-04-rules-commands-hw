@@ -2,6 +2,8 @@
 description: "Refactor the given code to project conventions — behavior unchanged, tests untouched, protected core untouched"
 ---
 
+# /refactor
+
 Refactor to this project's conventions, without changing behavior: $ARGUMENTS
 
 1. **Establish the baseline first:** `cd app && npm test` must be green before

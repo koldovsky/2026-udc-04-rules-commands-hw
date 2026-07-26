@@ -51,9 +51,10 @@ describe("reducer", () => {
     expect(prioritized.tasks[0]).not.toBe(withTask.tasks[0]);
   });
 
-  it("returns the same state for an unknown id priority change", () => {
+  it("leaves every field unchanged for an unknown id priority change", () => {
     const state: AppState = { tasks: [{ id: "a", title: "A", done: false }], filter: "all" };
     const next = reducer(state, setTaskPriority("missing", "high"));
+    expect(next).toEqual(state);
     expect(next.tasks[0]?.priority).toBeUndefined();
   });
 });

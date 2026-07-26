@@ -2,6 +2,8 @@
 description: "Diagnose a TypeScript or vitest failure and propose a root-cause fix — no any, no @ts-ignore, no protected-file edits"
 ---
 
+# /analyze-error
+
 Diagnose this error and fix its cause, not its symptom: $ARGUMENTS
 
 1. **Read before guessing.** Pull the `file:line` out of the stack or `tsc`

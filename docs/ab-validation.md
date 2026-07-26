@@ -50,7 +50,7 @@
 
 **Верифікація A** (команди з секцій «How to verify» самих правил):
 
-```
+```text
 cd app && npm test        → 20 passed (було 15), 4 файли
 cd app && npm run typecheck → tsc --noEmit, 0 помилок
 5 creators = 5 Action-варіантів = 5 payloads = 5 reducer-cases
@@ -95,7 +95,7 @@ creator here too». Тобто «rules OFF» тут не означає «без
 
 Тверде числове свідчення — видалені рядки в наявному тест-файлі:
 
-```
+```text
 git diff -U0 -- app/src/reducer.test.ts | grep -c '^-[^-]'
 A (rules ON):  1   ← лише рядок import (механічно неминучий)
 B (rules OFF): 3   ← import + assertion:9 + фікстура:36
@@ -171,8 +171,12 @@ verify-командами, а не тільки в комментарях: ко�
 `e8a230b`, ДО того як правила з'явилися в репо:
 
 ```bash
-git worktree add --detach <шлях>/run-b e8a230b
-ln -s <репо>/app/node_modules <шлях>/run-b/app/node_modules   # щоб npm test працював
+REPO_ROOT="$(git rev-parse --show-toplevel)"
+RUN_B_DIR="$REPO_ROOT/../ws04-run-b"
+
+git worktree add --detach "$RUN_B_DIR" e8a230b
+ln -s "$REPO_ROOT/app/node_modules" "$RUN_B_DIR/app/node_modules"   # щоб npm test працював
+cd "$RUN_B_DIR/app" && npm test
 ```
 
 Чому worktree, а не перейменування `.mdc` → `.mdc.off` у головному репо:

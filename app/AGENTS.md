@@ -14,7 +14,7 @@ vitest 2.1. No framework, no UI, no build step — Node 22+ only.
 
 ## Structure
 
-```
+```text
 app/
 ├── src/
 │   ├── types.ts        AppState, Task, TaskId, Filter, Priority, Action union, initialState  [PROTECTED]

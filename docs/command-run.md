@@ -19,7 +19,7 @@ export function topTaskTitle(state: AppState): string {
 
 Реальний вивід (він і був аргументом команди):
 
-```
+```text
 $ cd app && npm run typecheck
 src/selectors.ts(28,10): error TS2304: Cannot find name 'capitalize'.
 src/selectors.ts(28,21): error TS2532: Object is possibly 'undefined'.
