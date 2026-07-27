@@ -1,6 +1,6 @@
 ---
 description: "Action type format, action creator shape, and the rule that every new action needs a test"
-globs: "app/src/actions.ts,app/src/reducer.ts,app/src/types.ts"
+globs: "app/src/**/*.ts"
 alwaysApply: false
 ---
 
@@ -16,12 +16,14 @@ per variant and a `default: return state` fallthrough.
 
 ## Rule
 
-- **Action type format:** `"namespace/verb"` — for example `"task/pinned"`,
-  `"filter/reset"`. No SCREAMING_SNAKE_CASE, no free-form strings.
+- **Action type format:** `"namespace/verb"` — for example `"task/prioritized"`,
+  `"filter/reset"`. No SCREAMING_SNAKE_CASE, no free-form strings. For
+  task-domain actions, use past-participle verbs matching the existing
+  convention: `task/added`, `task/toggled`, `task/removed`, `task/prioritized`.
 - **Action creator signature:** a pure named function that returns `Action`:
   ```ts
-  export function pinTask(id: TaskId): Action {
-    return { type: "task/pinned", payload: { id } };
+  export function setPriority(id: TaskId, priority: Priority): Action {
+    return { type: "task/prioritized", payload: { id, priority } };
   }
   ```
   - Always typed as returning `Action` (the full union), not a specific member.
@@ -29,9 +31,9 @@ per variant and a `default: return state` fallthrough.
 - **Reducer case:** every new Action variant gets its own explicit `case` in the
   `switch`. No fall-through between cases. No mutation (see conventions rule).
   ```ts
-  case "task/pinned":
+  case "task/prioritized":
     return { ...state, tasks: state.tasks.map(t =>
-      t.id === action.payload.id ? { ...t, pinned: true } : t
+      t.id === action.payload.id ? { ...t, priority: action.payload.priority } : t
     )};
   ```
 - **Test requirement:** A new action is not "done" until `reducer.test.ts`
@@ -44,7 +46,7 @@ per variant and a `default: return state` fallthrough.
 1. `grep -r "type:.*_" app/src/types.ts` — should return nothing; type tags use
    `"namespace/verb"` not SCREAMING_SNAKE_CASE.
 2. `grep -r "export default" app/src/actions.ts` — should return nothing.
-3. Ask the AI to "add a 'pin task' action" — the result must follow the
-   `"task/pinned"` format, include a creator, add a reducer case, and add a
-   Vitest test.
+3. Ask the AI to "set task priority" — the result must follow the
+   `"task/prioritized"` format (past-participle), include a creator, add a
+   reducer case, and add a Vitest test.
 4. `cd app && npm test` — green after adding any new action.

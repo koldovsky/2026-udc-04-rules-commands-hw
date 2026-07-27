@@ -5,7 +5,7 @@ See also `AGENTS.md` in this directory for the same content in AGENTS format.
 
 ## Project structure
 
-```
+```text
 app/src/
   types.ts       — domain types (Task, AppState, Filter, Action union) ⚠️ protected
   store.ts       — generic observable store (createStore) ⚠️ protected
@@ -19,10 +19,11 @@ app/src/
 ## Commands
 
 ```bash
-cd app && npm test        # run all tests (Vitest)
+cd app && npm test             # run all tests (Vitest)
+cd app && npm run typecheck    # type-check without emitting
 ```
 
-Note: lint is not configured — do not invent an `npm run lint` command.
+Note: lint is not configured — do not run `npm run lint`.
 
 ## Architecture
 
@@ -37,14 +38,10 @@ external state library.** The store is a ~40-line implementation in `store.ts`.
 
 ## Code style
 
-- **Named exports only** — no `export default` anywhere
-- **No `any`, no `@ts-ignore`** — TypeScript strict mode is on
-- **Immutable reducer** — never mutate `state`; always return new objects/arrays
-- **Kebab-case filenames** — `my-feature.ts`, not `myFeature.ts`
-- **Colocated tests** — `foo.ts` → `foo.test.ts` in the same directory
-- **Action type format** — `"namespace/verb"` (e.g. `"task/added"`, `"filter/set"`)
-- **Text helpers** — only `slugify(s)`, `truncate(s, n, suffix?)`,
-  `normalizeSpaces(s)` from `lib/text.ts`; no lodash, no invented helpers
+- **TypeScript strict, named exports** — no `export default`, no `any`, no `@ts-ignore`
+- **Immutable reducer, kebab-case files** — spread/map/filter only; `my-feature.ts` not `myFeature.ts`
+- **Colocated tests** — `foo.ts` → `foo.test.ts`; AAA pattern; Vitest
+- **State & text** — action types `"namespace/verb"` (past-participle for task actions: `added`, `toggled`); only `slugify`/`truncate`/`normalizeSpaces` from `lib/text.ts`
 
 ## Protected files
 

@@ -2,13 +2,18 @@
 description: "Add a new action to the task board: Action variant → reducer case → action creator → test"
 ---
 
+# Add Action
+
 Add the action `$ARGUMENTS` to the app following the project's golden path.
 
 1. **types.ts** — append a new variant to the `Action` discriminated union:
+
    ```ts
    | { type: "namespace/verb"; payload: { /* typed fields */ } }
    ```
-   Use `"namespace/verb"` format (e.g. `"task/pinned"`, `"filter/reset"`).
+
+   Use `"namespace/verb"` format (e.g. `"task/prioritized"`, `"filter/reset"`).
+   For task-domain actions, use past-participle verbs (`added`, `toggled`, `prioritized`).
    Do NOT change any existing type shapes (`Task`, `AppState`, `Filter`).
 
 2. **reducer.ts** — add an explicit `case` for the new action type. The case
@@ -16,6 +21,7 @@ Add the action `$ARGUMENTS` to the app following the project's golden path.
    directly (no `.push`, `.splice`, `.sort`).
 
 3. **actions.ts** — add a named export action creator function:
+
    ```ts
    export function myAction(/* params */): Action {
      return { type: "namespace/verb", payload: { /* ... */ } };

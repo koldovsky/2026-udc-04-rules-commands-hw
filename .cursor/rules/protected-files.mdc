@@ -22,7 +22,7 @@ have their public APIs altered without explicit human approval.
 
 - **NEVER change the signature of `createStore`** in `store.ts`. Its parameter
   types and return type are the public contract.
-- **NEVER change the shape of `Task`** (`{ id: TaskId; title: string; done: boolean }`),
+- **NEVER change the shape of `Task`** (`{ id: TaskId; title: string; done: boolean; priority: Priority }`),
   `AppState`, or `Filter` in `types.ts`. Adding new optional fields requires
   human review because it changes the `initialState`.
 - **Adding a new Action variant is the ONE allowed edit to `types.ts`** — append

@@ -2,6 +2,8 @@
 description: "Diagnose a TypeScript or test error in the app and propose a safe fix"
 ---
 
+# Analyze Error
+
 Analyze the following error and propose a fix: $ARGUMENTS
 
 1. **Identify the error type** — TypeScript compile error, Vitest test failure,

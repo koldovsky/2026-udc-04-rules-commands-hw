@@ -35,7 +35,7 @@ replace or wrap it with Redux, Zustand, MobX, Jotai, or any other library.
 
 ## How to verify
 
-1. `grep -r "from 'redux'\|from 'zustand'\|from '@reduxjs'" app/src` — should
+1. `grep -rE "from ['\"]redux|from ['\"]zustand|from ['\"]@reduxjs|from ['\"]mobx|from ['\"]jotai|from ['\"]recoil" app/src` — should
    return nothing.
 2. Ask the AI to "add a new task status" — it should propose adding to the
    `Action` union in `types.ts` + a new reducer case, not installing a library.

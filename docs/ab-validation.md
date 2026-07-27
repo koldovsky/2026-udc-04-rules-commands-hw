@@ -73,9 +73,9 @@ AI (Claude Code з завантаженим AGENTS.md/CLAUDE.md) виконав 
 **npm test:** 17/17 green ✅
 
 **Що відрізняється від Result A:**
-1. ❌ **Назва action type:** `"task/priority-set"` замість `"task/prioritized"`.
-   Проєкт використовує минулий час дієслова (`"task/added"`, `"task/toggled"`,
-   `"task/removed"`). Без `action-pattern.mdc` AI обрав іншу форму.
+1. ❌ **Назва action type:** `"task/priority-set"` замість `"task/prioritized"` —
+   не дотримано past-participle конвенції task-дій, закріпленої в `action-pattern.mdc`
+   (`task/added`, `task/toggled`, `task/removed`, `task/prioritized`).
 2. ❌ **Жодного попередження про protected-файл** — змінив `Task` без `⚠️`.
 3. ❌ **Тест на edge case відсутній** — Result A написав "ignores setPriority
    for unknown id"; Result B написав тест на збереження властивостей (інший фокус).
@@ -86,7 +86,7 @@ AI (Claude Code з завантаженим AGENTS.md/CLAUDE.md) виконав 
 
 | Aspect | A (rules ON) | B (rules OFF) |
 |---|---|---|
-| Action type name | ✅ `"task/prioritized"` (verb, past tense — відповідає патерну) | ⚠️ `"task/priority-set"` (noun-verb — інша форма) |
+| Action type name | ✅ `"task/prioritized"` (past-participle — відповідає конвенції task-дій) | ⚠️ `"task/priority-set"` (compound noun-verb — не відповідає past-participle патерну) |
 | Попередження про protected type | ✅ Явне `⚠️` перед зміною `Task` | ❌ Без попередження |
 | Golden path усвідомлено | ✅ Явно названо кожен крок архітектури | ❌ Просто виконав |
 | Edge case тест | ✅ "ignores unknown id" | ❌ Відсутній |
@@ -101,10 +101,10 @@ AI (Claude Code з завантаженим AGENTS.md/CLAUDE.md) виконав 
 ## Conclusion
 
 Тест з чистою базою виявив конкретну розбіжність: без `action-pattern.mdc` AI
-обрав назву `"task/priority-set"` замість `"task/prioritized"`, порушивши
-неявний патерн проєкту (минулий час дієслова). Також відсутнє попередження
-про зміну захищеного типу (`protected-files.mdc`) і edge case тест на невідомий id.
-Великі конвенції (immutability, Vitest, named exports, typed union) збіглися —
-бо вони очевидні з існуючого коду. Правила найбільше важать там де конвенція
-тонка і не самоочевидна: точний формат імен і явне попередження перед зміною
-публічного контракту.
+обрав назву `"task/priority-set"` замість `"task/prioritized"`, не дотримавшись
+past-participle конвенції task-дій, закріпленої в правилі. Також відсутнє
+попередження про зміну захищеного типу (`protected-files.mdc`) і edge case тест
+на невідомий id. Великі конвенції (immutability, Vitest, named exports, typed union)
+збіглися — бо вони очевидні з існуючого коду. Правила найбільше важать там де
+конвенція тонка і не самоочевидна: точний формат імен і явне попередження перед
+зміною публічного контракту.
