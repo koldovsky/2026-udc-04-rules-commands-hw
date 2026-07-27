@@ -1,0 +1,37 @@
+---
+description: "Real API surface of the in-house text lib — do not hallucinate extra helpers"
+globs: "app/src/lib/**"
+alwaysApply: false
+---
+
+# Custom lib — app/src/lib/text.ts
+
+## Context
+
+`app/src/lib/text.ts` is a small in-house text helper library, not
+lodash/underscore. Its entire supported surface is three functions.
+
+## Rule
+
+- The only functions that exist are:
+  - `slugify(input: string): string`
+  - `truncate(input: string, maxLength: number, suffix?: string): string`
+  - `normalizeSpaces(input: string): string`
+- Do NOT call or import helpers like `capitalize`, `camelCase`, `deburr`,
+  `kebabCase`, `pad`, or any other lodash/underscore-style helper — they do
+  not exist in this lib.
+- If new text behavior is needed, add a new named export to
+  `app/src/lib/text.ts` explicitly (with a colocated test in
+  `app/src/lib/text.test.ts`) rather than assuming it already exists elsewhere.
+- Do not import a general-purpose string utility package (e.g. lodash) as a
+  substitute — extend the in-house lib instead.
+
+## How to verify
+
+1. `grep -n "^export function" app/src/lib/text.ts` — output is exactly
+   `slugify`, `truncate`, `normalizeSpaces` (plus any function explicitly added
+   in this session, each with a matching test).
+2. `grep -rn "capitalize\|camelCase\|deburr\|kebabCase" app/src` — no matches
+   unless just added as a real implementation.
+3. `grep -n "lodash\|underscore" app/package.json app/src` — no matches.
+4. `cd app && npm test -- text.test.ts` (or `npm test`) passes.

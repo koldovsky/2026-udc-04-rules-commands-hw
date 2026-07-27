@@ -1,0 +1,32 @@
+---
+description: "Protected core files that require explicit approval to change"
+globs: "**/*"
+alwaysApply: true
+---
+
+# Do-not-touch: protected core
+
+## Context
+
+`app/src/store.ts` (the dispatch/notify engine) and `app/src/types.ts` (the
+`AppState`/`Action` contract) are load-bearing — every other file depends on
+their shape. Changing them ripples through the whole app.
+
+## Rule
+
+- Do NOT edit `app/src/store.ts` or `app/src/types.ts` unless the user has
+  explicitly asked to change one of those two files by name in the current
+  request.
+- Normal feature work (new actions, new behavior) extends
+  `app/src/reducer.ts` and `app/src/actions.ts`, not the protected files.
+- If a task seems to require touching `store.ts` or `types.ts`, stop and ask
+  the user for explicit confirmation before editing, explaining why it's
+  needed.
+
+## How to verify
+
+1. `git diff --stat -- app/src/store.ts app/src/types.ts` (or diff against the
+   last known-good commit) — empty, unless the user explicitly requested the
+   change in this session.
+2. Re-read the conversation/task description: does it name `store.ts` or
+   `types.ts` directly? If not, any diff to those files is a violation.

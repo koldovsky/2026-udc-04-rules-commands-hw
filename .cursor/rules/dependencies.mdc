@@ -1,0 +1,36 @@
+---
+description: "No new npm dependencies without explicit user approval"
+globs: "app/**"
+alwaysApply: true
+---
+
+# Dependencies
+
+## Context
+
+`app/package.json` currently declares exactly two devDependencies:
+`typescript` and `vitest`, and zero runtime dependencies. The store, reducer,
+and text lib are all hand-rolled on purpose (see `architecture.mdc`,
+`custom-lib.mdc`) — pulling in a package is often an attempt to shortcut
+around that constraint.
+
+## Rule
+
+- Do NOT add, remove, or upgrade any package in `app/package.json` (or run
+  `npm install <pkg>`) unless the user has explicitly approved that specific
+  package in the current request.
+- Do NOT introduce a dependency to replace in-house code (e.g. a state
+  library instead of `store.ts`, lodash instead of `app/src/lib/text.ts`,
+  a test framework instead of vitest).
+- If a task seems to need a new package, stop and ask the user first, naming
+  the package and why.
+
+## How to verify
+
+1. `git diff -- app/package.json app/package-lock.json` — empty, unless the
+   user explicitly approved a specific package in this session.
+2. `cat app/package.json` — `dependencies` is absent/empty and
+   `devDependencies` contains only `typescript` and `vitest`, unless approved
+   otherwise.
+3. `cd app && npm test && npm run typecheck` still pass without any new
+   `node_modules` entries being required.
