@@ -1,0 +1,37 @@
+---
+description: "Where action creators and selectors belong and how they are shaped"
+globs: "app/src/{actions,selectors}.ts"
+alwaysApply: false
+---
+
+# Actions & selectors — placement and shape
+
+## Context
+
+`app/src/actions.ts` holds action creators (`addTask`, `toggleTask`,
+`removeTask`, `setPriority`, `setFilter`); `app/src/selectors.ts` holds pure read
+helpers (`visibleTasks`, `remainingCount`). Consumers use these instead of
+building action objects or reading `state.tasks` by hand.
+
+## Rule
+
+- Every dispatchable action gets a creator in `app/src/actions.ts` that returns
+  a typed `Action`; never build `{ type, payload }` objects inline at call sites.
+- Action creators contain NO logic beyond assembling the payload — no state
+  reads, no side effects.
+- Derived reads go in `app/src/selectors.ts` as PURE functions of `AppState`
+  (no mutation, no I/O); reuse a selector instead of filtering `state.tasks`
+  again at the call site.
+- Keep both files as named exports consistent with the `Action` union in
+  `types.ts`.
+
+## How to verify
+
+1. `grep -rEn "type:[[:space:]]*\"" app/src --include=*.ts` finds action `type`
+   literals only in `actions.ts`, `reducer.ts`, and `types.ts` — not in
+   UI/consumer code.
+2. Selectors take `AppState` (or a slice) and return data without mutating it.
+3. Each action creator has a matching reducer `case` and union member.
+
+
+

@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 import { createStore } from "./store.js";
-import { addTask, toggleTask } from "./actions.js";
+import { addTask, setPriority, toggleTask } from "./actions.js";
 
 describe("createStore", () => {
   it("starts from the initial state", () => {
@@ -12,6 +12,13 @@ describe("createStore", () => {
     const store = createStore();
     store.dispatch(addTask("a", "A"));
     expect(store.getState().tasks).toHaveLength(1);
+  });
+
+  it("changes task priority through dispatch", () => {
+    const store = createStore();
+    store.dispatch(addTask("a", "A"));
+    store.dispatch(setPriority("a", "high"));
+    expect(store.getState().tasks[0]?.priority).toBe("high");
   });
 
   it("notifies subscribers on every dispatch", () => {

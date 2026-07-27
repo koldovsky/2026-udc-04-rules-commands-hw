@@ -1,0 +1,31 @@
+---
+description: "No new dependencies without explicit approval"
+globs: "app/**"
+alwaysApply: false
+---
+
+# Dependencies — keep the app dependency-free
+
+## Context
+
+The app ships with only `typescript` and `vitest` as devDependencies (see
+`app/package.json`) and NO runtime dependencies. The exercise is about the
+custom store, not about pulling in libraries.
+
+## Rule
+
+- Do NOT add npm packages (runtime or dev) to solve a feature. Prefer the
+  standard library and the existing in-house code.
+- NEVER edit `app/package.json` `dependencies`/`devDependencies` or add a
+  lockfile entry without explicit user approval.
+- Do NOT introduce a state-management, utility (lodash), or UI library.
+- If a package genuinely seems necessary, STOP and ask the user first, naming
+  the package and why the standard library is insufficient.
+
+## How to verify
+
+1. `git diff app/package.json` shows no dependency changes for feature work.
+2. No new `import` from a bare package name (only relative `./` imports plus the
+   existing `vitest` in tests).
+3. `cd app && npm test` passes without installing anything new.
+
