@@ -36,9 +36,9 @@ normalizeSpaces(input: string): string
   utility.** They are not installed.
 - **NEVER call functions that don't exist:** `capitalize`, `camelCase`,
   `deburr`, `pad`, `repeat`, `startCase`, etc. are not in `lib/text.ts`.
-- If you need a helper not listed above, add it to `lib/text.ts` explicitly
-  (with a corresponding test in `lib/text.test.ts`) — never invent a function
-  that isn't there or import an external library.
+- If the three functions above are insufficient, that is a code-contribution
+  decision requiring human review — do NOT add helpers autonomously or import
+  an external library.
 - **Import paths:**
   - In source files (`*.ts`): `'./lib/text.js'` (ESM `.js` extension required)
   - In test files (`*.test.ts`): `'./lib/text'` (no extension; Vitest resolves it)
