@@ -14,7 +14,8 @@ Tests use vitest and live NEXT TO the code they cover (e.g.
 
 ## Rule
 
-- Colocate every test as `<name>.test.ts` beside the file under test.
+- Colocate every test beside the file under test, named `<name>.test.ts`,
+  `<name>.spec.ts`, `<name>.test.tsx`, or `<name>.spec.tsx`.
 - Import from vitest: `import { describe, expect, it } from "vitest";`.
 - Structure each test Arrange → Act → Assert (AAA); keep one behavior per `it`.
 - When you add an action/reducer case or a `lib/` helper, ADD a colocated test
@@ -25,8 +26,10 @@ Tests use vitest and live NEXT TO the code they cover (e.g.
 
 ## How to verify
 
-1. Each new `*.test.ts` sits beside its source file.
+1. Each new `*.{test,spec}.{ts,tsx}` sits beside its source file.
 2. `cd app && npm test` is green, including the new tests.
 3. New reducer/action/helper code has at least one covering test.
+
+
 
 

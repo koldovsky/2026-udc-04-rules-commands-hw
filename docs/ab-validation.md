@@ -17,11 +17,29 @@ In Copilot the rules live where Copilot reads them, so the ON/OFF toggle moves
 those files aside (not `.cursor/rules`, which Copilot ignores):
 
 ```bash
+# Helper: abort unless app/src has NO pending changes (tracked or untracked).
+require_clean_appsrc() {
+  if [ -n "$(git status --porcelain -- app/src)" ]; then
+    echo "app/src is not clean — aborting to protect the experiment" >&2
+    return 1
+  fi
+}
+
+# Pre-flight: both runs must START from an identical CLEAN app/src baseline.
+require_clean_appsrc || exit 1
+
 # A — rules ON: fresh Agent chat, paste the ab-task.md request, capture result.
 #     confirm the reply shows "Used reference: copilot-instructions.md".
 git status --short app/src            # inspect the A result before stashing
-git stash push -u -- app/src          # save A (incl. untracked), reset tree clean
-git status --short app/src            # expect empty — B starts from a clean tree
+
+# Save A (incl. untracked). Capture the EXACT stash SHA and abort if the push
+# failed or created no new stash (e.g. nothing to save).
+before_stash=$(git rev-parse -q --verify refs/stash || true)
+git stash push -u -- app/src || { echo "stash push failed" >&2; exit 1; }
+a_stash=$(git rev-parse -q --verify refs/stash || true)
+[ -n "$a_stash" ] && [ "$a_stash" != "$before_stash" ] || {
+  echo "no new stash created — aborting" >&2; exit 1; }
+require_clean_appsrc || exit 1        # B must START from a clean tree
 
 # B — rules OFF:
 mv .github/copilot-instructions.md .github/copilot-instructions.md.off
@@ -30,11 +48,17 @@ mv app/AGENTS.md app/AGENTS.md.off
 # fresh Agent chat, paste the SAME request, capture result, then restore:
 git clean -fdn app/src                # DRY RUN — verify only intended files listed
 git checkout -- app/src && git clean -fd app/src
-git status --short app/src            # expect empty — B changes fully removed
+require_clean_appsrc || exit 1        # validate B changes are fully removed
 mv .github/copilot-instructions.md.off .github/copilot-instructions.md
 mv AGENTS.md.off AGENTS.md
 mv app/AGENTS.md.off app/AGENTS.md
-git stash pop                         # restore the A result
+
+# Restore EXACTLY the A stash by its SHA (preserves any unrelated stashes and
+# working-tree changes outside app/src).
+a_ref=$(git stash list --format='%gd %H' | awk -v s="$a_stash" '$2==s{print $1; exit}')
+[ -n "$a_ref" ] || { echo "A stash not found — restore manually" >&2; exit 1; }
+git stash pop "$a_ref" || { echo "stash pop conflicted — resolve manually" >&2; exit 1; }
+git status --short app/src            # expect ONLY the A result (no B leftovers)
 ```
 
 ## Result A — rules ON
@@ -80,15 +104,19 @@ golden-path solution — but with less rigor and different naming:
 
 ## Conclusion
 
-With a strong model (GPT-5.5) the rules did **not** rescue the architecture —
-even OFF the model stayed on the golden path (dispatch + immutable reducer, no
-state library, no `any`, protected core untouched). The rules' value showed up
-in **rigor and consistency**, not correctness: rules-ON added store-level
-dispatch coverage and explicit immutability tests (19 vs 16 passing) and matched
-the repo's naming conventions, whereas rules-OFF did the minimum viable test.
-The `testing.mdc` rule mattered most here. Honest takeaway: on a capable model,
-rule-sets are a **quality/consistency floor**, not a safety net — the gap would
-widen on weaker models or vaguer prompts.
+In this single A/B run — one prompt (`materials/ab-task.md`), one model
+(GPT-5.5), this repository — both runs landed on the golden path: dispatch +
+immutable reducer, no state library, no `any`, protected core untouched. The
+observed difference was in rigor and consistency, not correctness: the rules-ON
+run added a store-level dispatch test and an explicit immutability assertion
+(19 vs 16 passing) and matched the repo's existing naming (`Priority` /
+`setPriority` vs `TaskPriority` / `setTaskPriority`). For this prompt,
+`testing.mdc` accounted for most of the observed gap.
+
+These are observations from this one experiment only; they are not generalized
+to other prompts, models, or repositories.
+
+
 
 
 
