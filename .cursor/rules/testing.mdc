@@ -1,0 +1,22 @@
+---
+description: "Colocated vitest tests, AAA pattern"
+globs: "app/**/*.test.ts"
+alwaysApply: false
+---
+
+# Testing
+
+## Context
+
+Tests are colocated `*.test.ts` files run with vitest.
+
+## Rule
+
+- Put new tests next to the file they test, named `<file>.test.ts`.
+- Use vitest (`describe`/`it`/`expect`) and an Arrange-Act-Assert structure.
+- Add a test for every new action/reducer case/selector.
+
+## How to verify
+
+1. `cd app && npm test` is green.
+2. New test files sit beside their source file with matching names.

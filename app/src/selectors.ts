@@ -4,12 +4,16 @@
 
 import type { AppState, Task } from "./types.js";
 
+function tasksByDone(tasks: Task[], done: boolean): Task[] {
+  return tasks.filter((task) => task.done === done);
+}
+
 export function visibleTasks(state: AppState): Task[] {
   switch (state.filter) {
     case "active":
-      return state.tasks.filter((task) => !task.done);
+      return tasksByDone(state.tasks, false);
     case "done":
-      return state.tasks.filter((task) => task.done);
+      return tasksByDone(state.tasks, true);
     case "all":
     default:
       return state.tasks;
@@ -17,5 +21,5 @@ export function visibleTasks(state: AppState): Task[] {
 }
 
 export function remainingCount(state: AppState): number {
-  return state.tasks.filter((task) => !task.done).length;
+  return tasksByDone(state.tasks, false).length;
 }

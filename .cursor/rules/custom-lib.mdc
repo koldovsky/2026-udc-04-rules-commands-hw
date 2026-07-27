@@ -1,0 +1,21 @@
+---
+description: "app/src/lib/text.ts has a fixed API — do not hallucinate helpers"
+globs: "app/src/lib/**"
+alwaysApply: false
+---
+
+# Custom lib
+
+## Context
+
+`text.ts` only has `slugify`, `truncate`, `normalizeSpaces` — it's not lodash.
+
+## Rule
+
+- Don't use or assume helpers like `capitalize`/`camelCase`/`deburr` — they
+  don't exist.
+- Don't add lodash/underscore as a dependency.
+
+## How to verify
+
+1. `grep -rn "capitalize|camelCase|deburr" app/src` → no matches.
