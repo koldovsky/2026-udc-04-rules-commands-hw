@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { reducer } from "./reducer.js";
-import { addTask, removeTask, setFilter, toggleTask } from "./actions.js";
+import { addTask, clearCompleted, removeTask, setFilter, toggleTask } from "./actions.js";
 import { initialState, type AppState } from "./types.js";
 
 describe("reducer", () => {
@@ -36,5 +36,17 @@ describe("reducer", () => {
     const state: AppState = { tasks: [{ id: "a", title: "A", done: false }], filter: "all" };
     const next = reducer(state, toggleTask("missing"));
     expect(next.tasks[0]?.done).toBe(false);
+  });
+
+  it("clears completed tasks, keeping the rest", () => {
+    const state: AppState = {
+      tasks: [
+        { id: "a", title: "A", done: true },
+        { id: "b", title: "B", done: false },
+      ],
+      filter: "all",
+    };
+    const next = reducer(state, clearCompleted());
+    expect(next.tasks).toEqual([{ id: "b", title: "B", done: false }]);
   });
 });

@@ -18,6 +18,10 @@ export function removeTask(id: TaskId): Action {
   return { type: "task/removed", payload: { id } };
 }
 
+export function clearCompleted(): Action {
+  return { type: "task/cleared" };
+}
+
 export function setFilter(filter: Filter): Action {
   return { type: "filter/set", payload: { filter } };
 }

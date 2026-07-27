@@ -1,0 +1,31 @@
+---
+description: "TS code style — named exports, no any/@ts-ignore, immutable updates, kebab-case files"
+globs: "app/**/*.ts"
+alwaysApply: false
+---
+
+# Conventions — TypeScript code style
+
+## Context
+
+The app is TypeScript-strict (`noUncheckedIndexedAccess` is on) and follows a
+small, consistent style so the codebase stays predictable. See
+`app/src/reducer.ts` and `app/src/actions.ts` for the pattern to match.
+
+## Rule
+
+- **Named exports only** — no `export default`.
+- **No `any`, no `@ts-ignore`.** If a type is genuinely unknown, model it
+  properly instead of widening or suppressing.
+- **Immutable state updates** — use spread/`map`/`filter` to produce new
+  objects/arrays; never mutate `state`, `state.tasks`, or a `Task` in place.
+- **File names: kebab-case** (e.g. `text-utils.ts`); type/interface names:
+  PascalCase (e.g. `AppState`, `Task`).
+
+## How to verify
+
+1. `grep -rn "export default" app/src` — no matches.
+2. `grep -rn "\bany\b\|@ts-ignore" app/src` — no matches (outside comments
+   explaining why one was deliberately avoided).
+3. `cd app && npm run typecheck` passes with strict mode on.
+4. New files under `app/src` use kebab-case names.

@@ -1,0 +1,38 @@
+---
+description: "app/src/lib/text.ts has a fixed API — don't invent helpers that don't exist"
+globs: "app/src/lib/**"
+alwaysApply: false
+---
+
+# Custom lib — app/src/lib/text.ts fixed API
+
+## Context
+
+`app/src/lib/text.ts` is an in-house text-helper module, not lodash or
+underscore. Its entire supported surface is exactly three functions:
+
+- `slugify(input: string): string`
+- `truncate(input: string, maxLength: number, suffix?: string): string`
+- `normalizeSpaces(input: string): string`
+
+Functions like `capitalize`, `camelCase`, `deburr`, `kebabCase`, etc. do
+**not** exist here and must not be assumed to exist.
+
+## Rule
+
+- Only import `slugify`, `truncate`, `normalizeSpaces` from
+  `app/src/lib/text.ts` — do not import or call any other name from this
+  module.
+- If new text-processing behavior is needed, add a new named export to
+  `text.ts` explicitly (with a test) rather than assuming a helper already
+  exists or reaching for a new dependency.
+- Do not replace `text.ts` with lodash/underscore or add them as a
+  dependency to get "missing" helpers.
+
+## How to verify
+
+1. `grep -rn "from \"\./lib/text" app/src` (or `../lib/text`) and confirm every
+   imported name is one of `slugify`, `truncate`, `normalizeSpaces`.
+2. `grep -rn "capitalize\|camelCase\|deburr\|kebabCase" app/src` — no matches
+   unless newly and explicitly added to `text.ts` with a test.
+3. `app/package.json` has no `lodash`/`underscore` dependency added.

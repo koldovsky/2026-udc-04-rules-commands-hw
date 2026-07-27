@@ -1,0 +1,36 @@
+---
+description: "Protected core files — store.ts and types.ts require explicit approval to change"
+globs: "app/**"
+alwaysApply: true
+---
+
+# Do-not-touch — protected core
+
+## Context
+
+`app/src/store.ts` (the dispatch/notify engine) and `app/src/types.ts` (the
+core `AppState`/`Task`/`Action` types) are load-bearing: everything else in
+`app/` depends on their exact shape. `materials/architecture-brief.md` calls
+these the "protected core." Routine feature work should never need to touch
+them.
+
+## Rule
+
+- Do NOT edit `app/src/store.ts` or `app/src/types.ts` unless the user
+  explicitly asks for a change to the store engine or core types in this
+  request.
+- Extending the `Action` union in `types.ts` to ADD a new variant is allowed
+  (that's the sanctioned growth path) — but changing/removing existing
+  fields, or changing `createStore`'s public signature, is not, without
+  explicit approval.
+- If a task seems to require changing these files, stop and ask for
+  confirmation instead of proceeding silently.
+
+## How to verify
+
+1. `git diff app/src/store.ts` — empty, unless the user explicitly requested a
+   store-engine change.
+2. `git diff app/src/types.ts` — only additive changes (new `Action` variants,
+   new optional fields), no removed/renamed existing members, unless approved.
+3. Public signatures `createStore(preloaded?: AppState): Store` and the
+   `Store` interface (`getState`/`dispatch`/`subscribe`) are unchanged.

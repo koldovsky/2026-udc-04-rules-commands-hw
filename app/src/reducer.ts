@@ -32,6 +32,12 @@ export function reducer(state: AppState, action: Action): AppState {
         tasks: state.tasks.filter((task) => task.id !== action.payload.id),
       };
 
+    case "task/cleared":
+      return {
+        ...state,
+        tasks: state.tasks.filter((task) => !task.done),
+      };
+
     case "filter/set":
       return { ...state, filter: action.payload.filter };
 

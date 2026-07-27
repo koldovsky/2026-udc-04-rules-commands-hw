@@ -1,0 +1,39 @@
+---
+description: "Custom store architecture — state changes only via dispatch, extend via Action + reducer, never a state library"
+globs: "app/**"
+alwaysApply: false
+---
+
+# Architecture — custom store, not Redux/Zustand
+
+## Context
+
+`app/` uses a small in-house store (`app/src/store.ts`), not Redux, Zustand,
+MobX, or Jotai. `createStore()` returns `{ getState, dispatch, subscribe }` and
+that is the **only** sanctioned way state changes. New behavior is added by
+extending the `Action` discriminated union in `app/src/types.ts` and handling
+the new variant in `app/src/reducer.ts` — this is the "golden path" described
+in `materials/architecture-brief.md`.
+
+## Rule
+
+- All state changes go through `store.dispatch(action)`. Never mutate
+  `state.tasks` or `state.filter` directly, and never call `reducer()` outside
+  the store.
+- To add new behavior: add an `Action` variant in `app/src/types.ts` → handle
+  it in `app/src/reducer.ts` → add an action creator in `app/src/actions.ts` →
+  add a colocated test.
+- Do NOT introduce Redux, Zustand, MobX, Jotai, or any other state-management
+  library. Do NOT "modernize" `createStore`/`dispatch`/`subscribe` by replacing
+  them with a library-based implementation.
+- Reads go through `app/src/selectors.ts` helpers, not raw `state.tasks`
+  access, when adding new UI/consumer code.
+
+## How to verify
+
+1. `grep -rE "redux|zustand|mobx|jotai" app/package.json app/src` — no matches.
+2. `grep -rn "state\.tasks\s*\[" app/src` and check for direct mutation
+   (`.push(`, `.splice(`, assignment into `state.tasks[i]`) — should find zero
+   in `reducer.ts` or elsewhere outside test fixtures.
+3. Any new `Action` variant added to `types.ts` has a matching `case` in
+   `reducer.ts` and a matching creator in `actions.ts`.
