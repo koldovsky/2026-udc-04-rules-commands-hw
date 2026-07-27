@@ -8,7 +8,18 @@ action-pattern.mdc + testing.mdc
 > - Add a way to change a task's priority through the normal state flow.
 > - Keep everything type-safe and the existing tests green.
 
-**Tool used:** Claude Code (this session, with `app/AGENTS.md` + `app/CLAUDE.md` loaded)
+**Tool used:** Claude Code
+
+**Test protocol — file state per run:**
+
+| State | `.cursor/rules/*.mdc` | `app/AGENTS.md` | `app/CLAUDE.md` |
+|---|---|---|---|
+| Result A — rules ON | present (not read by Claude Code) | ✅ active | ✅ active |
+| Result B — rules OFF | present (not read by Claude Code) | ❌ renamed `.off` | ❌ renamed `.off` |
+
+Note: Claude Code reads `app/AGENTS.md` + `app/CLAUDE.md` as its rule baseline;
+`.cursor/rules/*.mdc` are Cursor-specific and do not affect Claude Code.
+Code base was restored via `git restore app/src/` before Result B.
 
 ---
 

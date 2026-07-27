@@ -15,11 +15,9 @@ like `capitalize`, `camelCase`, or `deburr` — none of these exist here.
 
 ## Rule
 
-The supported API is exactly:
+`app/src/lib/text.ts` currently exports exactly three functions:
 
 ```ts
-import { slugify, truncate, normalizeSpaces } from './lib/text';
-
 // Turn text into a URL/anchor-safe slug
 slugify(input: string): string
 // "Buy Milk!" → "buy-milk"
@@ -38,8 +36,9 @@ normalizeSpaces(input: string): string
   utility.** They are not installed.
 - **NEVER call functions that don't exist:** `capitalize`, `camelCase`,
   `deburr`, `pad`, `repeat`, `startCase`, etc. are not in `lib/text.ts`.
-- If you need a new text helper, add it to `lib/text.ts` explicitly and write
-  a corresponding test in `lib/text.test.ts`. Do not add it anywhere else.
+- If you need a helper not listed above, add it to `lib/text.ts` explicitly
+  (with a corresponding test in `lib/text.test.ts`) — never invent a function
+  that isn't there or import an external library.
 - **Import paths:**
   - In source files (`*.ts`): `'./lib/text.js'` (ESM `.js` extension required)
   - In test files (`*.test.ts`): `'./lib/text'` (no extension; Vitest resolves it)

@@ -58,4 +58,5 @@ human approval before making the change.
 - No secrets, API keys, or credentials in any file
 - Do not install external state libraries (Redux, Zustand, etc.)
 - Do not replace the custom store with a third-party solution
+- No new npm dependencies without explicit approval
 - Run `cd app && npm test` to verify changes before marking work complete
