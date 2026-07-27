@@ -1,0 +1,49 @@
+---
+description: "app/src/lib/text.ts has a fixed, small API — don't invent helpers that don't exist"
+globs: "app/src/**/*.{ts,tsx}"
+alwaysApply: false
+---
+
+# Custom lib — `app/src/lib/text.ts` fixed API
+
+## Context
+
+`app/src/lib/text.ts` is an in-house text-helper lib, not lodash. Its current
+exports are exactly these three functions (new ones may be added as a
+separate named export with a colocated test — see Rule below):
+
+- `slugify(input: string): string`
+- `truncate(input: string, maxLength: number, suffix?: string): string`
+- `normalizeSpaces(input: string): string`
+
+## Rule
+
+- Only call `slugify`, `truncate`, `normalizeSpaces` — do not assume helpers
+  like `capitalize`, `camelCase`, `deburr`, `kebabCase` exist, and don't pull
+  in `lodash`/`underscore` as a substitute.
+- `truncate`'s length budget (`maxLength`) includes the suffix — don't append
+  a suffix on top of an already-`maxLength`-sized slice. Its default `suffix`
+  is the single Unicode ellipsis `…`, not `"..."`.
+- If new text-processing behavior is needed, add a new named-export function
+  to `text.ts` (and a colocated test in `text.test.ts` following
+  `testing.mdc`) rather than reaching for a helper that "should" exist.
+- Do not change the existing three functions' signatures or default
+  parameter values — only add new functions.
+
+## How to verify
+
+1. `grep -n "^export function" app/src/lib/text.ts` lists exactly
+   `slugify`, `truncate`, `normalizeSpaces`, plus any explicitly-added new
+   functions — nothing imported from elsewhere claiming those names.
+2. `grep -rn "capitalize(\|camelCase(\|deburr(\|kebabCase(" app/src` (call
+   syntax, so it doesn't flag the doc comment naming these as unsupported)
+   returns no matches unless one was just added as a real, tested function
+   in `text.ts`.
+3. `grep -rniE '"(lodash|underscore)"\s*:' app/package.json` and
+   `grep -rnE "^\s*(import|export).*from\s+['\"](lodash|underscore)['\"]" app/src`
+   both return no matches (the second check is anchored to actual
+   `import`/`export` statements, so a bare mention in a comment doesn't
+   count).
+4. `grep -n "maxLength: number, suffix = " app/src/lib/text.ts` still shows
+   the original default (`suffix = "…"`) unless the task explicitly asked to
+   change it.

@@ -2,7 +2,7 @@
 // selectors instead of poking at `state.tasks` directly, so filtering logic
 // lives in one place.
 
-import type { AppState, Task } from "./types.js";
+import type { AppState, Filter, Task } from "./types.js";
 
 export function visibleTasks(state: AppState): Task[] {
   switch (state.filter) {
@@ -18,4 +18,12 @@ export function visibleTasks(state: AppState): Task[] {
 
 export function remainingCount(state: AppState): number {
   return state.tasks.filter((task) => !task.done).length;
+}
+
+export function taskCount(state: AppState): number {
+  return state.tasks.length;
+}
+
+export function currentFilter(state: AppState): Filter {
+  return state.filter;
 }

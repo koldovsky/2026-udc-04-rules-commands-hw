@@ -1,0 +1,54 @@
+---
+description: "Named exports, no any/@ts-ignore, immutable updates, import style, kebab-case files"
+globs: "app/**/*.{ts,tsx}"
+alwaysApply: false
+---
+
+# Code conventions
+
+## Context
+
+`app/src` is TypeScript-strict (`noUncheckedIndexedAccess` is on) with a
+consistent set of conventions across every file — see
+`materials/architecture-brief.md`, "Conventions".
+
+## Rule
+
+- **Named exports only** — no `export default` anywhere in `app/src`.
+- No `any` and no `@ts-ignore`/`@ts-expect-error`. If a type is genuinely
+  unknown, model it properly (union, generic, `unknown` + narrowing).
+- All state updates are **immutable**: build new objects/arrays with spread,
+  `map`, `filter`, etc. Never mutate an existing array/object in place.
+- Relative imports between `app/src` files keep the `.js` extension (matches
+  every existing import, e.g. `"./types.js"`, `"./lib/text.js"`), even though
+  the file on disk is `.ts`.
+- Type-only imports use `import type { ... }` (or an inline `type` modifier,
+  as in `import { initialState, type AppState } from "./types.js"`) —
+  don't import a type as if it were a value.
+- `noUncheckedIndexedAccess` is on: indexing an array (`tasks[0]`) or looking
+  up an optional record key yields `T | undefined`. Guard/narrow before use
+  (as `reducer.test.ts` does with `toggled.tasks[0]?.done`) instead of
+  asserting it away with `!`.
+- File names are **kebab-case** (e.g. `text-utils.ts`, not `textUtils.ts`);
+  type/interface names are PascalCase (matches existing `Task`, `AppState`).
+
+## How to verify
+
+1. `grep -rn "export default" app/src` returns no matches.
+2. `grep -rnE "\bany\b|@ts-ignore|@ts-expect-error" app/src --include=*.ts
+   --include=*.tsx | grep -vE ':[0-9]+:\s*//'` — the second `grep` strips out
+   comment-only lines automatically (a matched line whose content, after the
+   `file:line:` prefix, starts with `//`), so the check is a deterministic
+   pass/fail instead of eyeballing it; returns no matches. Test files
+   (`*.test.ts`/`*.spec.ts` and their `.tsx` counterparts) are included, not
+   exempt from this rule.
+3. `grep -rnoE "(from|import)\s+['\"]\.\.?/[^'\"]*['\"]" app/src
+   --include=*.ts --include=*.tsx | grep -vE "\.js['\"]$"` (every relative
+   import via `from`/`import`, either quote style, `./` or `../`, filtered
+   down to those NOT ending in `.js`) returns no matches.
+4. `cd app && npm run typecheck` passes (strict mode catches unintended `any`
+   leaks, unguarded indexed access, and bad import resolution).
+5. `find app/src -type f \( -name "*.ts" -o -name "*.tsx" \) -exec basename {} \;
+   | grep -vE '^[a-z0-9-]+(\.(test|spec))?\.(ts|tsx)$'` returns no matches —
+   every filename under `app/src` follows the kebab-case pattern
+   (`^[a-z0-9-]+(\.(test|spec))?\.(ts|tsx)$`); any printed line is a violation.

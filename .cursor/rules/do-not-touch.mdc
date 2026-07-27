@@ -1,0 +1,40 @@
+---
+description: "Protected core files — store.ts and types.ts require explicit permission to change"
+alwaysApply: true
+---
+
+# Do-not-touch — protected core
+
+## Context
+
+`app/src/store.ts` and `app/src/types.ts` are the protected core (see
+`materials/architecture-brief.md`) — everything else in `app/src` builds on
+top of them.
+
+## Rule
+
+- Do NOT edit `app/src/store.ts` unless the user's request explicitly names
+  that file and asks for a change to it. Do not re-implement its
+  `dispatch`/`subscribe`/`getState` behavior elsewhere as a workaround.
+- `app/src/types.ts` is the one "protected" file that legitimately grows: new
+  `Action` variants and new `Task`/`AppState` fields are added here (that's
+  the sanctioned extension point per `architecture.mdc`). What's off-limits
+  even in `types.ts` is rewriting or renaming the *existing* exported
+  shapes/names (`Task`, `AppState`, `Action`, `Listener`, `initialState`) —
+  additive changes only.
+- If a task genuinely cannot be done without changing `store.ts`'s engine
+  itself (not just adding an `Action` variant), stop and say so instead of
+  silently making the change or routing around it.
+
+## How to verify
+
+1. `git diff --name-only` (or the PR's changed-files list) does not include
+   `app/src/store.ts` unless the task explicitly asked for it.
+2. If `app/src/types.ts` changed, `git diff app/src/types.ts` shows only
+   additions (new union members / new fields), not a renamed or
+   removed existing export.
+3. No new file duplicates `dispatch`/`subscribe`/`getState`-shaped logic
+   (`grep -rnE "(function|const|let)\s+(createStore|dispatch|subscribe)\b|getState\s*\(\)\s*\{|getState\s*:\s*\(\)\s*=>|dispatch\s*\([^)]*\)\s*\{|dispatch\s*:\s*\(|subscribe\s*\([^)]*\)\s*\{|subscribe\s*:\s*\(" app/src`
+   should only match `store.ts`).
+4. `cd app && npm test` still passes after the change (protected-core
+   breakage tends to cascade into test failures across multiple files).

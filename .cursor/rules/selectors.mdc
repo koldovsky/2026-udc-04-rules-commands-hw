@@ -1,0 +1,41 @@
+---
+description: "Reads go through app/src/selectors.ts, not raw state field access"
+globs: "app/src/selectors.ts,app/src/**/*.{ts,tsx}"
+alwaysApply: false
+---
+
+# Selectors — read helpers stay centralized
+
+## Context
+
+`app/src/selectors.ts` (`visibleTasks`, `remainingCount`, `taskCount`,
+`currentFilter`) is the sanctioned way to derive data from `AppState` — see
+`app/src/index.ts` for the pattern.
+
+## Rule
+
+- New derived/read logic over `AppState` (counts, filters, lookups) is added
+  as a new named export in `app/src/selectors.ts`, not inlined at the call
+  site.
+- Consumers of state read through selectors (`visibleTasks`,
+  `remainingCount`, or a newly added selector) rather than reading
+  `state.tasks`/`state.filter` directly and re-deriving the same logic.
+- Selectors stay pure functions of `(state, ...args) => value` — no
+  dispatching, no side effects, no mutation of the input state, and no
+  reaching into `store.getState()` themselves (the caller passes `state` in).
+
+## How to verify
+
+1. New read/derive logic over `AppState` appears as an exported function in
+   `app/src/selectors.ts` with a matching test in a colocated
+   `selectors.test.ts`.
+2. `grep -rnE "\bstate\.(tasks|filter)\b" app/src` — catches any field/method
+   access off `state.tasks`/`state.filter` (`.filter`, `.map`, `.find`,
+   `.length`, or bare access), not just `.filter`/`.map`; matches should only
+   appear inside `selectors.ts` and `reducer.ts`, not scattered across other
+   consumer files (e.g. `index.ts`). Doesn't catch access via a destructured
+   alias (`const { tasks } = state`) — review those by eye.
+3. `grep -n "dispatch\|getState()" app/src/selectors.ts` returns no matches —
+   selectors never call the store themselves.
+4. `cd app && npm run typecheck` passes (selectors keep the same `AppState`
+   import shape as the rest of the app).

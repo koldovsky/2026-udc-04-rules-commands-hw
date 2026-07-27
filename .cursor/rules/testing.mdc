@@ -1,0 +1,60 @@
+---
+description: "Colocated vitest tests using the AAA pattern, matching existing naming and coverage style"
+globs: "app/**/*.{test,spec}.{ts,tsx}"
+alwaysApply: false
+---
+
+# Testing
+
+## Context
+
+Tests are colocated (`app/src/reducer.test.ts` next to `reducer.ts`) and run
+with **vitest** (`cd app && npm test`) — see `app/src/reducer.test.ts` for the
+existing style.
+
+## Rule
+
+- New test files are **colocated**: `foo.ts` gets `foo.test.ts` in the same
+  directory, not a separate `__tests__`/`test/` tree.
+- Use **vitest** APIs (`describe`, `it`, `expect`, `vi`) — the same imports
+  already used in `app/src/reducer.test.ts`/`app/src/store.test.ts`. Do not
+  introduce jest, mocha, or another test runner.
+- Structure each test as **Arrange-Act-Assert**: set up input/state, perform
+  the one action/call under test, assert the result — avoid interleaving
+  setup and assertions.
+- Match the existing naming style: `describe` names the unit under test
+  (`"reducer"`, `"createStore"`, `"slugify"`); `it` names read as a plain-
+  English behavior statement in lowercase, third person present tense
+  ("adds a task as not done"), not "should add a task".
+- Every new `Action` variant or exported function gets at least one happy-
+  path test AND one edge case (empty input, missing id, boundary value) — one
+  test per unit is not enough on its own.
+- No snapshot tests — none exist in this codebase; assert on specific values/
+  shapes instead (`toEqual`, `toBe`, `toHaveLength`), matching every existing
+  test.
+
+## How to verify
+
+1. `cd app && npm test` is green.
+2. Every non-test `.ts`/`.tsx` file under `app/src` (excluding `types.ts` and
+   `store.ts`) has a colocated `*.test.ts`/`*.spec.ts` (or `.tsx`)
+   counterpart: `for f in $(find app/src -type f \( -name "*.ts" -o -name
+   "*.tsx" \) ! -name "*.test.ts" ! -name "*.test.tsx" ! -name "*.spec.ts" !
+   -name "*.spec.tsx" ! -name "types.ts" ! -name "store.ts"); do
+   base="${f%.*}"; { test -f "${base}.test.ts" || test -f "${base}.test.tsx"
+   || test -f "${base}.spec.ts" || test -f "${base}.spec.tsx"; } || { echo
+   "MISSING TEST: $f"; exit 1; }; done` exits `0` and prints nothing — a
+   printed line is a source file missing its colocated test, and the loop
+   stops (fail-fast) at the first one.
+3. Every `*.test.ts`/`*.spec.ts` (or `.tsx`) file imports `describe`, `it`,
+   and `expect` from `vitest` (add `vi` too for tests that need mocking, as
+   `store.test.ts` does): `for f in $(find app/src -type f \( -name
+   "*.test.ts" -o -name "*.test.tsx" -o -name "*.spec.ts" -o -name
+   "*.spec.tsx" \)); do grep -qE "from ['\"]vitest['\"]" "$f" && grep -qE
+   "\bdescribe\b" "$f" && grep -qE "\bit\b" "$f" && grep -qE "\bexpect\b"
+   "$f" || { echo "MISSING VITEST IMPORT: $f"; exit 1; }; done` exits `0`,
+   and `grep -rnE "from ['\"](jest|mocha|chai)['\"]" app/src` returns no
+   matches — new test files import from `vitest`, never `jest`/`mocha`/
+   `chai`.
+4. `grep -rn "toMatchSnapshot" app/src` returns no matches.
+5. Each new `it(...)` block name does not start with "should".

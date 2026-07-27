@@ -1,0 +1,34 @@
+---
+description: "No new npm dependencies, and no version bumps of existing ones, without explicit user permission"
+alwaysApply: true
+---
+
+# Dependencies — no new packages, no silent bumps
+
+## Context
+
+`app/package.json` has zero runtime dependencies and only `typescript`/
+`vitest` as devDependencies — intentionally minimal.
+
+## Rule
+
+- Do NOT add any package to `app/package.json` (`dependencies` or
+  `devDependencies`) unless the user's request explicitly names the package
+  and asks for it to be added.
+- Do NOT change the version of an existing dependency (`typescript`,
+  `vitest`) unless explicitly asked to.
+- This includes state-management libraries (redux/zustand/mobx/jotai),
+  utility libraries (lodash/underscore/ramda), and test-tooling alternatives
+  (jest/mocha/chai) — the app already has vitest and does not need another.
+- If a task seems to need a new package or a version bump to work around an
+  error, say so and ask instead of making the change silently.
+
+## How to verify
+
+1. `git diff app/package.json app/package-lock.json` is empty, unless the
+   task explicitly requested a dependency change.
+2. `cd app && npm test` still runs with the existing `node_modules` (no
+   `npm install <new-package>` or `npm install <pkg>@<newversion>` was run as
+   part of the task).
+3. A manual diff of `app/package.json` shows no new/changed entries under
+   `dependencies`/`devDependencies`.

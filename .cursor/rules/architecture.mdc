@@ -1,0 +1,118 @@
+---
+description: "Custom store is the only way state changes; extend via Action union + reducer, never a state library"
+globs: "app/**"
+alwaysApply: false
+---
+
+# Architecture — custom store, not Redux/Zustand
+
+## Context
+
+`app/src/store.ts` (`createStore` -> `{ getState, dispatch, subscribe }`) is
+the only state engine in this app — a hand-rolled store, not Redux/Zustand.
+See `materials/architecture-brief.md`.
+
+## Rule
+
+- State changes ONLY through `store.dispatch(action)`. Never mutate the object
+  returned by `store.getState()`, and never assign to its fields.
+- To add new behavior: add a variant to the `Action` union in
+  `app/src/types.ts` (allowed — see `do-not-touch.mdc` for the exact boundary)
+  → handle it in `app/src/reducer.ts` (pure, returns a new object) → add a
+  matching creator in `app/src/actions.ts` (see `action-creators.mdc`).
+- Build actions with the creators from `app/src/actions.ts`, never by hand-
+  writing `{ type: "...", payload: {...} }` at the call site.
+- Do NOT import or add `redux`, `zustand`, `mobx`, `jotai`, or any other state
+  library (see `dependencies.mdc`). Do NOT reimplement `dispatch`/`subscribe`/
+  `getState` in a new file — `app/src/store.ts` is the only instance.
+- `subscribe` returns an unsubscribe function; call it when a listener should
+  stop receiving updates instead of leaving it registered forever (see the
+  "stops notifying after unsubscribe" case in `app/src/store.test.ts`).
+- UI/consumer code reads state via `app/src/selectors.ts`, not by reaching
+  into `state.tasks`/`state.filter` directly.
+
+## How to verify
+
+1. `grep -rniE '"(redux|zustand|mobx|jotai)"[[:space:]]*:' app/package.json`
+   returns no matches — redux/zustand/mobx/jotai aren't declared as a
+   dependency or devDependency.
+2. This syntax-aware check parses each source file's AST (via the
+   `typescript` package already installed as a devDependency — no new
+   package needed) instead of grepping raw text, so it can't be fooled by a
+   mention inside a comment or string literal (e.g. `const note = "x =
+   require('redux')"`), while still catching every real import form
+   (side-effect `import "redux"`, `from`-form imports/re-exports,
+   `require(...)`, dynamic `import(...)`, and subpath specifiers like
+   `zustand/vanilla` or `jotai/utils`):
+   ```bash
+   cd app
+   node <<'EOF'
+   const ts = require("typescript");
+   const fs = require("fs");
+   const { execSync } = require("child_process");
+   const files = execSync("git ls-files src", { encoding: "utf8" })
+     .split("\n")
+     .filter((f) => /\.(ts|tsx)$/.test(f));
+   const forbidden = /^(redux|zustand|mobx|jotai)(\/.*)?$/;
+   const bad = [];
+   for (const file of files) {
+     const src = fs.readFileSync(file, "utf8");
+     const sf = ts.createSourceFile(file, src, ts.ScriptTarget.Latest, true);
+     (function visit(node) {
+       if (
+         (ts.isImportDeclaration(node) || ts.isExportDeclaration(node)) &&
+         node.moduleSpecifier &&
+         ts.isStringLiteral(node.moduleSpecifier) &&
+         forbidden.test(node.moduleSpecifier.text)
+       ) {
+         bad.push(`${file}: ${node.moduleSpecifier.text}`);
+       }
+       if (ts.isCallExpression(node)) {
+         const isRequire =
+           ts.isIdentifier(node.expression) && node.expression.text === "require";
+         const isDynImport = node.expression.kind === ts.SyntaxKind.ImportKeyword;
+         const arg = node.arguments[0];
+         if (
+           (isRequire || isDynImport) &&
+           arg &&
+           ts.isStringLiteral(arg) &&
+           forbidden.test(arg.text)
+         ) {
+           bad.push(`${file}: ${arg.text}`);
+         }
+       }
+       ts.forEachChild(node, visit);
+     })(sf);
+   }
+   if (bad.length) {
+     console.log(bad.join("\n"));
+     process.exit(1);
+   }
+   EOF
+   ```
+   No output (exit 0) means nothing in `app/src` imports, re-exports, or
+   requires a state library.
+3. Every new action `type` string appears in all three of `types.ts`,
+   `reducer.ts`, and `actions.ts`:
+   ```bash
+   diff <(grep -oE "['\"][a-z]+/[a-z]+['\"]" app/src/types.ts | tr -d "'\"" | sort -u) \
+        <(grep -oE "case ['\"][a-z]+/[a-z]+['\"]" app/src/reducer.ts | grep -oE "['\"][a-z]+/[a-z]+['\"]" | tr -d "'\"" | sort -u)
+   diff <(grep -oE "['\"][a-z]+/[a-z]+['\"]" app/src/types.ts | tr -d "'\"" | sort -u) \
+        <(grep -oE "['\"][a-z]+/[a-z]+['\"]" app/src/actions.ts | tr -d "'\"" | sort -u)
+   ```
+   Both `diff`s must produce no output — any output means the `Action` union,
+   reducer `case` arms, and creators in `actions.ts` have fallen out of sync
+   (quote-insensitive, so a variant written with `'single quotes'` is still
+   caught).
+4. `grep -rnE "getState\(\)(\.[a-zA-Z]+|\[[^]]+\])+\s*=|getState\(\)(\.[a-zA-Z]+|\[[^]]+\])*\.(push|splice|pop|shift|unshift|sort|reverse)\(" app/src`
+   returns no matches — that pattern is direct mutation of live state instead
+   of going through `dispatch`, including nested writes chained straight off
+   `getState()` (e.g. `getState().tasks[0].done = true`). (Reading
+   `getState().tasks` is fine; assigning to it or calling a mutating array
+   method on it is not.) This only catches mutations written directly on the
+   `getState()` expression — an aliased mutation split across statements
+   (`const state = store.getState(); state.tasks.push(...)`) isn't caught;
+   review those by eye, the same limitation `selectors.mdc` notes for
+   destructured aliases.
+5. `cd app && npm test` passes, including the existing immutability
+   assertion in `reducer.test.ts` ("does not mutate the previous state").

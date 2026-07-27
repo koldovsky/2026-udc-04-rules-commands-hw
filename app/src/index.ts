@@ -4,15 +4,23 @@
 
 import { createStore } from "./store.js";
 import { addTask, toggleTask, setFilter } from "./actions.js";
-import { visibleTasks, remainingCount } from "./selectors.js";
+import {
+  visibleTasks,
+  remainingCount,
+  taskCount,
+  currentFilter,
+} from "./selectors.js";
 import { slugify } from "./lib/text.js";
+import type { AppState } from "./types.js";
+
+export function formatStatus(state: AppState): string {
+  return `tasks: ${taskCount(state)}, remaining: ${remainingCount(state)}, filter: ${currentFilter(state)}`;
+}
 
 const store = createStore();
 
 store.subscribe((state) => {
-  console.log(
-    `tasks: ${state.tasks.length}, remaining: ${remainingCount(state)}, filter: ${state.filter}`,
-  );
+  console.log(formatStatus(state));
 });
 
 const buyMilk = slugify("Buy Milk");

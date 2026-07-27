@@ -1,0 +1,52 @@
+---
+description: "Every Action variant gets a matching action creator in app/src/actions.ts, following existing naming"
+globs: "app/src/**/*.{ts,tsx}"
+alwaysApply: false
+---
+
+# Action creators — one per `Action` variant
+
+## Context
+
+`app/src/actions.ts` holds one creator per `Action` variant (`addTask`,
+`toggleTask`, `removeTask`, `clearTasks`, `setTaskPriority`, `setFilter`) —
+the sanctioned way to build `Action` objects.
+
+## Rule
+
+- Every new `Action` variant added to `app/src/types.ts` gets a matching
+  named-export creator function in `app/src/actions.ts`, named
+  `verbNoun`/`verb` (e.g. `addTask`, `setFilter`) — not `createAddTask` or
+  `taskAddedAction`.
+- Match the existing `type` string convention: `"<domain>/<lowercase verb>"`
+  (`task/added`, `task/toggled`, `task/removed`, `task/cleared`,
+  `task/prioritized`, `filter/set`), not `SCREAMING_SNAKE_CASE` or a bare
+  verb.
+- Action creators only build and return an `Action` object — they never call
+  `dispatch` themselves and never contain reducer logic (no branching on
+  existing state).
+- Consumers/tests dispatch via the creator (`store.dispatch(addTask(...))`),
+  not by hand-writing `{ type: "...", payload: {...} }` inline.
+
+## How to verify
+
+1. Set equality between the `type` strings in the `Action` union
+   (`app/src/types.ts`) and the `type` strings returned by creators in
+   `app/src/actions.ts` — matching counts alone would miss a duplicated
+   creator masking a missing one:
+   ```bash
+   diff <(grep -oE "['\"][a-z]+/[a-z]+['\"]" app/src/types.ts | tr -d "'\"" | sort -u) \
+        <(grep -oE "['\"][a-z]+/[a-z]+['\"]" app/src/actions.ts | tr -d "'\"" | sort -u)
+   ```
+   No output means every `Action` variant has exactly one creator and there
+   are no stray or duplicate `type` strings, whether quoted with `'` or `"`.
+2. `grep -rnE "type[[:space:]]*:[[:space:]]*['\"]" app/src --include='*.ts'
+   --include='*.tsx' --exclude='types.ts' --exclude='actions.ts'
+   --exclude='reducer.ts' --exclude='*.test.ts' --exclude='*.test.tsx'
+   --exclude='*.spec.ts' --exclude='*.spec.tsx'`
+   returns no matches — nothing builds raw action objects by hand elsewhere,
+   whether quoted with `'` or `"` or spaced around the colon.
+3. New `type` strings match `^[a-z]+\/[a-z]+$` and read as a lowercase verb
+   (`added`/`removed`/`toggled`/`cleared`/`prioritized`/`set`), consistent
+   with the existing six.
+4. `cd app && npm test` passes, including a test exercising the new creator.
