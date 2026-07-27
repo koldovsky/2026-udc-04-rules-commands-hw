@@ -19,18 +19,22 @@ those files aside (not `.cursor/rules`, which Copilot ignores):
 ```bash
 # A — rules ON: fresh Agent chat, paste the ab-task.md request, capture result.
 #     confirm the reply shows "Used reference: copilot-instructions.md".
-git stash push -- app/src            # save A, reset tree so B starts clean
+git status --short app/src            # inspect the A result before stashing
+git stash push -u -- app/src          # save A (incl. untracked), reset tree clean
+git status --short app/src            # expect empty — B starts from a clean tree
 
 # B — rules OFF:
 mv .github/copilot-instructions.md .github/copilot-instructions.md.off
 mv AGENTS.md AGENTS.md.off
 mv app/AGENTS.md app/AGENTS.md.off
 # fresh Agent chat, paste the SAME request, capture result, then restore:
+git clean -fdn app/src                # DRY RUN — verify only intended files listed
 git checkout -- app/src && git clean -fd app/src
+git status --short app/src            # expect empty — B changes fully removed
 mv .github/copilot-instructions.md.off .github/copilot-instructions.md
 mv AGENTS.md.off AGENTS.md
 mv app/AGENTS.md.off app/AGENTS.md
-git stash pop                        # restore the A result
+git stash pop                         # restore the A result
 ```
 
 ## Result A — rules ON
@@ -85,5 +89,6 @@ the repo's naming conventions, whereas rules-OFF did the minimum viable test.
 The `testing.mdc` rule mattered most here. Honest takeaway: on a capable model,
 rule-sets are a **quality/consistency floor**, not a safety net — the gap would
 widen on weaker models or vaguer prompts.
+
 
 

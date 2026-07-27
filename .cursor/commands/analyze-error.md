@@ -2,6 +2,8 @@
 description: "Diagnose an error/stack trace and propose a safe fix"
 ---
 
+# Analyze error
+
 Analyze this error and propose a fix: $ARGUMENTS
 
 1. Read the error/stack trace and locate the failing file and line in `app/src`.
@@ -15,4 +17,3 @@ Analyze this error and propose a fix: $ARGUMENTS
 
 Follow the project conventions in `.cursor/rules/` (custom store — NOT
 Redux/Zustand; no `any`/`@ts-ignore`; do not touch the protected core).
-

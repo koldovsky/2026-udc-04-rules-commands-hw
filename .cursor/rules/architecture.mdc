@@ -28,9 +28,13 @@ See `materials/architecture-brief.md` for the source of truth.
 
 ## How to verify
 
-1. `grep -rEi "redux|zustand|mobx|jotai|recoil" app/` returns zero matches.
+1. `grep -rEi "from ['\"](redux|zustand|mobx|jotai|recoil)" app/ --exclude-dir=node_modules --exclude=AGENTS.md --exclude=CLAUDE.md`
+   returns zero matches — instructional files (`app/AGENTS.md`, `app/CLAUDE.md`)
+   and the protected-core prose in `store.ts` are ignored, but a real
+   state-library import in application source is still caught.
 2. New action `type` strings exist in `app/src/types.ts` `Action` union AND have
    a matching `case` in `app/src/reducer.ts`.
 3. Every new action has a creator in `app/src/actions.ts` and a colocated test.
 4. `cd app && npm test` is green.
+
 

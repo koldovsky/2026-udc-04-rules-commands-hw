@@ -9,9 +9,9 @@ alwaysApply: false
 ## Context
 
 `app/src/actions.ts` holds action creators (`addTask`, `toggleTask`,
-`removeTask`, `setFilter`); `app/src/selectors.ts` holds pure read helpers
-(`visibleTasks`, `remainingCount`). Consumers use these instead of building
-action objects or reading `state.tasks` by hand.
+`removeTask`, `setPriority`, `setFilter`); `app/src/selectors.ts` holds pure read
+helpers (`visibleTasks`, `remainingCount`). Consumers use these instead of
+building action objects or reading `state.tasks` by hand.
 
 ## Rule
 
@@ -27,8 +27,11 @@ action objects or reading `state.tasks` by hand.
 
 ## How to verify
 
-1. `grep -rn "type:\s*\"" app/src --include=*.ts` finds action `type` literals
-   only in `actions.ts`, `reducer.ts`, and `types.ts` — not in UI/consumer code.
+1. `grep -rEn "type:[[:space:]]*\"" app/src --include=*.ts` finds action `type`
+   literals only in `actions.ts`, `reducer.ts`, and `types.ts` — not in
+   UI/consumer code.
 2. Selectors take `AppState` (or a slice) and return data without mutating it.
 3. Each action creator has a matching reducer `case` and union member.
+
+
 

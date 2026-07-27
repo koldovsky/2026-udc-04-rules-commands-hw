@@ -1,6 +1,6 @@
 ---
 description: "TypeScript conventions for the task-board app"
-globs: "app/**/*.ts"
+globs: "app/**/*.{ts,tsx}"
 alwaysApply: false
 ---
 
@@ -30,4 +30,5 @@ the reducer/actions/selectors trio predictable. See `app/src/actions.ts` and
 2. `grep -rEn "\bany\b|@ts-ignore|@ts-expect-error" app/src` returns zero matches.
 3. `cd app && npm run typecheck` passes with no errors.
 4. Reducer cases return new objects (no `state.x =` assignments).
+
 

@@ -11,7 +11,7 @@ working inside `app/`. Keep changes small, typed, and on the golden path.
   A custom store, **not** Redux/Zustand. **Protected core.**
 - `app/src/reducer.ts` — pure `(state, action) => newState`. Where the domain grows.
 - `app/src/actions.ts` — action creators (`addTask`, `toggleTask`, `removeTask`,
-  `setFilter`).
+  `setPriority`, `setFilter`).
 - `app/src/selectors.ts` — pure read helpers (`visibleTasks`, `remainingCount`).
 - `app/src/lib/text.ts` — in-house text lib with a fixed API (`slugify`,
   `truncate`, `normalizeSpaces`).

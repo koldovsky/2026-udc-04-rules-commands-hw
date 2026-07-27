@@ -1,6 +1,6 @@
 ---
 description: "Testing conventions — vitest, colocated, AAA"
-globs: "app/**/*.test.ts"
+globs: "app/**/*.{test,spec}.{ts,tsx}"
 alwaysApply: false
 ---
 
@@ -28,4 +28,5 @@ Tests use vitest and live NEXT TO the code they cover (e.g.
 1. Each new `*.test.ts` sits beside its source file.
 2. `cd app && npm test` is green, including the new tests.
 3. New reducer/action/helper code has at least one covering test.
+
 

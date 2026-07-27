@@ -2,6 +2,8 @@
 description: "Refactor selected code to project conventions without changing behavior"
 ---
 
+# Refactor
+
 Refactor: $ARGUMENTS
 
 1. Read the target code and its colocated test(s) to capture current behavior.
@@ -17,4 +19,3 @@ Refactor: $ARGUMENTS
 
 Follow the project conventions in `.cursor/rules/` (custom store — NOT
 Redux/Zustand; named exports; immutable updates; protected core untouched).
-
