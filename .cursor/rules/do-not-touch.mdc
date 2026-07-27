@@ -1,0 +1,41 @@
+---
+description: "Protected core — store.ts and types.ts require explicit approval"
+alwaysApply: true
+---
+
+# Protected core — ask before editing
+
+## Context
+
+`app/src/store.ts` (the dispatch/notify engine) and `app/src/types.ts` (the
+`AppState`/`Task` shapes and the `Action` union) are load-bearing: the reducer,
+action creators, selectors and every test depend on them. A silent change here
+ripples through the whole app, and the seeded comments in both files say so.
+
+## Rule
+
+- Treat these as protected:
+  - `app/src/store.ts` — DO NOT change at all without explicit approval. The
+    `Store` interface, `createStore` signature, and the dispatch/notify loop
+    are frozen.
+  - `app/src/types.ts` — ADDITIVE changes only (a new `Action` variant, a new
+    optional field on `Task`). Renaming, removing, or narrowing an existing
+    member requires explicit approval.
+- Before any edit to these files, state in the reply: which file, what the
+  addition is, and why the reducer/actions layer could not absorb it. Then
+  wait for a yes.
+- NEVER change the public signatures of `createStore`, the action creators in
+  `app/src/actions.ts`, or the functions in `app/src/lib/text.ts`. Extend, do
+  not redefine.
+- If a request seems to need a protected edit, propose the additive version
+  first (new action variant + reducer case) — that covers almost every feature.
+
+## How to verify
+
+1. `git diff --name-only` — if `app/src/store.ts` appears, an explicit approval
+   for it exists in the conversation.
+2. `git diff app/src/types.ts` shows only added lines / added union members —
+   no removed or renamed existing members.
+3. `grep -n "export function createStore" app/src/store.ts` still reads
+   `createStore(preloaded: AppState = initialState): Store`.
+4. `cd app && npm test` — the seeded `store.test.ts` passes unmodified.

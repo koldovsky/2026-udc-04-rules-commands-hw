@@ -1,0 +1,43 @@
+---
+description: "Testing — colocated vitest specs in Arrange-Act-Assert form"
+globs: "app/**/*.test.ts"
+alwaysApply: false
+---
+
+# Testing — vitest, colocated, AAA
+
+## Context
+
+Tests live next to the code they cover (`app/src/reducer.test.ts`,
+`app/src/store.test.ts`, `app/src/lib/text.test.ts`) and run with vitest via
+`cd app && npm test`. There is no `__tests__/` directory and no jest — an agent
+that invents either produces files that never run.
+
+## Rule
+
+- Put the spec beside its subject as `<name>.test.ts`. NEVER create
+  `__tests__/`, `*.spec.ts`, or a top-level `test/` directory.
+- Import from vitest explicitly: `import { describe, it, expect } from "vitest";`
+  `tsconfig.json` declares `"types": ["vitest/globals"]`, so TypeScript accepts
+  a bare `describe(...)` — but no vitest config enables `globals: true`, so it
+  throws at runtime. A clean typecheck proves nothing here; always run the suite.
+- Structure every test as Arrange → Act → Assert, in that order, with one
+  logical assertion target per `it`.
+- Test names describe observable behavior:
+  `it("keeps the other tasks untouched when one is toggled")`.
+- For reducer tests, assert immutability too: the previous state object and its
+  untouched members keep their identity
+  (`expect(next.tasks[1]).toBe(prev.tasks[1])`).
+- Every new action variant, selector, or `lib/` function ships with a test in
+  the same change. NEVER use `it.skip`/`describe.skip` or a placeholder
+  assertion like `expect(true).toBe(true)` to make a suite look green.
+- Do not mock the store. It is 40 lines — build real state and dispatch.
+
+## How to verify
+
+1. `cd app && npm test` — green, and the run output lists the new file.
+2. `ls app/src` — every non-test module that changed has a sibling
+   `*.test.ts`.
+3. `grep -rnE "\.skip\(|\bjest\b|__tests__" app/src` — zero hits.
+4. Each new `it(...)` fails if you revert the production change it covers
+   (sanity-check by undoing the reducer case once).

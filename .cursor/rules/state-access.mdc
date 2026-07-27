@@ -1,0 +1,44 @@
+---
+description: "actions.ts and selectors.ts — the sanctioned write and read layers"
+globs: "app/src/{actions,selectors}.ts"
+alwaysApply: false
+---
+
+# Write through actions, read through selectors
+
+## Context
+
+`app/src/actions.ts` keeps every action payload shape in one place, and
+`app/src/selectors.ts` keeps every derived read in one place (`visibleTasks`,
+`remainingCount`). When a consumer builds `{ type: "task/added", payload: ... }`
+inline or filters `state.tasks` at the call site, that knowledge leaks and the
+next payload change breaks callers the compiler cannot find.
+
+## Rule
+
+- Never construct an action object literal outside `actions.ts`. Consumers
+  call `dispatch(addTask(id, title))`, not `dispatch({ type: "task/added", ... })`.
+- Every `Action` union variant has exactly one creator, named after the intent
+  in camelCase (`addTask`, `setFilter`), returning `Action` — not a narrowed
+  literal type.
+- Action creators are pure mappings from arguments to payload. No ID
+  generation, no defaults pulled from global state, no validation side effects.
+- Derived reads live in `selectors.ts` as `(state: AppState) => T` pure
+  functions. Any `state.tasks.filter/map/reduce` that appears twice outside
+  this file becomes a selector.
+- Selectors NEVER mutate, sort in place, or dispatch. `sort` needs a copy:
+  `[...state.tasks].sort(...)`.
+- Both files export types-only imports from `./types.js` — they must not
+  import `store.ts` (that direction would be circular).
+
+## How to verify
+
+1. `grep -rn "type: \"" app/src --include=*.ts` — matches only in `types.ts`,
+   `actions.ts`, and test files.
+2. Each variant in the `Action` union in `types.ts` has a creator in
+   `actions.ts`: compare `grep -c "type: \"" app/src/actions.ts` with the
+   number of union members.
+3. `grep -n "store" app/src/actions.ts app/src/selectors.ts` — no import of
+   `./store.js`.
+4. `grep -rn "state\.tasks\.\(filter\|map\)" app/src` outside
+   `selectors.ts`/`reducer.ts`/tests — zero hits.
