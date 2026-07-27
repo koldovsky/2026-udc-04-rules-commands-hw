@@ -1,0 +1,34 @@
+---
+description: "Protected core — do not edit store.ts or types.ts without explicit approval"
+alwaysApply: true
+---
+
+# Do not touch — protected core
+
+## Context
+
+`app/src/store.ts` (`createStore` / `dispatch` / `subscribe`) and
+`app/src/types.ts` (`AppState`, `Task`, `Action` union, `initialState`) are the
+load-bearing contract. Casual edits ripple through reducer, actions, selectors,
+and tests.
+
+## Rule
+
+- Treat `app/src/store.ts` and `app/src/types.ts` as **protected**.
+- **Do not** edit them unless the user explicitly asks / approves changing the
+  protected core in this conversation.
+- Normal feature work extends `app/src/reducer.ts`, `app/src/actions.ts`, and
+  `app/src/selectors.ts` — and only touches `types.ts` when a new `Action`
+  variant (or domain field) is **explicitly** required and approved.
+- **NEVER** change the public signature of `createStore` (return shape:
+  `getState` / `dispatch` / `subscribe`).
+- If a task seems to require rewriting the store engine, stop and ask — do not
+  silently refactor.
+
+## How to verify
+
+1. In the diff, `store.ts` is unchanged unless the user approved it.
+2. If `types.ts` changed, the user asked for a new action/field; signature of
+   `createStore` is untouched.
+3. Feature work primarily lands in `reducer.ts` / `actions.ts` / `selectors.ts`
+   (+ colocated tests).

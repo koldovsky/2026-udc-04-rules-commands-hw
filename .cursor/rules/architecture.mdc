@@ -1,0 +1,37 @@
+---
+description: "Custom store architecture — dispatch/reducer path; never Redux/Zustand/MobX"
+globs: "app/**"
+alwaysApply: false
+---
+
+# Architecture — custom store
+
+## Context
+
+`app/` uses an in-house store (`app/src/store.ts`), not Redux/Zustand/MobX/Jotai.
+State changes flow only through `dispatch` + a pure reducer. New behavior starts
+in the `Action` union (`app/src/types.ts`), then `reducer.ts`, then action
+creators in `actions.ts`.
+
+## Rule
+
+- Change state **only** via `store.dispatch(action)`. Never mutate `state` /
+  `getState()` results in place.
+- To add behavior: extend `Action` in `app/src/types.ts` → handle in
+  `app/src/reducer.ts` → add creator in `app/src/actions.ts` → add a colocated
+  test.
+- Keep `reducer` pure: `(state, action) => newState`; return new objects/arrays
+  (spread / `map` / `filter`).
+- UI/consumers call action creators from `actions.ts`; do not hand-build action
+  objects.
+- Reads go through selectors in `app/src/selectors.ts`, not raw `state.tasks`
+  poking in UI code.
+- **NEVER** install or import `redux`, `zustand`, `mobx`, `jotai`, or similar
+  state libraries. Do not "modernize" the custom store away.
+
+## How to verify
+
+1. Grep `app/` for `from ["']redux|zustand|mobx|jotai` — zero matches.
+2. New features touch `types.ts` (`Action` variant) + `reducer.ts` + `actions.ts`;
+   no direct `state.tasks.push` / `task.done =` mutations.
+3. `cd app && npm test` stays green after the change.

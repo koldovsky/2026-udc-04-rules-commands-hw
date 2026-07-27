@@ -1,0 +1,35 @@
+---
+description: "Colocated vitest tests — AAA pattern, keep npm test green"
+globs: "app/src/**/*.test.ts"
+alwaysApply: false
+---
+
+# Testing
+
+## Context
+
+Tests live next to source as `*.test.ts` and run with **vitest**
+(`cd app && npm test`). Existing examples: `reducer.test.ts`, `store.test.ts`,
+`lib/text.test.ts`. They import from vitest and use action creators from
+`actions.ts`.
+
+## Rule
+
+- Place tests as **colocated** `*.test.ts` beside the module under test
+  (e.g. `reducer.ts` → `reducer.test.ts`). Do not create a separate `__tests__/`
+  tree unless asked.
+- Use **vitest** (`describe` / `it` / `expect` from `"vitest"`). Do not switch
+  to Jest or another runner.
+- Structure cases with **AAA**: Arrange (state/inputs) → Act (call reducer /
+  function) → Assert (`expect(...)`).
+- Prefer dispatching via action creators (`addTask`, …), not hand-built action
+  literals, so payload shapes stay consistent.
+- Cover new reducer/action behavior with at least one focused test; include an
+  immutability check when changing state shape.
+- After changes: `cd app && npm test` must stay green.
+
+## How to verify
+
+1. New tests are named `*.test.ts` next to the source file.
+2. Imports come from `"vitest"`; no `jest` / `@jest` imports.
+3. `cd app && npm test` exits 0.

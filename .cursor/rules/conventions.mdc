@@ -1,0 +1,31 @@
+---
+description: "TypeScript conventions — named exports, no any, immutable updates, kebab-case"
+globs: "app/**/*.ts"
+alwaysApply: false
+---
+
+# Conventions
+
+## Context
+
+The seeded app (`app/src/`) is strict TypeScript (`noUncheckedIndexedAccess`).
+Style is consistent across `reducer.ts`, `actions.ts`, `selectors.ts`, and
+`lib/text.ts`. Agents must match these conventions, not invent a new style.
+
+## Rule
+
+- **Named exports only** — no `export default`.
+- **No** `any`, `@ts-ignore`, or `@ts-expect-error` unless the user explicitly
+  approves a one-off exception.
+- State updates are **immutable**: use spread / `map` / `filter`; never mutate
+  arrays or objects in place inside the reducer or callers.
+- New files: **kebab-case** (`text-utils.ts` style). Types/interfaces: PascalCase
+  (`Task`, `AppState`).
+- Prefer existing patterns in neighboring files (import paths with `.js`
+  extension as already used).
+
+## How to verify
+
+1. Grep `app/src` for `\bany\b`, `@ts-ignore`, `@ts-expect-error` — zero new hits.
+2. Grep for `export default` in `app/src` — zero matches.
+3. New filenames are kebab-case; `cd app && npm run typecheck` passes.

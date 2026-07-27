@@ -1,0 +1,36 @@
+---
+description: "Action creators and selectors — extend actions.ts / selectors.ts; no hand-built actions"
+globs: "app/src/{actions,selectors,reducer}.ts"
+alwaysApply: false
+---
+
+# Actions & selectors
+
+## Context
+
+`app/src/actions.ts` holds the sanctioned action creators (`addTask`,
+`toggleTask`, `removeTask`, `setPriority`, `setFilter`). `app/src/selectors.ts` holds pure
+read helpers (`visibleTasks`, `remainingCount`). Together with `reducer.ts`
+they are where domain growth belongs — not ad-hoc UI logic.
+
+## Rule
+
+- After adding an `Action` variant and reducer case, **always** add a matching
+  named action creator in `actions.ts` that returns that `Action`.
+- UI / callers use creators from `actions.ts` — **NEVER** construct
+  `{ type: "...", payload: ... }` literals at call sites.
+- Derived reads belong in `selectors.ts` as pure functions of `AppState`.
+  Prefer extending selectors over duplicating filter logic elsewhere.
+- Keep creators and selectors free of I/O and store imports; they must stay
+  pure (easy to unit-test).
+- Do not add new npm packages for trivial list/filter helpers already covered
+  by selectors + `lib/text.ts`.
+
+## How to verify
+
+1. Every `Action` variant in `types.ts` has a creator in `actions.ts` and a
+   `case` in `reducer.ts`.
+2. Grep call sites outside `actions.ts` for `type: "task/` / `type: "filter/`
+   object literals — prefer zero outside tests that intentionally use creators.
+3. New read logic is in `selectors.ts` (or uses existing selectors); `cd app &&
+   npm test` is green.

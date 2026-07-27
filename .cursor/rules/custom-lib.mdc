@@ -1,0 +1,36 @@
+---
+description: "Fixed API of app/src/lib/text.ts — only slugify, truncate, normalizeSpaces"
+globs: "app/src/lib/**"
+alwaysApply: false
+---
+
+# Custom lib — `text.ts` fixed API
+
+## Context
+
+`app/src/lib/text.ts` is an **in-house** util, not lodash/underscore. Agents
+often hallucinate helpers that do not exist. The supported surface is exactly
+three functions.
+
+## Rule
+
+- The **only** supported exports are:
+  - `slugify(input: string): string`
+  - `truncate(input: string, maxLength: number, suffix?: string): string`
+  - `normalizeSpaces(input: string): string`
+- **Do not** call or import helpers that are not in this file (e.g. `capitalize`,
+  `camelCase`, `deburr`, `kebabCase`, `trim`, `padEnd` from a phantom API).
+- Do **not** replace this module with lodash/`underscore`/similar.
+- If a new helper is needed: add it **explicitly** in `text.ts` with a named
+  export, a short JSDoc, and a colocated test in `text.test.ts`. Keep existing
+  signatures unchanged.
+- Consumers import from `./lib/text.js` (or relative path) using named imports.
+
+## How to verify
+
+1. Open `app/src/lib/text.ts` — only the documented exports exist (or newly
+   added ones you explicitly implemented + tested).
+2. Grep `app/` for `capitalize|camelCase|deburr` used as text-lib calls —
+   should be zero unless you added them for real.
+3. `cd app && npm test` (especially `text.test.ts`) passes; no new lodash
+   dependency in `app/package.json`.
