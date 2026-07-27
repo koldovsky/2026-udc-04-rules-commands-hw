@@ -1,7 +1,7 @@
-# App — Agent Baseline
+# App — Agent Baseline (Claude Code)
 
-Cross-tool baseline for Cursor, Claude Code, JetBrains AI, and any other agent
-working in the `app/` directory.
+Cross-tool baseline for Claude Code working in the `app/` directory.
+See also `AGENTS.md` in this directory for the same content in AGENTS format.
 
 ## Project structure
 
@@ -38,10 +38,10 @@ external state library.** The store is a ~40-line implementation in `store.ts`.
 
 ## Code style
 
-- **TypeScript strict, named exports** — no `export default`, `any`, or `@ts-ignore`
-- **Immutable reducer, kebab-case filenames** — never mutate state in place; `my-feature.ts` not `myFeature.ts`
-- **Colocated Vitest tests** — one `*.test.ts` per module; AAA pattern
-- **Action types & text helpers** — `"namespace/verb"` format; only functions from `lib/text.ts`
+- **TypeScript strict, named exports** — no `export default`, no `any`, no `@ts-ignore`
+- **Immutable reducer, kebab-case files** — spread/map/filter only; `my-feature.ts` not `myFeature.ts`
+- **Colocated tests** — `foo.ts` → `foo.test.ts`; AAA pattern; Vitest
+- **State & text** — action types `"namespace/verb"` (past-participle for task actions: `added`, `toggled`); only `slugify`/`truncate`/`normalizeSpaces` from `lib/text.ts`
 
 ## Protected files
 

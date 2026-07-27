@@ -1,0 +1,43 @@
+---
+description: "Do not modify the public API of store.ts or the core types in types.ts"
+globs: "app/src/**/*.ts"
+alwaysApply: true
+---
+
+# Protected Core Files
+
+## Context
+
+`app/src/store.ts` and `app/src/types.ts` are load-bearing files that the
+entire app contracts against. `store.ts` exports `createStore` — every consumer
+calls it with the same signature. `types.ts` exports `Task`, `AppState`,
+`Filter`, `Listener`, and the `Action` discriminated union — every other module
+imports from here.
+
+Changing the PUBLIC shape of these types cascades through the whole codebase
+and breaks the existing tests. These files must not be restructured, renamed, or
+have their public APIs altered without explicit human approval.
+
+## Rule
+
+- **NEVER change the signature of `createStore`** in `store.ts`. Its parameter
+  types and return type are the public contract.
+- **NEVER change the shape of `Task`** (`{ id: TaskId; title: string; done: boolean; priority: Priority }`),
+  `AppState`, or `Filter` in `types.ts`. Adding new optional fields requires
+  human review because it changes the `initialState`.
+- **Adding a new Action variant is the ONE allowed edit to `types.ts`** — append
+  a new `| { type: "…"; payload: … }` line to the `Action` union. Do not
+  restructure existing variants.
+- **Never add business logic to `store.ts`** — it is a generic observable store,
+  not domain-specific.
+- If a task requires changing the core types, stop and ask the developer for
+  approval before proceeding.
+
+## How to verify
+
+1. Ask the AI to "simplify store.ts" or "refactor the store" — it must not
+   change the `createStore` function's parameter list or return type.
+2. Ask the AI to "add a priority field to tasks" — it should add a new
+   Action variant to `types.ts` but must NOT change `Task` or `AppState` without
+   explicit approval.
+3. Run `cd app && npm test` — all tests in `store.test.ts` must remain green.

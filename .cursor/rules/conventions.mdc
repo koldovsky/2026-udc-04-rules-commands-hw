@@ -1,0 +1,41 @@
+---
+description: "Code conventions — named exports, strict TypeScript, immutable updates, kebab-case filenames"
+globs: "app/src/**/*.ts"
+alwaysApply: false
+---
+
+# Code Conventions
+
+## Context
+
+`app/` is a strict TypeScript project (`tsconfig.json` has `strict: true`).
+Every existing module uses named exports. The reducer in `reducer.ts` always
+returns a new state object — it never mutates the `state` argument. Filenames
+across `app/src/` are kebab-case. These conventions must stay consistent.
+
+## Rule
+
+- **Named exports only.** Never write `export default`. All functions, types,
+  and constants are named and re-imported by name.
+- **No `any`, no `@ts-ignore`.** If the type is unknown, annotate it properly
+  (`unknown` + narrowing, or a concrete interface). TypeScript strict mode is
+  on — embrace it.
+- **Immutable reducer updates.** The reducer must never mutate `state`. Always
+  return new objects/arrays:
+  - Adding to an array: `[...state.tasks, newItem]`, not `state.tasks.push(…)`
+  - Updating an item: `state.tasks.map(t => t.id === id ? {...t, done: true} : t)`
+  - Removing: `state.tasks.filter(t => t.id !== id)`
+- **Kebab-case filenames.** New files must be `my-feature.ts`, not
+  `myFeature.ts` or `MyFeature.ts`.
+- **TypeScript strict mode is already on** — do not disable any strict flags in
+  `tsconfig.json`.
+
+## How to verify
+
+1. `grep -r "export default" app/src` — should return nothing.
+2. `grep -r "any\|@ts-ignore" app/src` — should return nothing (excluding
+   comments and test fixtures where `unknown` narrowing is explicitly needed).
+3. `grep -r "\.push\|\.splice\|\.sort(" app/src/reducer.ts` — should return
+   nothing; reducer must be mutation-free.
+4. Ask the AI to "add a task edit action" — resulting reducer case must use
+   `state.tasks.map(…)` with spread, not direct mutation.

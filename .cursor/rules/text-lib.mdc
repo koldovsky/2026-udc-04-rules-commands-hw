@@ -1,0 +1,53 @@
+---
+description: "Use only the three functions from app/src/lib/text.ts — no lodash, no invented helpers"
+globs: "app/src/**/*.ts"
+alwaysApply: false
+---
+
+# Custom Text Library
+
+## Context
+
+`app/src/lib/text.ts` is the project's ONLY text-utility module. It exports
+exactly three functions with fixed signatures. There is no lodash, underscore,
+or any other utility library installed. Agents frequently hallucinate methods
+like `capitalize`, `camelCase`, or `deburr` — none of these exist here.
+
+## Rule
+
+`app/src/lib/text.ts` currently exports exactly three functions:
+
+```ts
+// Turn text into a URL/anchor-safe slug
+slugify(input: string): string
+// "Buy Milk!" → "buy-milk"
+
+// Shorten to at most maxLength chars, including the suffix
+truncate(input: string, maxLength: number, suffix?: string): string
+// default suffix is "…"
+// truncate("Hello world", 5) → "Hell…"
+
+// Collapse whitespace and trim
+normalizeSpaces(input: string): string
+// "  a   b " → "a b"
+```
+
+- **NEVER import from `lodash`, `underscore`, `ramda`, or any external
+  utility.** They are not installed.
+- **NEVER call functions that don't exist:** `capitalize`, `camelCase`,
+  `deburr`, `pad`, `repeat`, `startCase`, etc. are not in `lib/text.ts`.
+- If the three functions above are insufficient, that is a code-contribution
+  decision requiring human review — do NOT add helpers autonomously or import
+  an external library.
+- **Import paths:**
+  - In source files (`*.ts`): `'./lib/text.js'` (ESM `.js` extension required)
+  - In test files (`*.test.ts`): `'./lib/text'` (no extension; Vitest resolves it)
+
+## How to verify
+
+1. `grep -r "from 'lodash'\|require('lodash')" app/src` — should return
+   nothing.
+2. Ask the AI to "display the task title as a slug" — it must call `slugify`
+   from `./lib/text`, not invent a new helper or import lodash.
+3. `grep -r "capitalize\|camelCase\|deburr" app/src` — should return nothing
+   (these functions don't exist in the codebase).
