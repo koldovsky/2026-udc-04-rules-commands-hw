@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { reducer } from "./reducer.js";
-import { addTask, removeTask, setFilter, toggleTask } from "./actions.js";
+import { addTask, removeTask, renameTask, setFilter, toggleTask } from "./actions.js";
 import { initialState, type AppState } from "./types.js";
 
 describe("reducer", () => {
@@ -25,6 +25,12 @@ describe("reducer", () => {
     const withTask = reducer(initialState, addTask("a", "A"));
     const removed = reducer(withTask, removeTask("a"));
     expect(removed.tasks).toEqual([]);
+  });
+
+  it("renames a task's title", () => {
+    const withTask = reducer(initialState, addTask("a", "A"));
+    const renamed = reducer(withTask, renameTask("a", "Buy oat milk"));
+    expect(renamed.tasks[0]?.title).toBe("Buy oat milk");
   });
 
   it("sets the filter", () => {

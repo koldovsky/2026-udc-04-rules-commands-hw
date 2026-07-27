@@ -1,0 +1,33 @@
+---
+description: "Test file conventions — colocated vitest tests using AAA"
+globs: "app/**/*.test.ts"
+alwaysApply: false
+---
+
+# Testing
+
+## Context
+
+Tests live next to the code they cover (e.g. `app/src/reducer.test.ts`,
+`app/src/store.test.ts`, `app/src/lib/text.test.ts`) and run with vitest via
+`cd app && npm test`. See `app/src/reducer.test.ts` for the expected shape.
+
+## Rule
+
+- Tests are **colocated**: `foo.ts` is tested by `foo.test.ts` in the same
+  directory — never a separate `__tests__/` or `test/` tree.
+- Use **vitest** (`describe`/`it`/`expect` from `"vitest"`), not jest/mocha.
+- Follow **Arrange-Act-Assert**: set up inputs/state, perform the one action
+  under test, then assert — one clear act per test, no hidden multi-step
+  chains that blur which act caused which assertion.
+- Test through the public API (action creators + reducer/store), not internal
+  state shape assumptions.
+
+## How to verify
+
+1. `find app/src -name "*.test.ts"` — each result sits beside its
+   corresponding `*.ts` source file (no separate test directory).
+2. `grep -rln "from \"jest\"\|from \"mocha\"" app/src` — no matches.
+3. `cd app && npm test` — all tests pass.
+4. Read a new/changed test: it should have a clear setup block, one action
+   call, then assertions — matching the style in `app/src/reducer.test.ts`.

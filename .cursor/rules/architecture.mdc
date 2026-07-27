@@ -1,0 +1,34 @@
+---
+description: "Custom store architecture — how state changes and how to add new behavior"
+globs: "app/**"
+alwaysApply: false
+---
+
+# Architecture — custom store
+
+## Context
+
+State lives in a hand-written store (`app/src/store.ts`), not a state-management
+library. `app/src/types.ts` defines `AppState` and the `Action` discriminated
+union; `app/src/reducer.ts` is the pure `(state, action) => newState` function
+that handles them.
+
+## Rule
+
+- The only way to change state is `store.dispatch(action)`. Never assign to
+  `store.getState()`'s result, mutate `state.tasks`, or bypass `dispatch`.
+- To add new behavior: add a variant to the `Action` union in
+  `app/src/types.ts` first, then handle it in `app/src/reducer.ts`, then add a
+  matching action creator in `app/src/actions.ts`.
+- Reads go through `app/src/selectors.ts` (e.g. `visibleTasks`,
+  `remainingCount`), not direct `state.tasks` access from UI/consumer code.
+- Do NOT introduce Redux, Zustand, MobX, Jotai, or any other state library.
+  Do NOT "modernize" `store.ts` by swapping in one.
+
+## How to verify
+
+1. `grep -rn "redux\|zustand\|mobx\|jotai" app/src app/package.json` — no matches.
+2. `grep -rn "\.dispatch(" app/src` — every state change goes through this call.
+3. New action types appear in `app/src/types.ts`'s `Action` union AND are
+   handled in the `switch` in `app/src/reducer.ts` (no orphaned or missing cases).
+4. `cd app && npm run typecheck` passes.

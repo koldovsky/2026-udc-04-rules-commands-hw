@@ -1,0 +1,32 @@
+---
+description: "TypeScript coding conventions for app/ source files"
+globs: "app/**/*.ts"
+alwaysApply: false
+---
+
+# Conventions
+
+## Context
+
+The codebase (`app/src/*.ts`) uses TypeScript strict mode with
+`noUncheckedIndexedAccess` on, and follows a consistent style across
+`types.ts`, `reducer.ts`, `actions.ts`, `selectors.ts`.
+
+## Rule
+
+- Use **named exports only** — no `export default`.
+- Never use `any` or `@ts-ignore`. If a type is genuinely unknown, model it
+  explicitly (union, `unknown` + narrowing).
+- State updates must be **immutable**: build new objects/arrays with spread,
+  `map`, `filter` — never mutate `state`, `state.tasks`, or a `Task` in place.
+- File names are **kebab-case** (e.g. `text-utils.ts`), matching the existing
+  files in `app/src/` and `app/src/lib/`. Types/interfaces are PascalCase.
+
+## How to verify
+
+1. `grep -rn "export default" app/src` — no matches.
+2. `grep -rn ": any\|@ts-ignore" app/src` — no matches.
+3. `grep -rn "\.push(\|\.splice(\|\.sort(\| = state\." app/src/reducer.ts` — no
+   in-place mutation of `state` or its arrays.
+4. `find app/src -name "*.ts" | grep -E "[A-Z_]"` — no matches (files are kebab-case).
+5. `cd app && npm run typecheck` passes.

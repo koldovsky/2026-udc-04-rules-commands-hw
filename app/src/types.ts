@@ -28,6 +28,7 @@ export type Action =
   | { type: "task/added"; payload: { id: TaskId; title: string } }
   | { type: "task/toggled"; payload: { id: TaskId } }
   | { type: "task/removed"; payload: { id: TaskId } }
+  | { type: "task/renamed"; payload: { id: TaskId; title: string } }
   | { type: "filter/set"; payload: { filter: Filter } };
 
 export const initialState: AppState = {
