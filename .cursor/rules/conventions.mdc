@@ -1,0 +1,33 @@
+---
+description: "TypeScript conventions for the task-board app"
+globs: "app/**/*.ts"
+alwaysApply: false
+---
+
+# Conventions — TypeScript style
+
+## Context
+
+The app is TypeScript strict (`noUncheckedIndexedAccess` on). Consistency keeps
+the reducer/actions/selectors trio predictable. See `app/src/actions.ts` and
+`app/src/reducer.ts` for the established style.
+
+## Rule
+
+- Use NAMED exports only. NEVER use `export default`.
+- NEVER use `any`, `as any`, `@ts-ignore`, or `@ts-expect-error` to silence the
+  type checker. Fix the types instead.
+- Update state IMMUTABLY: build new objects/arrays with spread / `map` / `filter`;
+  never mutate `state`, `state.tasks`, or a task in place.
+- Name source files in kebab-case (e.g. `text-utils.ts`); use PascalCase for
+  types/interfaces and camelCase for functions/variables.
+- Import types with `import type { ... }` and keep the `.js` extension in
+  relative import specifiers (ESM), matching existing files.
+
+## How to verify
+
+1. `grep -rn "export default" app/src` returns zero matches.
+2. `grep -rEn "\bany\b|@ts-ignore|@ts-expect-error" app/src` returns zero matches.
+3. `cd app && npm run typecheck` passes with no errors.
+4. Reducer cases return new objects (no `state.x =` assignments).
+

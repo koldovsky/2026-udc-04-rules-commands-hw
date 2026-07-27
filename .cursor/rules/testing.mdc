@@ -1,0 +1,31 @@
+---
+description: "Testing conventions — vitest, colocated, AAA"
+globs: "app/**/*.test.ts"
+alwaysApply: false
+---
+
+# Testing — vitest, colocated, AAA
+
+## Context
+
+Tests use vitest and live NEXT TO the code they cover (e.g.
+`app/src/reducer.test.ts` beside `app/src/reducer.ts`). Run with
+`cd app && npm test`. See existing `reducer.test.ts` / `store.test.ts` for style.
+
+## Rule
+
+- Colocate every test as `<name>.test.ts` beside the file under test.
+- Import from vitest: `import { describe, expect, it } from "vitest";`.
+- Structure each test Arrange → Act → Assert (AAA); keep one behavior per `it`.
+- When you add an action/reducer case or a `lib/` helper, ADD a colocated test
+  in the same change.
+- Assert on returned NEW state; also assert immutability where relevant
+  (previous state unchanged, `next !== prev`).
+- Keep the seeded tests green — never weaken an assertion to make code pass.
+
+## How to verify
+
+1. Each new `*.test.ts` sits beside its source file.
+2. `cd app && npm test` is green, including the new tests.
+3. New reducer/action/helper code has at least one covering test.
+

@@ -1,0 +1,36 @@
+---
+description: "Custom-store architecture — how state changes and how the app grows"
+globs: "app/**"
+alwaysApply: false
+---
+
+# Architecture — custom store, golden path
+
+## Context
+
+`app/` uses a hand-written store, not a library. `app/src/store.ts` exposes
+`createStore()` returning `{ getState, dispatch, subscribe }` and is the ONLY
+sanctioned way state changes. `app/src/types.ts` holds `AppState`, `Task`, and
+the `Action` discriminated union; `app/src/reducer.ts` is the pure reducer.
+See `materials/architecture-brief.md` for the source of truth.
+
+## Rule
+
+- Change state ONLY via `store.dispatch(action)`; never assign to `state` or
+  task fields directly.
+- Extend behavior along the golden path: add an `Action` variant in
+  `app/src/types.ts` → handle it in `app/src/reducer.ts` → add an action creator
+  in `app/src/actions.ts` → add a colocated `*.test.ts`.
+- Read state through selectors in `app/src/selectors.ts`, not `state.tasks`
+  directly, when adding derived reads.
+- NEVER introduce Redux, Zustand, MobX, Jotai, Recoil, or any state library.
+- NEVER replace the custom store with `useState`/hooks or a global mutable object.
+
+## How to verify
+
+1. `grep -rEi "redux|zustand|mobx|jotai|recoil" app/` returns zero matches.
+2. New action `type` strings exist in `app/src/types.ts` `Action` union AND have
+   a matching `case` in `app/src/reducer.ts`.
+3. Every new action has a creator in `app/src/actions.ts` and a colocated test.
+4. `cd app && npm test` is green.
+

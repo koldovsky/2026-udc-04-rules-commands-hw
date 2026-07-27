@@ -1,0 +1,32 @@
+---
+description: "Protected core files that must not change without explicit approval"
+globs: ""
+alwaysApply: true
+---
+
+# Do not touch the protected core
+
+## Context
+
+`app/src/store.ts` (the dispatch/notify engine) and `app/src/types.ts` (core
+types + the `Action` union) are load-bearing: changes ripple through the whole
+app. Normal feature work extends `reducer.ts`/`actions.ts`, not these files.
+
+## Rule
+
+- Treat `app/src/store.ts` and `app/src/types.ts` as DO-NOT-TOUCH by default.
+- NEVER edit the `createStore` dispatch/subscribe engine in `app/src/store.ts`.
+- The ONLY sanctioned edit to `app/src/types.ts` is ADDING a new `Action`
+  variant to the union (and, when a feature requires it, adding a field to an
+  existing interface such as `Task`) — never remove or rename existing members.
+- Do NOT change the public signatures of `createStore` or the action creators.
+- If a task seems to require deeper changes to these files, STOP and ask the
+  user for explicit approval first.
+
+## How to verify
+
+1. `git diff --stat app/src/store.ts` shows no changes for ordinary features.
+2. Any diff to `app/src/types.ts` is additive (new union member / new field),
+   never a removal or rename.
+3. `createStore`, `getState`, `dispatch`, `subscribe` signatures are unchanged.
+
