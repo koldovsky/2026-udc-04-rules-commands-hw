@@ -38,13 +38,23 @@ recorded.
 This does not invalidate the observations below — the two diffs are real and
 verified — but it changes what they are evidence *of*. See the Conclusion.
 
-**Fixed after the fact.** The root `CLAUDE.md` now pulls every rule in
-explicitly with `@.cursor/rules/*.mdc` import lines, so Claude Code and Cursor
-run on the same rule text from one source. That fix landed *after* both runs, so
-it does not rescue the results below — but it means a re-run in Claude Code is
-now a real experiment rather than a no-op. Note the trade-off recorded in
-`CLAUDE.md`: the import has no glob scoping, so every rule is always in context
-there, unlike in Cursor.
+**Attempted fix, and what it taught.** The root `CLAUDE.md` was given
+`@.cursor/rules/*.mdc` import lines to pull the rules in. A probe in a fresh
+Claude Code session on 2026-07-27 showed **the imports do not expand**: the
+session had the current `CLAUDE.md` text (including the literal `@` lines) but
+none of the rule bodies — three separate rules-only markers (`escapeHtml`, the
+`actions.ts`→`store.ts` circular-import point, and the `grep -rn` verification
+commands) all came back "NOT IN CONTEXT".
+
+The probe file itself mentioned those three marker words, so it was not a
+perfectly sterile test — but contamination could only have produced a false
+*positive*, and the result was negative, so the conclusion holds.
+
+The import lines have since been removed and replaced with an explicit
+instruction to read `.cursor/rules/*.mdc`. The practical consequence for this
+document stands: **Claude Code is the wrong tool for this A/B**, because there
+is no automatic mechanism there for the rules to be toggled on and off. The
+faithful re-run belongs in Cursor.
 
 ## What "OFF" means in run B
 
@@ -233,11 +243,10 @@ To actually measure the rule-set, one of these is needed:
 1. **Re-run the A/B in Cursor**, which does auto-load `.cursor/rules/*.mdc` by
    `globs`/`alwaysApply`. Same prompt, same procedure. This is the faithful
    version of the experiment as the assignment intends it.
-2. **Or re-run it in Claude Code now that `CLAUDE.md` imports the rules.** With
-   the `@` imports in place the toggle finally has something to toggle — but
-   note that renaming a rule to `.mdc.off` now breaks its import line, so the
-   OFF condition must comment out or remove those lines rather than rely on the
-   rename alone.
+2. **Not Claude Code.** The `@` import route was tried and does not work (see
+   above), so there is no automatic loading there to switch off. Rules only
+   reach Claude Code if the agent is told to read them, and an instruction the
+   agent may or may not follow is not a controllable experimental variable.
 3. **Or test the context layer as a whole** — an `off-all` run that also parks
    `AGENTS.md`/`CLAUDE.md`. That answers a different but real question: what the
    baseline is worth versus no context at all.
