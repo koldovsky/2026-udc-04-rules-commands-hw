@@ -1,0 +1,43 @@
+---
+description: "Custom store architecture — never use Redux/Zustand; follow the established state flow"
+globs: "app/src/**/*.ts"
+alwaysApply: false
+---
+
+# Architecture: Custom Store Only
+
+## Context
+
+`app/` uses a hand-rolled store in `app/src/store.ts`. The store is a ~40-line
+implementation of the observer pattern — no external state library is installed
+or needed. `types.ts` defines the domain (`Task`, `AppState`) and the action
+discriminated union (`Action`). `reducer.ts` is a pure `(state, action) →
+newState` function. `selectors.ts` derives filtered views from state.
+
+This architecture is intentional and is the subject of the homework: do not
+replace or wrap it with Redux, Zustand, MobX, Jotai, or any other library.
+
+## Rule
+
+- The only state container is `createStore` from `app/src/store.ts`. Do NOT
+  import or install Redux, Zustand, MobX, Jotai, Recoil, or equivalents.
+- State flows in one direction: `actions.ts` → `reducer.ts` → `store.ts` →
+  `selectors.ts`. New state logic follows this same path.
+- **Golden path** for adding any new feature:
+  1. Add Action variant to the `Action` union in `types.ts`
+  2. Handle the new case in `reducer.ts`
+  3. Add action creator in `actions.ts`
+  4. Add colocated test in `reducer.test.ts`
+- `selectors.ts` contains pure functions that derive data from `AppState` — no
+  side effects, no store references inside selectors.
+- Never dispatch raw object literals — always go through an action creator from
+  `actions.ts`.
+
+## How to verify
+
+1. `grep -r "from 'redux'\|from 'zustand'\|from '@reduxjs'" app/src` — should
+   return nothing.
+2. Ask the AI to "add a new task status" — it should propose adding to the
+   `Action` union in `types.ts` + a new reducer case, not installing a library.
+3. Check `app/src/index.ts` — it should call `createStore`, not `configureStore`
+   or `createSlice`.

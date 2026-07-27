@@ -1,0 +1,44 @@
+---
+description: "Testing conventions — colocated Vitest tests, AAA pattern, run with npm test"
+globs: "app/src/**/*.ts"
+alwaysApply: false
+---
+
+# Testing
+
+## Context
+
+`app/` uses Vitest for unit tests. Every tested module has a colocated test
+file: `reducer.ts` → `reducer.test.ts`, `lib/text.ts` → `lib/text.test.ts`,
+`store.ts` → `store.test.ts`. Tests are run with `cd app && npm test`. There is
+no separate `__tests__/` directory — tests live next to the code they test.
+
+## Rule
+
+- **Colocated tests only.** For a new file `app/src/foo.ts`, the test is
+  `app/src/foo.test.ts` — not in a separate `tests/` folder.
+- **Vitest imports.** Always use: `import { describe, it, expect, beforeEach }
+  from 'vitest'` — not Jest globals or any other framework.
+- **AAA structure.** Every `it()` block follows Arrange → Act → Assert:
+  - Arrange: set up initial state or inputs
+  - Act: call the function under test
+  - Assert: `expect(result).toEqual(…)` or similar
+  - Use blank lines or comments to separate the three sections when the test is
+    not trivially short.
+- **Test the reducer, not the store.** Reducer tests pass state + action
+  directly to `reducer()` — they don't instantiate the store.
+- A new Action variant MUST have a corresponding test in `reducer.test.ts`
+  before the feature is considered done.
+- **Run command:** `cd app && npm test` (from the repo root, not from inside
+  `app/`).
+
+## How to verify
+
+1. `ls app/src/*.test.ts app/src/**/*.test.ts` — test files are colocated, not
+   in a separate folder.
+2. `grep -r "from 'jest'\|from '@jest'" app/src` — should return nothing; only
+   Vitest is used.
+3. Ask the AI to "write a test for the setFilter action" — the result should
+   use `describe`/`it`/`expect` from Vitest with a clear Arrange/Act/Assert
+   structure.
+4. `cd app && npm test` — must exit green.

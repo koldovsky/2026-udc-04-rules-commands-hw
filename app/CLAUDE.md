@@ -1,7 +1,7 @@
-# App — Agent Baseline
+# App — Agent Baseline (Claude Code)
 
-Cross-tool baseline for Cursor, Claude Code, JetBrains AI, and any other agent
-working in the `app/` directory.
+Cross-tool baseline for Claude Code working in the `app/` directory.
+See also `AGENTS.md` in this directory for the same content in AGENTS format.
 
 ## Project structure
 
@@ -19,9 +19,10 @@ app/src/
 ## Commands
 
 ```bash
-cd app && npm test             # run all tests (Vitest)
-cd app && npm run typecheck    # type-check without emitting
+cd app && npm test        # run all tests (Vitest)
 ```
+
+Note: lint is not configured — do not invent an `npm run lint` command.
 
 ## Architecture
 
@@ -43,7 +44,7 @@ external state library.** The store is a ~40-line implementation in `store.ts`.
 - **Colocated tests** — `foo.ts` → `foo.test.ts` in the same directory
 - **Action type format** — `"namespace/verb"` (e.g. `"task/added"`, `"filter/set"`)
 - **Text helpers** — only `slugify(s)`, `truncate(s, n, suffix?)`,
-  `normalizeSpaces(s)` from `lib/text.ts`; no lodash
+  `normalizeSpaces(s)` from `lib/text.ts`; no lodash, no invented helpers
 
 ## Protected files
 
@@ -60,4 +61,5 @@ human approval before making the change.
 - No secrets, API keys, or credentials in any file
 - Do not install external state libraries (Redux, Zustand, etc.)
 - Do not replace the custom store with a third-party solution
+- No new npm dependencies without explicit approval
 - Run `cd app && npm test` to verify changes before marking work complete
