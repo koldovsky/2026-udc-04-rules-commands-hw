@@ -1,0 +1,31 @@
+---
+description: "Code style conventions for app/ TypeScript files"
+globs: "app/**/*.{ts,tsx}"
+alwaysApply: false
+---
+
+# Conventions
+
+## Context
+
+The seeded app (`app/src/types.ts`, `store.ts`, `reducer.ts`, `actions.ts`,
+`selectors.ts`, `lib/text.ts`) follows a small, consistent style. Keeping new
+code in the same style is what lets the custom store and reducer stay easy to
+reason about.
+
+## Rule
+
+- Named exports only — no `export default`.
+- No `any` and no `@ts-ignore`/`@ts-expect-error`.
+- State updates are always immutable (spread/map/filter), matching the
+  pattern in `app/src/reducer.ts` — never `state.tasks.push(...)` or similar.
+- File names are kebab-case (e.g. `lib/text.ts`, not `Text.ts`).
+- Import local modules with explicit `.js` extensions, matching existing
+  imports (e.g. `import type { Action } from "./types.js"`).
+
+## How to verify
+
+1. `grep -rn "export default" app/src` — should find zero matches.
+2. `grep -rn "\bany\b\|@ts-ignore\|@ts-expect-error" app/src` — should find
+   zero matches.
+3. `cd app && npm test` stays green after the change.

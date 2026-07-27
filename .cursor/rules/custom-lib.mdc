@@ -1,0 +1,31 @@
+---
+description: "Real, fixed API surface of app/src/lib/text.ts"
+globs: "app/src/**/*.{ts,tsx}"
+alwaysApply: false
+---
+
+# Custom Lib (text.ts)
+
+## Context
+
+`app/src/lib/text.ts` has a fixed, three-function API — not lodash. Agents
+tend to hallucinate helpers that don't exist here.
+
+## Rule
+
+- Only import `slugify`, `truncate`, `normalizeSpaces` from
+  `app/src/lib/text.ts` — do not assume any other helper exists.
+- If new text behavior is needed (e.g. capitalization), add a new named
+  export function to `app/src/lib/text.ts` with a colocated test — do not
+  invent a call to a nonexistent function, and do not pull in an external
+  string-utility package.
+- Preserve existing signatures exactly: `truncate`'s `maxLength` includes the
+  suffix length; do not change this contract when extending the file.
+
+## How to verify
+
+1. `grep -rn "from \"\./lib/text" app/src \| grep -v "slugify\|truncate\|normalizeSpaces"` —
+   should find zero matches importing an unknown helper.
+2. Any new function added to `lib/text.ts` has a corresponding test in
+   `app/src/lib/text.test.ts`.
+3. `cd app && npm test` stays green.

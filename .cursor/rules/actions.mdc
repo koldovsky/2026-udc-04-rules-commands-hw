@@ -1,0 +1,36 @@
+---
+description: "Action-creator conventions for app/src/actions.ts"
+globs: "app/src/actions.ts"
+alwaysApply: false
+---
+
+# Action Creators (actions.ts)
+
+## Context
+
+`app/src/actions.ts` holds the sanctioned action creators (`addTask`,
+`toggleTask`, `removeTask`, `setFilter`, `setPriority`) — the only place
+action objects are constructed. UI/component code calls these helpers instead
+of building `{ type, payload }` literals by hand, so the payload shape for
+each `Action` variant stays defined in exactly one place.
+
+## Rule
+
+- Every `Action` variant in `app/src/types.ts` must have exactly one
+  corresponding creator function here, named after the action's intent (e.g.
+  `addTask` for `"task/added"`), returning the literal `Action` object.
+- A creator's parameters must map 1:1 to its action's `payload` fields — no
+  extra parameters, no repackaging into a different shape.
+- Do not construct `Action` object literals anywhere else in `app/src`
+  (components, reducer callers, tests excluded) — always call the creator.
+- When adding a new `Action` variant, add its creator here in the same change,
+  keeping the existing named-export, one-function-per-action style.
+
+## How to verify
+
+1. Every member of the `Action` union in `app/src/types.ts` has a matching
+   exported function in `app/src/actions.ts`.
+2. `grep -rn "type: \"" app/src --include=*.ts \| grep -v "actions.ts\|reducer.ts\|types.ts\|.test.ts"` —
+   should find zero matches (no hand-built action literals outside the
+   sanctioned files).
+3. `cd app && npm test` stays green.

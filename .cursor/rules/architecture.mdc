@@ -1,0 +1,34 @@
+---
+description: "Custom store architecture — how state changes must flow"
+globs: "app/**"
+alwaysApply: false
+---
+
+# Architecture
+
+## Context
+
+`app/src/store.ts` is a custom store, not a library. See
+`materials/architecture-brief.md` for the full design rationale.
+
+## Rule
+
+- All state changes go through `store.dispatch(action)`. Never mutate
+  `AppState`/`Task` objects directly and never call `reducer()` outside the
+  store.
+- To add new behavior: add a variant to the `Action` union in
+  `app/src/types.ts`, handle it in `app/src/reducer.ts`, then add a matching
+  action creator in `app/src/actions.ts`.
+- NEVER introduce Redux, Zustand, MobX, Jotai, or any other state-management
+  library. Do not "modernize" `createStore`.
+- Do not dispatch object literals shaped like actions from UI/component code —
+  always go through an action creator from `app/src/actions.ts`.
+
+## How to verify
+
+1. `grep -rn "redux\|zustand\|mobx\|jotai" app/` — should find zero matches
+   (aside from this rule file itself).
+2. `grep -rn "reducer(" app/src` — only `app/src/store.ts` should call
+   `reducer` directly.
+3. Any new action variant appears in all three of `types.ts`, `reducer.ts`,
+   and `actions.ts`.

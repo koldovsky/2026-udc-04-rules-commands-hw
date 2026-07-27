@@ -1,0 +1,33 @@
+---
+description: "Testing conventions for app/ — colocated vitest, AAA pattern"
+globs: "app/**/*.test.ts"
+alwaysApply: false
+---
+
+# Testing
+
+## Context
+
+Existing tests are colocated `*.test.ts` files next to the code they cover
+and run with vitest (`cd app && npm test` is green). Any new behavior (a new
+reducer case, action creator, or selector) needs a colocated test written the
+same way.
+
+## Rule
+
+- Put new tests in a `*.test.ts` file next to the module under test (e.g. a
+  new reducer case gets a test in `app/src/reducer.test.ts`), not in a
+  separate `__tests__/` tree.
+- Structure each test in Arrange-Act-Assert order: build input state/action,
+  call the function under test, assert on the result.
+- Test the reducer/selectors as pure functions — do not spin up a real
+  `store` just to test a reducer case.
+- Every new `Action` variant or action creator needs at least one new test.
+
+## How to verify
+
+1. `cd app && npm test` passes with no failing or skipped tests.
+2. Every new/changed `.ts` file under `app/src` has a matching `.test.ts`
+   sibling covering the new behavior.
+3. New tests read as Arrange/Act/Assert (setup, single call, assertion), not
+   multiple unrelated actions crammed into one test.

@@ -1,0 +1,32 @@
+---
+description: "Protected core files that must not change without explicit approval"
+alwaysApply: true
+---
+
+# Do Not Touch
+
+## Context
+
+`app/src/store.ts` and `app/src/types.ts` are load-bearing core files (see
+`materials/architecture-brief.md` for why).
+
+## Rule
+
+- Do NOT edit `app/src/store.ts` or the `Store`/`createStore` public shape in
+  it, unless the user explicitly asks to change the store itself.
+- Do NOT change existing fields/variants in `app/src/types.ts` — only ADD new
+  `Action` union variants or new optional fields when a task requires it.
+- Do NOT change the public signatures of existing action creators in
+  `app/src/actions.ts` or existing functions in `app/src/lib/text.ts` — only
+  add new ones.
+- If a task seems to require editing a protected file's existing behavior,
+  stop and ask the user first instead of proceeding.
+
+## How to verify
+
+1. `git diff app/src/store.ts` — empty unless the user explicitly requested a
+   store change.
+2. `git diff app/src/types.ts` — only shows added lines (new union members /
+   new optional fields), no removed or altered existing lines.
+3. Existing action-creator and `lib/text.ts` function signatures are unchanged
+   (same params, same return types).
