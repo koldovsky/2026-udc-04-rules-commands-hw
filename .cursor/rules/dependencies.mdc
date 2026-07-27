@@ -1,0 +1,68 @@
+---
+description: Prevent unapproved dependencies and unnecessary framework changes
+globs:
+  - "app/**"
+alwaysApply: false
+---
+
+# Dependencies
+
+## Context
+
+The task-board application already has the libraries required for its current architecture.
+
+The state layer is intentionally implemented with a custom store in:
+
+```text
+app/src/store.ts
+````
+
+## Rule
+
+Do not add, remove, or upgrade npm dependencies without explicit user approval.
+
+Do not run:
+
+```bash
+npm install <package>
+npm uninstall <package>
+```
+
+as part of normal feature work.
+
+Do not introduce state-management libraries such as:
+
+* Redux
+* Zustand
+* MobX
+* Jotai
+
+Do not replace existing project functionality with a new package when a small implementation using the current codebase is sufficient.
+
+If a new dependency appears necessary:
+
+1. explain the specific missing capability;
+2. identify the proposed package;
+3. explain why the existing code cannot reasonably provide it;
+4. wait for explicit approval before modifying `package.json` or the lock file.
+
+## How to verify
+
+* Inspect changes to:
+
+  ```text
+  app/package.json
+  app/package-lock.json
+  ```
+
+* Confirm no dependency files changed without approval.
+
+* Confirm no new third-party imports were introduced.
+
+* Run:
+
+  ```bash
+  cd app
+  npm test
+  npm run typecheck
+  ```

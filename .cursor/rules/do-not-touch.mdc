@@ -1,0 +1,44 @@
+---
+description: Protect load-bearing store and type files from unnecessary changes
+globs:
+  - "app/src/**/*.ts"
+alwaysApply: true
+---
+
+# Protected core
+
+## Context
+
+The following files are load-bearing:
+
+- `app/src/store.ts`
+- `app/src/types.ts`
+
+`app/src/store.ts` contains the custom dispatch and notification engine.
+
+`app/src/types.ts` contains the core domain types and the `Action` discriminated union.
+
+Changes to these files can affect the entire application.
+
+## Rule
+
+Do not modify `app/src/store.ts` or `app/src/types.ts` without explicit user approval.
+
+If a requested feature appears to require changes to either file, explain why the change is needed and wait for approval before editing.
+
+For normal feature work, prefer changes in:
+
+- `app/src/reducer.ts`
+- `app/src/actions.ts`
+- `app/src/selectors.ts`
+- their colocated tests
+
+Do not refactor, rename, reorganize, or “modernize” protected files as part of unrelated work.
+
+## How to verify
+
+Before completing the task:
+
+- inspect `git diff -- app/src/store.ts app/src/types.ts`;
+- confirm `store.ts` and `types.ts` are unchanged unless explicit approval was given;
+- report any protected-file modification explicitly.

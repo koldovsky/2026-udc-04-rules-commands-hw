@@ -1,0 +1,56 @@
+---
+description: Use only the supported API of the in-house text library
+globs:
+  - "app/src/lib/**"
+alwaysApply: false
+---
+
+# Custom text library
+
+## Context
+
+The project contains an in-house text library:
+
+```text
+app/src/lib/text.ts
+````
+
+Its complete supported API is:
+
+```ts
+slugify(input: string): string
+truncate(input: string, maxLength: number, suffix?: string): string
+normalizeSpaces(input: string): string
+```
+
+## Rule
+
+Only use functions that are actually exported by `app/src/lib/text.ts`.
+
+Do not assume this library is lodash or underscore.
+
+Do not use or invent unsupported helpers such as:
+
+* `capitalize`
+* `camelCase`
+* `deburr`
+* `startCase`
+* `kebabCase`
+
+Before using a text helper, inspect `app/src/lib/text.ts` and confirm that the function exists with the expected signature.
+
+Do not add a new third-party text utility library when the existing functions are sufficient.
+
+If a required helper does not exist, either implement a small local function or ask for approval before extending the shared library.
+
+## How to verify
+
+* Inspect imports from `app/src/lib/text.ts`.
+* Confirm every imported symbol is exported by that file.
+* Run:
+
+  ```bash
+  cd app
+  npm test
+  npm run typecheck
+  ```

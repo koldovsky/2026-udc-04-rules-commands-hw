@@ -1,0 +1,75 @@
+---
+description: Require colocated Vitest coverage for application behavior changes
+globs:
+  - "app/**/*.test.ts"
+alwaysApply: false
+---
+
+# Testing
+
+## Context
+
+Tests use Vitest and are colocated with implementation files.
+
+Examples follow the pattern:
+
+```text
+app/src/example.ts
+app/src/example.test.ts
+````
+
+Available validation commands:
+
+```bash
+cd app
+npm test
+npm run typecheck
+```
+
+Linting is not configured.
+
+## Rule
+
+Add or update tests for every behavior change.
+
+Tests must cover:
+
+* the expected successful behavior;
+* relevant edge cases;
+* unchanged behavior when an action does not apply;
+* immutable reducer behavior when state transitions are involved.
+
+For reducer changes, verify that:
+
+* the previous state object is not mutated;
+* unchanged items preserve their values;
+* the returned state matches the expected structure.
+
+Do not create a separate top-level test directory.
+
+Do not claim that tests passed unless the commands were actually executed successfully.
+
+Structure tests using the Arrange–Act–Assert pattern:
+
+1. Arrange the input state and dependencies.
+2. Act by calling the function or dispatching the action.
+3. Assert the resulting state or output.
+
+## How to verify
+
+Run:
+
+```bash
+cd app
+npm test
+npm run typecheck
+```
+
+Report:
+
+* which commands were run;
+* whether they passed;
+* how many tests passed, when available;
+* any command that could not be run.
+
+Do not report lint results because no lint command exists.
