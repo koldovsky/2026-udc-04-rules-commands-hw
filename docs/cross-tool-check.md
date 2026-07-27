@@ -1,9 +1,15 @@
 # Cross-tool check (Task E)
 
-> **Status: method fixed, results pending.** The probe below has been designed
-> and its discriminators verified; the two runs have not been recorded yet.
-> Every results cell is marked `PENDING` on purpose — nothing here is filled in
-> from expectation.
+> **Status: method fixed, results blocked.** The probe below has been designed
+> and its discriminators verified; the two runs have not been recorded. Every
+> results cell is marked `PENDING` on purpose — nothing here is filled in from
+> expectation.
+>
+> **The Cursor run is blocked: the free-plan request quota on this account is
+> exhausted**, so the second tool cannot be exercised. See the same note in
+> `docs/ab-validation.md`. A one-tool table would not be a cross-tool check, so
+> the rows stay `PENDING` rather than being half-filled from the Claude Code
+> side alone.
 
 **Tools:** Cursor · Claude Code (Opus 5)
 **Same prompt used in both:** a context-introspection probe, verbatim in

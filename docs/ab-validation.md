@@ -251,6 +251,25 @@ To actually measure the rule-set, one of these is needed:
    `AGENTS.md`/`CLAUDE.md`. That answers a different but real question: what the
    baseline is worth versus no context at all.
 
+### Why option 1 was not done — a hard blocker, not a skipped step
+
+**The Cursor re-run is currently impossible for me: the free-plan request quota
+on this account is exhausted.** Cursor's free tier caps AI requests, and the cap
+was reached before this A/B could be repeated there. Two clean runs (rules ON,
+rules OFF) of a multi-file change plus follow-up verification are well past what
+the remaining budget allows, and a partial run would be worse than none — it
+would produce a diff I could not attribute to the rules or to a truncated
+session.
+
+So option 1 stays as the correct next step, not as an oversight. It needs either
+a paid Cursor plan or a quota reset; both are outside what this submission can
+arrange. Options 2 and 3 do not substitute for it: option 2 is the negative
+finding already recorded above, and option 3 measures a different variable
+(baseline context vs no context), not the rule-set.
+
+The same blocker applies to `docs/cross-tool-check.md`, whose Cursor row is
+`PENDING` for this reason.
+
 Two further limits worth stating so the result is not over-read:
 
 - **A single task is a weak sample**, and `priority` maps very cleanly onto the
@@ -301,4 +320,4 @@ verify` step now checks for the announcement, not just for a clean diff.
 
 **Still unproven.** Confirming the fix works needs a run in a tool that actually
 loads `.cursor/rules/` — i.e. Cursor. That is the same re-run the Conclusion
-calls for, and it has not been done yet.
+calls for, and it is blocked by the exhausted free-plan quota described there.
