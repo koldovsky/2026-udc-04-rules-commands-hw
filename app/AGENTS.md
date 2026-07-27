@@ -101,10 +101,15 @@ This is **not** lodash. `capitalize`, `camelCase`, `kebabCase`, `deburr`,
 
 ## Guardrails
 
-- **Protected core — ask before editing.** `store.ts` is frozen; `types.ts`
-  accepts additive changes only (new `Action` variant, new field). Renaming or
-  removing an existing member needs explicit approval. State what you want to
-  change and why the reducer/actions layer cannot absorb it, then wait for a yes.
+- **Protected core.** Three cases, kept in sync with
+  `.cursor/rules/do-not-touch.mdc`:
+  1. `store.ts` — no edits at all without approval. Say what you want to change
+     and why the reducer/actions layer cannot absorb it, then wait for a yes.
+  2. `types.ts`, **additive** (new `Action` variant, new field, new exported
+     type) — proceed **without** approval, but list every addition by name in
+     your reply. Extending `types.ts` silently is itself the violation.
+  3. `types.ts`, **non-additive** (rename, remove, retype, narrow, or make an
+     optional field required) — stop and ask.
 - **Never swap the custom store for a library.** No `redux`, `@reduxjs/toolkit`,
   `zustand`, `mobx`, `jotai`, `recoil`, `valtio`. That store is the architecture.
 - **No new dependencies without approval.** Never run `npm install <pkg>` or
