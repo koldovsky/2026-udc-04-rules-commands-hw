@@ -12,7 +12,8 @@ It's a tiny TypeScript "task board" with a custom state store, used as the targe
 - `src/reducer.ts` — pure `(state, action) => newState` reducer. This is
   where new domain behavior is implemented.
 - `src/actions.ts` — action creators (`addTask`, `toggleTask`, `removeTask`,
-  `setFilter`). Callers build actions via these, not by hand.
+  `clearCompleted`, `setTaskPriority`, `setFilter`). Callers build actions via
+  these, not by hand.
 - `src/selectors.ts` — pure read helpers (`visibleTasks`, `remainingCount`).
 - `src/lib/text.ts` — in-house text helpers with a **fixed API**: `slugify`,
   `truncate`, `normalizeSpaces`. Nothing else exists in this module.

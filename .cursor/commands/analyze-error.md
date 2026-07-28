@@ -2,6 +2,8 @@
 description: "Diagnose an error/stack trace and propose a fix without any/@ts-ignore or protected-file edits"
 ---
 
+# Analyze Error
+
 Diagnose and propose a fix for this error: $ARGUMENTS
 
 1. Read the error/stack trace carefully; locate the exact file(s) and line(s)
@@ -12,12 +14,14 @@ Diagnose and propose a fix for this error: $ARGUMENTS
 3. Propose a fix that:
    - does not use `any` or `@ts-ignore` to silence the error,
    - does not mutate state directly (immutable updates only),
-   - does not touch `app/src/store.ts` or `app/src/types.ts` unless the root
-     cause is genuinely there — if so, stop and confirm before editing.
+   - does not touch `app/src/store.ts` without confirmation,
+   - may add an additive `Action` variant in `app/src/types.ts` when needed,
+     but must stop and confirm before making non-additive changes to core
+     types.
 4. Add or update a colocated test that reproduces the bug and passes with the
    fix applied.
-5. Run `cd app && npm test` and `npm run typecheck` to confirm the fix and
-   that no other test broke.
+5. Run `cd app && npm test && npm run typecheck` to confirm the fix and that
+   no other test broke.
 
 Follow `.cursor/rules/` — especially `conventions.mdc` (no `any`/`@ts-ignore`),
 `do-not-touch.mdc`, and `custom-lib.mdc` (don't assume `lib/text.ts` helpers

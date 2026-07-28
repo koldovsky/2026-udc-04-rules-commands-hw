@@ -31,9 +31,16 @@ in `materials/architecture-brief.md`.
 
 ## How to verify
 
-1. `grep -rE "redux|zustand|mobx|jotai" app/package.json app/src` — no matches.
-2. `grep -rn "state\.tasks\s*\[" app/src` and check for direct mutation
-   (`.push(`, `.splice(`, assignment into `state.tasks[i]`) — should find zero
-   in `reducer.ts` or elsewhere outside test fixtures.
-3. Any new `Action` variant added to `types.ts` has a matching `case` in
+1. `rg -n "redux|zustand|mobx|jotai" app/package.json app/src --glob '!*.test.ts'`
+   — no matches.
+2. `rg -n "state\.(tasks|filter)\s*=|state\.tasks\s*\[[^\]]+\]\s*=|state\.tasks\.(push|splice)\s*\(" app/src --glob '!*.test.ts'`
+   — no matches in production code.
+3. To catch mutations through local aliases in `reducer.ts` and related
+   production code, run an AST check such as
+   `npx eslint app/src --ext .ts --ignore-pattern '*.test.ts' --rule 'no-param-reassign: error'`
+   or an equivalent TypeScript AST scan for assignments/update expressions and
+   mutating calls (`push`, `splice`) whose target resolves back to `state`,
+   `state.tasks`, or a local alias derived from them. Test fixtures are allowed
+   to construct mutable-looking objects; production code is not.
+4. Any new `Action` variant added to `types.ts` has a matching `case` in
    `reducer.ts` and a matching creator in `actions.ts`.

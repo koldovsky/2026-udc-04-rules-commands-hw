@@ -1,6 +1,6 @@
 ---
 description: "app/src/lib/text.ts has a fixed API — don't invent helpers that don't exist"
-globs: "app/src/lib/**"
+globs: "app/src/**/*.{js,jsx,ts,tsx}"
 alwaysApply: false
 ---
 

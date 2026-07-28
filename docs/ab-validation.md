@@ -1,11 +1,7 @@
 # A/B validation (Task D)
 
-> Copy to `docs/ab-validation.md` and fill in. Run the SAME prompt twice — once
-> with rules ON, once with rules OFF (rename `.mdc` → `.mdc.off` or move them
-> aside), in a NEW chat each time.
-
 **Rule(s) under test:** 
-architecture.mdc, conventions.mdc, depencencies.mdc, testing.mdc
+architecture.mdc, conventions.mdc, dependencies.mdc, testing.mdc
 
 **Prompt (same for A and B):**
 the change request from `materials/ab-task.md`
