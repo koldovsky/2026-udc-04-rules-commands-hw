@@ -1,0 +1,23 @@
+---
+description: No new npm packages without explicit user approval
+alwaysApply: true
+---
+
+# Dependencies
+
+## Context
+
+The sample app intentionally has minimal dependencies: `app/package.json` lists only `typescript` and `vitest` as devDependencies. Adding libraries — especially state managers — breaks the exercise architecture and bypasses the custom store pattern.
+
+## Rule
+
+- Do **not** add npm packages (`npm install`, new entries in `package.json` dependencies) without explicit user approval.
+- Do **not** swap the custom store for an external state library — extend the reducer/actions pattern instead.
+- Prefer in-house utilities in `app/src/lib/` over external packages.
+- Do not add linting, formatting, or build tools unless the user asks.
+
+## How to verify
+
+1. `git diff app/package.json` shows no new dependencies unless the user approved them.
+2. `rg -i 'redux|zustand|mobx|jotai' app/` — zero imports.
+3. Feature work uses only existing devDependencies (`vitest`, `typescript`).

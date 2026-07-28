@@ -53,6 +53,9 @@ Baseline guidance for an Agentic IDE working in **this homework repo**.
   the `lib/text.ts` functions when extending the app — only add to them.
 - **Windows + Git Bash:** never use `2>nul` / `>nul` (creates a literal `nul`
   file). Use `2>/dev/null` / `>/dev/null`. `nul` is gitignored as a net.
+- **NEVER** `git commit` or `git push` (or open/merge a PR) without the user's
+  explicit approval for that specific action. Staging and diffing are fine;
+  committing and pushing are not, unless asked.
 
 ## How to verify
 

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { reducer } from "./reducer.js";
-import { addTask, removeTask, setFilter, toggleTask } from "./actions.js";
+import { addTask, duplicateTask, removeTask, setFilter, toggleTask } from "./actions.js";
 import { initialState, type AppState } from "./types.js";
 
 describe("reducer", () => {
@@ -25,6 +25,21 @@ describe("reducer", () => {
     const withTask = reducer(initialState, addTask("a", "A"));
     const removed = reducer(withTask, removeTask("a"));
     expect(removed.tasks).toEqual([]);
+  });
+
+  it("duplicates a task with a new id, same title, and done: false", () => {
+    const withTask = reducer(initialState, addTask("a", "A"));
+    const toggled = reducer(withTask, toggleTask("a"));
+    const duplicated = reducer(toggled, duplicateTask("a", "a-copy"));
+    expect(duplicated.tasks).toEqual([
+      { id: "a", title: "A", done: true },
+      { id: "a-copy", title: "A", done: false },
+    ]);
+  });
+
+  it("returns the same state when duplicating an unknown id", () => {
+    const next = reducer(initialState, duplicateTask("missing", "missing-copy"));
+    expect(next).toBe(initialState);
   });
 
   it("sets the filter", () => {

@@ -1,0 +1,26 @@
+---
+description: TypeScript conventions — named exports, strict types, immutability, kebab-case files
+globs: app/**/*.ts
+alwaysApply: false
+---
+
+# Conventions
+
+## Context
+
+The sample app in `app/src/` uses strict TypeScript (`noUncheckedIndexedAccess` enabled). Existing files (`reducer.ts`, `actions.ts`, `selectors.ts`) establish the style agents must follow.
+
+## Rule
+
+- **Named exports only** — no `export default`.
+- **No `any` or `@ts-ignore`** — use proper types or narrow with guards.
+- **Immutable state updates** in the reducer: return new objects/arrays via spread, `map`, or `filter`; never mutate `state` in place.
+- **File naming:** kebab-case for files (`text-utils.ts` style); PascalCase for types/interfaces (`Task`, `AppState`).
+- **Imports:** use `.js` extensions in relative imports (ESM), e.g. `import { reducer } from "./reducer.js"`.
+
+## How to verify
+
+1. `rg 'export default' app/src/` — zero matches in new/changed files.
+2. `rg '@ts-ignore|: any\b' app/src/` — zero matches.
+3. Reducer immutability test in `app/src/reducer.test.ts` passes (`initialState` unchanged after dispatch).
+4. `cd app && npm run typecheck` passes.
