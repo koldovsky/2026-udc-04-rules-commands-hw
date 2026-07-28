@@ -24,8 +24,8 @@ small, consistent style so the codebase stays predictable. See
 
 ## How to verify
 
-1. `grep -rn "export default" app/src` — no matches.
-2. `grep -rn "\bany\b\|@ts-ignore" app/src` — no matches (outside comments
-   explaining why one was deliberately avoided).
+1. `rg -n "export default" app --glob '*.{ts,tsx}'` — no matches.
+2. `rg -n "\bany\b|@ts-ignore" app --glob '*.{ts,tsx}'` — no matches (outside
+   comments explaining why one was deliberately avoided).
 3. `cd app && npm run typecheck` passes with strict mode on.
-4. New files under `app/src` use kebab-case names.
+4. New `.ts`/`.tsx` files under `app` use kebab-case names.

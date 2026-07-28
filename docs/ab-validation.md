@@ -1,7 +1,7 @@
 # A/B validation (Task D)
 
 **Rule(s) under test:** 
-architecture.mdc, conventions.mdc, dependencies.mdc, testing.mdc
+Only architecture.mdc, conventions.mdc, dependencies.mdc, testing.mdc were activated.
 
 **Prompt (same for A and B):**
 the change request from `materials/ab-task.md`

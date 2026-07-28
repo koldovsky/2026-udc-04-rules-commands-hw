@@ -31,8 +31,15 @@ Functions like `capitalize`, `camelCase`, `deburr`, `kebabCase`, etc. do
 
 ## How to verify
 
-1. `grep -rn "from \"\./lib/text" app/src` (or `../lib/text`) and confirm every
-   imported name is one of `slugify`, `truncate`, `normalizeSpaces`.
-2. `grep -rn "capitalize\|camelCase\|deburr\|kebabCase" app/src` — no matches
-   unless newly and explicitly added to `text.ts` with a test.
-3. `app/package.json` has no `lodash`/`underscore` dependency added.
+1. Run an AST-based import check so quote style, `.js` specifiers, and local
+   aliases do not hide invalid imports:
+
+   ```bash
+   cd app && node --input-type=module -e 'import fs from "node:fs"; import path from "node:path"; import ts from "typescript"; const allowed = new Set(["slugify", "truncate", "normalizeSpaces"]); const files = fs.readdirSync("src", { recursive: true }).filter((file) => /\.(js|jsx|ts|tsx)$/.test(file) && file !== path.join("lib", "text.ts")).map((file) => path.join("src", file)); let failed = false; for (const file of files) { const source = ts.createSourceFile(file, fs.readFileSync(file, "utf8"), ts.ScriptTarget.Latest, true); ts.forEachChild(source, (node) => { if (!ts.isImportDeclaration(node) || !ts.isStringLiteral(node.moduleSpecifier)) return; const specifier = node.moduleSpecifier.text; if (!/(^|\/)lib\/text(\.js|\.ts)?$/.test(specifier)) return; const clause = node.importClause; if (!clause || clause.name || !clause.namedBindings || !ts.isNamedImports(clause.namedBindings)) { console.error(`${file}: import only named helpers from ${specifier}`); failed = true; return; } for (const element of clause.namedBindings.elements) { const imported = (element.propertyName ?? element.name).text; if (!allowed.has(imported)) { console.error(`${file}: invalid import ${imported} from ${specifier}`); failed = true; } } }); } process.exit(failed ? 1 : 0);'
+   ```
+
+2. If doing a quick text search, limit it to import clauses and exclude
+   comments and `app/src/lib/text.ts`; forbidden helpers such as `capitalize`,
+   `camelCase`, `deburr`, and `kebabCase` must not be imported from the local
+   text module unless they were explicitly added to `text.ts` with a test.
+3. `rg -n '"(lodash|underscore)"' app/package.json` — no dependency match.
