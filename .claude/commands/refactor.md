@@ -2,6 +2,8 @@
 description: "Refactor selected code to project conventions without changing behavior"
 ---
 
+# Refactor
+
 Refactor: $ARGUMENTS
 
 1. Keep behavior identical — no observable change in output/tests.

@@ -15,6 +15,13 @@
 
 **Tool used:** Claude Code
 
+## How
+
+- **New chat each time.** Result A and Result B each started in a fresh
+  Claude Code chat with no history from the other run, so nothing could leak
+  between them. The prompt above was the very first message in both — no
+  follow-up hints either time.
+
 ## Result A — rules ON
 
 - Touched: `app/src/types.ts`, `app/src/reducer.ts`, `app/src/actions.ts`,
