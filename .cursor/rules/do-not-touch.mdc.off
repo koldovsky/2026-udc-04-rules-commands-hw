@@ -1,0 +1,38 @@
+---
+description: "Protect the load-bearing custom store and core domain types from unapproved changes"
+globs: "app/src/store.ts, app/src/types.ts"
+alwaysApply: true
+---
+
+# Protected Core Files
+
+## Context
+
+`app/src/store.ts` and `app/src/types.ts` are load-bearing parts of the task-board application.
+
+`app/src/store.ts` contains the dispatch and subscription engine used by the entire application. 
+
+`app/src/types.ts` contains the core state model and the `Action` discriminated union. Changes to these files can affect the reducer, action creators, selectors, tests, and all store consumers. 
+
+Normal feature work should primarily extend `app/src/reducer.ts`, `app/src/actions.ts`, `app/src/selectors.ts`, and their colocated tests.
+
+## Rule
+
+- Treat `app/src/store.ts` and `app/src/types.ts` as protected files. 
+- Modify either protected file only when the user or task explicitly requires that specific change. 
+- Before changing a protected file, identify why the change cannot be completed through `app/src/reducer.ts`, `app/src/actions.ts`, or `app/src/selectors.ts`. 
+- Keep changes to protected files minimal and scoped to the requested behavior. 
+- When adding a new feature, prefer extending the existing `Action` union rather than redesigning the state engine. 
+- NEVER refactor `createStore()` without explicit approval. 
+- NEVER replace the `Action` discriminated union with untyped strings or generic payload objects. 
+- DO NOT rename or remove `getState`, `dispatch`, or `subscribe`. 
+- DO NOT change the `AppState` shape unless the requested feature requires it.
+
+## How to verify
+
+1. Run `git diff -- app/src/store.ts app/src/types.ts` and confirm there are no changes unless explicit approval was given. 
+2. If either protected file changed, confirm the task description directly requires that modification. 
+3. Confirm `createStore()` still returns `getState`, `dispatch`, and `subscribe`. 
+4. Confirm `Action` remains a discriminated union using the `type` property. 
+5. Run `cd app && npm test`. 
+6. Run `cd app && npm run typecheck`.

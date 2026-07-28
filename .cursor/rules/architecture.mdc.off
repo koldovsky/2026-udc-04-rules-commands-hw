@@ -1,0 +1,44 @@
+---
+description: "Enforce the custom task-board state architecture when changing applcation behavior"
+globs: "app/**/*.ts"
+alwaysApply: false
+---
+
+# Custom Store Architecture
+
+## Context
+
+The task-board application uses a small in-house state store, NOT a library.
+
+The architecture is split across:
+
+- `app/src/store.ts` — returns `{ getState, dispatch, subscribe }`.
+- `app/src/types.ts` — defines `AppState`, `Task`, and the `Action` union.
+- `app/src/reducer.ts` — applies actions, returns new objects/arrays.
+- `app/src/actions.ts` — exposes action creators for UI/consumers.
+- `app/src/selectors.ts` — pure read helpers.
+
+This separation keeps state changes predictable, typed, and testable.
+
+## Rule
+
+- Change application state only by calling `store.dispatch(action)`. 
+- Add new behavior through the following sequence: 
+    1. Add an `Action` variant to the discriminated union in `app/src/types.ts`. 
+    2. Handle the action in `app/src/reducer.ts`. 
+    3. Add an action creator in `app/src/actions.ts`. 
+    4. Add or update a colocated test. 
+- Keep `app/src/reducer.ts` pure: the reducer must depend only on its `state` and `action` arguments. 
+- Consumers must use action creators from `app/src/actions.ts` instead of manually constructing action objects. 
+- Reads derived from application state should use selectors from `app/src/selectors.ts`. 
+- NEVER mutate state directly. 
+- NEVER replace the custom store with Redux, Zustand, MobX, Jotai, or another state-management library. 
+- DO NOT introduce library-specific concepts such as slices, reducers created by Redux Toolkit, middleware chains, atoms, or Zustand stores.
+
+## How to verify
+
+1. Search for direct state mutation such as `state.tasks.push`, `state.tasks.splice`, or assignments to `state.filter`; the search should find zero production usages. 
+2. Search `app/` for imports from `redux`, `@reduxjs/toolkit`, `zustand`, `mobx`, or `jotai`; the search should find zero matches. 
+3. Confirm every new action type appears in `app/src/types.ts`, `app/src/reducer.ts`, and `app/src/actions.ts`. 
+4. Run `cd app && npm test`. 
+5. Run `cd app && npm run typecheck`.
