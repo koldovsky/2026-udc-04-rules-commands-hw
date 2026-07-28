@@ -1,0 +1,40 @@
+---
+description: "Restrict text helper usage to the supported in-house text library API"
+globs: "app/src/lib/*.*"
+alwaysApply: false
+---
+
+# In-House Text Library
+
+## Context
+
+`app/src/lib/text.ts` is a small project-specific text utility module. 
+
+Its complete supported API is: 
+- `slugify(input: string): string` 
+- `truncate(input: string, maxLength: number, suffix?: string): string` 
+- `normalizeSpaces(input: string): string` 
+
+This module is not Lodash, Underscore, or a general-purpose string library. Helpers such as `capitalize`, `camelCase`, and `deburr` do not exist in this project.
+
+## Rule
+
+- Use only the exported functions that actually exist in `app/src/lib/text.ts`. 
+- Import `slugify`, `truncate`, and `normalizeSpaces` as named exports. 
+- Preserve the documented argument and return types. 
+- Add a new helper only when the task explicitly requires new reusable text behavior. 
+- Add a colocated test when adding or changing a text helper. 
+- Keep text helpers pure and deterministic. 
+- NEVER call non-existent helpers such as `capitalize`, `camelCase`, `deburr`, `kebabCase`, `snakeCase`, or `startCase`. 
+- NEVER assume Lodash or Underscore APIs are available. 
+- DO NOT add Lodash, Underscore, or another text utility package to replace the existing module. 
+- DO NOT duplicate `slugify`, `truncate`, or `normalizeSpaces` logic in another file.
+
+## How to verify
+
+1. Open `app/src/lib/text.ts` and confirm every imported helper is actually exported there. 
+2. Search `app/src` for `capitalize(`, `camelCase(`, `deburr(`, `kebabCase(`, `snakeCase(`, and `startCase(`; unsupported helper calls should find zero matches. 
+3. Search `package.json` and source imports for `lodash` or `underscore`; the search should find zero matches. 
+4. Confirm changed or added text helpers have a colocated `text.test.ts` file. 
+5. Run `cd app && npm test`. 
+6. Run `cd app && npm run typecheck`.

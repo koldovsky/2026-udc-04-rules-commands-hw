@@ -1,0 +1,41 @@
+---
+description: "Require colocated Vitest tests for application behavior"
+globs: "app/**/test.ts"
+alwaysApply: false
+---
+
+# Colocated Vitest Tests
+
+## Context
+
+The task-board application uses Vitest for automated tests. 
+
+Tests are colocated with the source code they verify and use the `*.test.ts` filename pattern. 
+The project test command is: `cd app && npm test` 
+Tests should verify observable behavior of reducers, action creators, selectors, and text helpers without depending on implementation details.
+
+## Rule
+
+- Place tests next to the source file under test. 
+- Name test files using the `*.test.ts` suffix. 
+- Use Vitest APIs such as `describe`, `it` or `test`, `expect`, and `vi`. 
+- Structure each test using Arrange, Act, Assert: 
+    - Arrange the input state, action, or arguments. 
+    - Act by calling the function under test. 
+    - Assert the returned result or observable behavior. 
+- Add tests for new reducer actions, action creators, selectors, and text helper behavior. 
+- Include edge cases relevant to strict typing and empty collections. 
+- Verify reducers do not mutate their input state. 
+- Keep tests deterministic and independent. 
+- NEVER depend on test execution order. 
+- DO NOT use Jest-specific configuration or imports. 
+- DO NOT create a separate top-level test directory for colocated unit tests.
+
+## How to verify
+
+1. Confirm each new test file is colocated with its source file and ends with `.test.ts`. 
+2. Search test files for imports from `jest`; the search should find zero matches. 
+3. Inspect reducer tests and confirm they compare the original state before and after dispatch to detect mutation. 
+4. Confirm each test clearly contains Arrange, Act, and Assert phases, either through comments or obvious structure. 
+5. Run `cd app && npm test`. 
+6. Run `cd app && npm run typecheck`.

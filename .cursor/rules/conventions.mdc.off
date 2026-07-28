@@ -1,0 +1,42 @@
+---
+description: "Apply project TypeScript, export, naming, and immutability conventions"
+globs: "app/**/*.ts"
+alwaysApply: false
+---
+
+# TypeScript Conventions
+
+## Context
+
+The task-board application is compiled in strict TypeScript mode with `noUncheckedIndexedAccess` enabled.
+
+Project conventions are intended to keep modules easy to inspect and prevent unsafe shortcuts that bypass the type system.
+
+Relevant files include:
+- `app/src/types.ts` — shared domain types 
+- `app/src/reducer.ts` — immutable state transitions 
+- `app/src/actions.ts` — named action creators 
+- `app/src/selectors.ts` — named selectors
+
+## Rule
+
+- Use named exports only. 
+- Use explicit domain types from `app/src/types.ts` where applicable. 
+- Use PascalCase for types and interfaces. 
+- Use kebab-case for new filenames. 
+- Handle possibly missing array or object values explicitly because `noUncheckedIndexedAccess` is enabled. 
+- Use immutable operations such as object spread, array spread, `map`, and `filter` when creating updated state. 
+- Prefer precise union types, generics, or `unknown` with type narrowing over unsafe type escapes. 
+- NEVER use `any`. 
+- NEVER use `@ts-ignore`. 
+- DO NOT add default exports. 
+- DO NOT mutate arrays or objects that belong to the current application state.
+
+## How to verify
+
+1. Search `app/src` for `export default`; the search should find zero matches. 
+2. Search `app/src` for `: any`, `<any>`, `as any`, and `@ts-ignore`; the search should find zero matches. 
+3. Inspect reducer changes and confirm they return new objects or arrays rather than modifying existing state. 
+4. Confirm newly added TypeScript filenames use kebab-case. 
+5. Run `cd app && npm run typecheck`. 
+6. Run `cd app && npm test`.

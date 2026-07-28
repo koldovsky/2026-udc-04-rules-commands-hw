@@ -1,0 +1,40 @@
+---
+description: "Keep state reads in selectors and state commands in action creators"
+globs: "app/src/selectors.ts,app/src/actions.ts"
+alwaysApply: false
+---
+
+# Selectors and Action Creators
+
+## Context
+
+The task-board application separates reads from writes. 
+
+`app/src/selectors.ts` contains pure read helpers such as `visibleTasks` and `remainingCount`. 
+
+`app/src/actions.ts` contains action creators such as `addTask`, `toggleTask`, `removeTask`, and `setFilter`. 
+
+This separation prevents consumers from duplicating filtering logic or manually constructing action objects.
+
+## Rule
+
+- Put reusable derived-state logic in `app/src/selectors.ts`. 
+- Keep selectors pure: selectors must not dispatch actions, mutate state, or produce side effects.
+- Selectors must derive their result only from the provided `AppState`. 
+- Add a named selector when the same state-reading logic is needed in more than one consumer. 
+- Put action construction in `app/src/actions.ts`. 
+- Each action creator must return a valid member of the `Action` union from `app/src/types.ts`. 
+- Consumers should call action creators instead of writing objects such as `{ type: "task/add", payload: ... }` manually. 
+- Use named exports for all selectors and action creators. 
+- NEVER access and transform `state.tasks` directly in UI or consumer code when an appropriate selector exists. 
+- NEVER dispatch from a selector. 
+- DO NOT place state mutations or business logic inside action creators. 
+- DO NOT create action types that are absent from the `Action` union.
+
+## How to verify
+
+1. Search consumer code for manually constructed objects containing `type:` values from the `Action` union; production consumers should use action creators instead. 
+2. Search `app/src/selectors.ts` for `.push`, `.splice`, direct assignments, or `dispatch`; the search should find zero matches. 
+3. Confirm every action creator return value is assignable to `Action`. 
+4. Confirm selectors such as task filtering and remaining-task counting are not duplicated in consumer modules. 
+5. Run `cd app && npm test && npm run typecheck`.
