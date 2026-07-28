@@ -18,6 +18,10 @@ export function removeTask(id: TaskId): Action {
   return { type: "task/removed", payload: { id } };
 }
 
+export function duplicateTask(id: TaskId, newId: TaskId): Action {
+  return { type: "task/duplicated", payload: { id, newId } };
+}
+
 export function setFilter(filter: Filter): Action {
   return { type: "filter/set", payload: { filter } };
 }

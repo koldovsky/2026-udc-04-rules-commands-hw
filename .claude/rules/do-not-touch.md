@@ -1,0 +1,18 @@
+# Do Not Touch — Protected Core
+
+## Context
+
+`app/src/store.ts` (the dispatch/subscribe engine) and `app/src/types.ts` (core types + `Action` union) are load-bearing protected core. Comments in both files mark them as do-not-touch zones. Normal feature work extends `reducer.ts`, `actions.ts`, `selectors.ts`, and tests.
+
+## Rule
+
+- Do **not** modify `app/src/store.ts` unless the user explicitly asks.
+- Do **not** refactor or restructure `app/src/types.ts` — but adding a new `Action` variant or domain field as part of the golden path is allowed.
+- If unsure whether a change to a protected file is needed, ask the user first.
+- Prefer extending `reducer.ts`, `actions.ts`, and `selectors.ts` for new behavior.
+
+## How to verify
+
+1. Diff should not include edits to `store.ts` unless the user requested it.
+2. Changes to `types.ts` are limited to new `Action` variants or domain fields — not restructuring the store interface or `createStore`.
+3. Agent refuses or asks before making unrelated edits to protected files.

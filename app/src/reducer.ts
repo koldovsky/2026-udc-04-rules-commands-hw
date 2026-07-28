@@ -32,6 +32,18 @@ export function reducer(state: AppState, action: Action): AppState {
         tasks: state.tasks.filter((task) => task.id !== action.payload.id),
       };
 
+    case "task/duplicated": {
+      const source = state.tasks.find((task) => task.id === action.payload.id);
+      if (!source) return state;
+      return {
+        ...state,
+        tasks: [
+          ...state.tasks,
+          { id: action.payload.newId, title: source.title, done: false },
+        ],
+      };
+    }
+
     case "filter/set":
       return { ...state, filter: action.payload.filter };
 

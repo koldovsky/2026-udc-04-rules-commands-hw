@@ -1,0 +1,28 @@
+---
+paths:
+  - "app/**"
+---
+
+# Architecture — Custom Store
+
+## Context
+
+The task board uses an in-house store in `app/src/store.ts` (`createStore` → `getState`, `dispatch`, `subscribe`). It is deliberately NOT Redux, Zustand, MobX, or Jotai. State shape and the `Action` discriminated union live in `app/src/types.ts`; pure transitions in `app/src/reducer.ts`; action creators in `app/src/actions.ts`.
+
+## Rule
+
+- Change state **only** via `store.dispatch(action)` — never mutate `AppState` directly outside the reducer.
+- Extend behavior via the golden path:
+  1. Add an `Action` variant in `app/src/types.ts`
+  2. Handle it in `app/src/reducer.ts` (immutable return)
+  3. Add an action creator in `app/src/actions.ts`
+- Read derived state through `app/src/selectors.ts` (`visibleTasks`, `remainingCount`) — avoid ad-hoc filtering on raw `state.tasks` in UI code.
+- Do **not** edit `app/src/store.ts` to add behavior; extend actions/reducer instead.
+- NEVER install or import Redux, Zustand, MobX, or Jotai.
+
+## How to verify
+
+1. `rg -i 'redux|zustand|mobx|jotai' app/` — zero matches.
+2. New features touch `types.ts` (Action union), `reducer.ts`, and `actions.ts` — not `store.ts`.
+3. State updates in `reducer.ts` use spread/map/filter (e.g. `task/toggled`), never in-place mutation.
+4. `cd app && npm test && npm run typecheck` pass.
