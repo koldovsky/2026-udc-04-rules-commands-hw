@@ -1,0 +1,43 @@
+---
+description: "The real (fixed) API surface of the in-house app/src/lib/text.ts"
+globs: "app/src/lib/**"
+alwaysApply: false
+---
+
+# custom-lib — app/src/lib/text.ts has a fixed API
+
+## Context
+
+`app/src/lib/text.ts` is an in-house utility file, **not** lodash/underscore.
+Its entire supported surface is exactly three functions. Assuming a
+lodash-style helper exists here is a common hallucination this rule exists to
+prevent.
+
+## Rule
+
+- The **only** functions that exist in `app/src/lib/text.ts` are:
+  - `slugify(input: string): string`
+  - `truncate(input: string, maxLength: number, suffix?: string): string`
+  - `normalizeSpaces(input: string): string`
+- Do **not** assume or import helpers like `capitalize`, `camelCase`,
+  `deburr`, `kebabCase`, `startCase`, etc. — they do not exist in this repo.
+- If a task genuinely needs a new text helper, **add it explicitly** to
+  `app/src/lib/text.ts` with a named export and a colocated test in
+  `app/src/lib/text.test.ts` — don't assume it or silently import from a
+  library.
+- Do not change the existing three functions' signatures; only add to the
+  file.
+
+## How to verify
+
+1. `grep -rnE "import .*(capitalize|camelCase|deburr|kebabCase|startCase)" app/src`
+   → no matches, and
+   `grep -rnE "(capitalize|camelCase|deburr|kebabCase|startCase)\s*\(" app/src`
+   → no matches. (These names DO legitimately appear in a warning comment
+   inside `text.ts` itself — what must never exist are imports or call sites
+   of them, so grep for those specifically. Exception: a matching new export
+   just added deliberately, with a test.)
+2. Every import from `./lib/text.js` / `./text.js` only names
+   `slugify`, `truncate`, or `normalizeSpaces` (or a newly-added, tested
+   export).
+3. `cd app && npm test` covers any newly added helper.

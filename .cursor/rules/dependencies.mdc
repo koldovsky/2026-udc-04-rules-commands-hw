@@ -1,0 +1,34 @@
+/mo---
+description: "No new npm dependencies without explicit approval"
+globs: "app/**"
+alwaysApply: true
+---
+
+# Dependencies — ask before adding any
+
+## Context
+
+`app/package.json` currently has exactly two `devDependencies`
+(`typescript`, `vitest`) and zero runtime dependencies. That is intentional —
+the exercise is about the custom store and in-house lib, not about picking
+libraries.
+
+## Rule
+
+- Do **not** run `npm install <pkg>` / add anything to `dependencies` or
+  `devDependencies` in `app/package.json` without the user explicitly
+  approving that specific package first.
+- Solve tasks with what's already here: the custom store
+  (`store.ts`/`reducer.ts`/`actions.ts`), `app/src/lib/text.ts`, and the
+  TypeScript/Node standard library.
+- If a task genuinely seems to need a new dependency, stop and ask instead of
+  installing it.
+
+## How to verify
+
+1. `git diff -- app/package.json app/package-lock.json` is empty unless the
+   user explicitly approved the specific new package.
+2. `app/package.json` still has no `dependencies` section and exactly
+   `typescript` + `vitest` under `devDependencies`:
+   `grep -n '"dependencies"' app/package.json` → no match;
+   `grep -nE '"(typescript|vitest)":' app/package.json` → exactly 2 lines.

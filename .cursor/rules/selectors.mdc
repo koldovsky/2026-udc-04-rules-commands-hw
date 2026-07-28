@@ -1,0 +1,37 @@
+---
+description: "Derived/read data goes through app/src/selectors.ts"
+globs: "app/src/**/*.ts"
+alwaysApply: false
+---
+
+# Selectors — the single place reads are derived
+
+## Context
+
+`app/src/selectors.ts` exists so filtering/derivation logic (which tasks are
+visible, how many remain) lives in one place instead of being copy-pasted
+wherever state is read. Today it exports `visibleTasks(state)` and
+`remainingCount(state)`. This rule attaches to **all** of `app/src` (not
+just `selectors.ts`), because the violation it prevents — an inline
+`state.tasks.filter(...)` — gets written at the call site, in some other
+file.
+
+## Rule
+
+- New derived-data needs (a count, a filtered list, a lookup) get a new named
+  selector function in `app/src/selectors.ts`, not an inline
+  `state.tasks.filter(...)`/`.map(...)` written at the call site.
+- Selectors are **pure functions** of `AppState` — no side effects, no
+  reaching into `store` internals, no reading `Date.now()`/randomness inside a
+  selector.
+- Keep existing selector signatures (`visibleTasks(state: AppState): Task[]`,
+  `remainingCount(state: AppState): number`) stable; add new exports rather
+  than changing what these return.
+
+## How to verify
+
+1. `grep -rn "state.tasks.filter\|state.tasks.map" app/src` → matches only
+   appear inside `app/src/selectors.ts` (and `app/src/reducer.ts`, which
+   builds new state rather than deriving a read view).
+2. Any new selector is a named export in `app/src/selectors.ts` with an
+   `AppState` parameter and no side effects.

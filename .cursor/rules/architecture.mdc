@@ -1,0 +1,42 @@
+---
+description: "Custom state store architecture — how state is allowed to change in this app"
+globs: "app/**"
+alwaysApply: false
+---
+
+# Architecture — custom store only
+
+## Context
+
+`app/` is a task-board with a **hand-rolled state store**
+(`app/src/store.ts`), deliberately not a library. See
+`materials/architecture-brief.md` for the full rationale. The golden path for
+new behavior is: `app/src/types.ts` (Action union) → `app/src/reducer.ts` →
+`app/src/actions.ts` → a colocated test.
+
+## Rule
+
+- The **only** way state changes is `store.dispatch(action)` from
+  `app/src/store.ts`. Never call `reducer()` directly and never mutate the
+  object returned by `getState()`.
+- New behavior starts with a new variant on the `Action` discriminated union
+  in `app/src/types.ts`, handled with a new `case` in `app/src/reducer.ts`,
+  and exposed through a named action creator in `app/src/actions.ts`.
+- Reads go through `app/src/selectors.ts` (`visibleTasks`, `remainingCount`),
+  not ad-hoc `state.tasks.filter(...)` scattered around the app.
+- **NEVER** introduce Redux, Zustand, MobX, Jotai, Recoil, or any other
+  state-management library. Do not "modernize" `store.ts` — it is intentionally
+  custom.
+
+## How to verify
+
+1. `grep -inE '"(redux|zustand|mobx|jotai|recoil)"' app/package.json` → no
+   matches, and
+   `grep -rnE "from ['\"](redux|zustand|mobx|jotai|recoil)" app/src` → no
+   matches. (The library names DO legitimately appear in a warning comment
+   in `store.ts` — what must never exist are installs and imports, so grep
+   for those specifically, not for the bare words.)
+2. Any new action appears in all three places: the `Action` union
+   (`types.ts`), a `case` in `reducer.ts`, and a creator in `actions.ts`.
+3. `cd app && npm run typecheck` passes (no unhandled union member, no stray
+   `any` papering over a mismatch).
