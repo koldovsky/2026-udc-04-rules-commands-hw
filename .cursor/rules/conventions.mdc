@@ -1,0 +1,50 @@
+---
+description: Enforce the TypeScript, naming, export, and testing conventions used by the app
+globs:
+  - "app/**/*.ts"
+alwaysApply: false
+---
+
+# Conventions
+
+## Context
+
+The application uses strict TypeScript and Vitest.
+
+Relevant configuration and examples:
+
+- `app/tsconfig.json`
+- `app/src/**/*.ts`
+- `app/src/**/*.test.ts`
+
+TypeScript has `noUncheckedIndexedAccess` enabled.
+
+## Rule
+
+Follow these project conventions:
+
+- Do not use `any`.
+- Do not use `@ts-ignore`.
+- Handle possibly undefined array or object access explicitly.
+- Use named exports only.
+- Do not introduce default exports.
+- Use PascalCase for types and interfaces.
+- Use kebab-case for filenames.
+- Keep tests colocated with implementation files as `*.test.ts`.
+- Use Vitest for tests.
+- Prefer small, focused functions with explicit input and output types.
+
+Do not invent a lint command. Linting is not configured in this project.
+
+## How to verify
+
+- Search for `any`, `@ts-ignore`, and `export default`.
+- Check that new filenames use kebab-case.
+- Check that tests are next to the corresponding implementation.
+- Run:
+
+  ```bash
+  cd app
+  npm test
+  npm run typecheck
+  ```

@@ -1,0 +1,56 @@
+---
+description: Preserve the task-board custom state architecture when implementing features
+globs:
+  - "app/**"
+alwaysApply: false
+---
+
+# Architecture
+
+## Context
+
+The application uses a custom in-house state store.
+
+Relevant files:
+
+- `app/src/types.ts` — domain types and the `Action` discriminated union
+- `app/src/reducer.ts` — pure state transitions
+- `app/src/actions.ts` — action creators
+- `app/src/selectors.ts` — state read helpers
+- `app/src/store.ts` — dispatch, subscription, and notification engine
+
+## Rule
+
+Follow the application’s existing state-management flow.
+
+For new behavior:
+
+1. If the change requires modifying `app/src/types.ts`, explain why the modification is necessary and obtain explicit user approval before editing the file.
+2. After approval, add or reuse an `Action` variant in `app/src/types.ts`.
+3. Handle the action in `app/src/reducer.ts`.
+4. Add an action creator in `app/src/actions.ts`.
+5. Add or update a colocated `*.test.ts` file.
+
+State changes must go through `dispatch`.
+
+Do not:
+
+- mutate state directly;
+- update state outside the reducer;
+- construct action objects in consumers when an action creator can be used;
+- replace the custom store with Redux, Zustand, MobX, Jotai, or another state library.
+
+Read derived state through selectors from `app/src/selectors.ts` instead of duplicating filtering or counting logic.
+
+## How to verify
+
+- Search for direct mutations such as `.push()`, `.splice()`, or assignments to state properties.
+- Confirm every new action is handled by `app/src/reducer.ts`.
+- Confirm consumers use action creators from `app/src/actions.ts`.
+- Run:
+
+  ```bash
+  cd app
+  npm test
+  npm run typecheck
+  ```
