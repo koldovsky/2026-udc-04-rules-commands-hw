@@ -31,9 +31,11 @@ suggestion quietly removes the constraint the rules exist to protect.
 
 1. `git diff app/package.json app/package-lock.json` — empty, unless an
    approval for the specific package is in the conversation.
-2. `grep -c '"' app/package.json` aside, `dependencies` is still absent and
-   `devDependencies` still lists only `typescript` and `vitest`.
-3. `grep -rn "from \"[a-z@]" app/src` — every bare import resolves to `vitest`
-   or a Node builtin; everything else is relative.
+2. `grep -nE "\"(dependencies|devDependencies)\":" app/package.json` — only
+   `devDependencies` matches (`dependencies` is absent entirely), and the block
+   it opens still lists exactly `typescript` and `vitest`, nothing else.
+3. `grep -rnE "from ['\"][a-z@]" app/src` — catches both quote styles; every
+   bare import resolves to `vitest` or a Node builtin, everything else is
+   relative and ends in `.js`.
 4. No new config files at `app/` root (`.eslintrc*`, `.prettierrc*`,
    `jest.config.*`).

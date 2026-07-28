@@ -14,7 +14,7 @@ runtime dependencies — `app/package.json` lists exactly two devDependencies.
 
 ## Structure
 
-```
+```text
 app/
   src/
     types.ts        AppState, Task, Filter, the Action union, initialState   [PROTECTED]
@@ -31,9 +31,13 @@ app/
 
 ## Commands
 
+**Prerequisite, run by a human:** `npm install` (first run only). An agent never
+runs it on its own initiative — `.cursor/rules/dependencies.mdc` bans every
+install command without explicit approval, and that ban does not carve out the
+no-argument form. Ask, then wait for a yes.
+
 ```bash
 cd app
-npm install         # first run only
 npm test            # vitest run — 3 files, 15 tests, must stay green
 npm run test:watch  # vitest in watch mode
 npm run typecheck   # tsc --noEmit

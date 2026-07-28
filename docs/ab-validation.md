@@ -118,7 +118,7 @@ updated. An optional field would have been a defensible alternative.
 
 Files touched:
 
-```
+```text
  app/src/actions.ts      |    6 +++++-
  app/src/reducer.test.ts |   36 ++++++++++++++++++++++++++++++++----
  app/src/reducer.ts      |   17 ++++++++++++++++-
@@ -172,7 +172,7 @@ Verified on the working tree as produced: `npx tsc --noEmit` clean, `npm test`
 
 Files touched:
 
-```
+```text
  app/src/actions.ts      |    6 +++++-
  app/src/reducer.test.ts |   41 +++++++++++++++++++++++++++++++++++++----
  app/src/reducer.ts      |   17 ++++++++++++++++-
@@ -291,7 +291,7 @@ its own merits. The rule said both of these:
 
 > `types.ts` — ADDITIVE changes only (a new `Action` variant, a new optional
 > field on `Task`).
-
+>
 > Before any edit to these files, state in the reply: which file, what the
 > addition is, and why the reducer/actions layer could not absorb it. Then wait
 > for a yes.

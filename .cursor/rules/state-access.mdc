@@ -24,8 +24,9 @@ next payload change breaks callers the compiler cannot find.
 - Action creators are pure mappings from arguments to payload. No ID
   generation, no defaults pulled from global state, no validation side effects.
 - Derived reads live in `selectors.ts` as `(state: AppState) => T` pure
-  functions. Any `state.tasks.filter/map/reduce` that appears twice outside
-  this file becomes a selector.
+  functions. Any `state.tasks.filter/map/reduce` outside this file — and outside
+  `reducer.ts`, which writes rather than reads — becomes a selector on its
+  **first** occurrence, not its second. One call site is already one too many.
 - Selectors NEVER mutate, sort in place, or dispatch. `sort` needs a copy:
   `[...state.tasks].sort(...)`.
 - Both files export types-only imports from `./types.js` — they must not

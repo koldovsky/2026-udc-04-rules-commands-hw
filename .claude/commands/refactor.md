@@ -2,6 +2,8 @@
 description: "Refactor code to project conventions without changing observable behavior"
 ---
 
+# Refactor
+
 Refactor: $ARGUMENTS
 
 This is a **behavior-preserving** change. The test suite must pass before and
@@ -21,9 +23,9 @@ pass, you have changed behavior: stop and say so instead.
    - respect `noUncheckedIndexedAccess`: guard `tasks[0]`, never assert with `!`
    - kebab-case files, PascalCase types, camelCase functions
 4. **Apply the layering** from `.cursor/rules/state-access.mdc`: inline action
-   object literals move into `app/src/actions.ts`; a `state.tasks.filter/map`
-   that appears at more than one call site becomes a selector in
-   `app/src/selectors.ts`.
+   object literals move into `app/src/actions.ts`; any `state.tasks.filter/map`
+   outside `selectors.ts`/`reducer.ts` becomes a selector in
+   `app/src/selectors.ts` — the first occurrence, not the second.
 5. **Keep public signatures frozen.** `createStore`, the action creators, and the
    `app/src/lib/text.ts` functions keep their exact parameter lists and return
    types (`.cursor/rules/do-not-touch.mdc`). Extend, never redefine.

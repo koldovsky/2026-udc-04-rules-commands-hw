@@ -21,12 +21,16 @@ returning new object identities.
   `state.x`, never call a setter, never expose a mutation helper.
 - The golden path to add behavior, in this order:
   1. add a variant to the `Action` union in `app/src/types.ts`
-     (`{ type: "<domain>/<pastTense>"; payload: {...} }`)
+     (`{ type: "<domain>/<verb>"; payload: {...} }`)
   2. handle it in the `switch` in `app/src/reducer.ts`, immutably
   3. add an action creator in `app/src/actions.ts`
   4. add a colocated `*.test.ts`
-- Action `type` strings follow the existing `domain/pastTense` shape:
-  `task/added`, `task/toggled`, `task/removed`, `filter/set`. Match it.
+- Action `type` strings are `<domain>/<verb>`, and the verb follows the existing
+  set: **past tense** for something that happened to an entity (`task/added`,
+  `task/toggled`, `task/removed`), and the established exception **`filter/set`**
+  — an imperative — for setting a state-level value. A new action on `Task` uses
+  past tense; a new state-level setter may follow `filter/set`. Same wording in
+  `.cursor/commands/add-action.md`, step 1.
 - The reducer stays pure: no `Date.now()`, no `Math.random()`, no `fetch`, no
   logging. IDs and timestamps arrive via the action payload.
 - Reads go through `app/src/selectors.ts`, not through `state.tasks` at the

@@ -25,9 +25,13 @@ that invents either produces files that never run.
   logical assertion target per `it`.
 - Test names describe observable behavior:
   `it("keeps the other tasks untouched when one is toggled")`.
-- For reducer tests, assert immutability too: the previous state object and its
-  untouched members keep their identity
-  (`expect(next.tasks[1]).toBe(prev.tasks[1])`).
+- For reducer tests, assert immutability too: `next` is a new object, and every
+  member of the state shape the action does **not** own keeps its identity.
+  Which member that is depends on the action — for a task action assert the
+  untouched task, `expect(next.tasks[1]).toBe(prev.tasks[1])`, plus
+  `expect(next.tasks[0]).not.toBe(prev.tasks[0])` for the changed one; for a
+  state-level action like `filter/set` assert `expect(next.tasks).toBe(prev.tasks)`.
+  Do not demand `tasks[1]` from an action that never touches `tasks`.
 - Every new action variant, selector, or `lib/` function ships with a test in
   the same change. NEVER use `it.skip`/`describe.skip` or a placeholder
   assertion like `expect(true).toBe(true)` to make a suite look green.
@@ -36,8 +40,12 @@ that invents either produces files that never run.
 ## How to verify
 
 1. `cd app && npm test` — green, and the run output lists the new file.
-2. `ls app/src` — every non-test module that changed has a sibling
-   `*.test.ts`.
+2. Take the changed production modules from `git diff --name-only -- app/src`
+   (drop the `*.test.ts` entries) and check each one against
+   `ls app/src app/src/lib`: every changed module has a sibling
+   `<name>.test.ts` that covers the change. (`index.ts` is demo wiring with
+   top-level side effects — it has no spec by design; that is the only
+   exception.)
 3. `grep -rnE "\.skip\(|\bjest\b|__tests__" app/src` — zero hits.
 4. Each new `it(...)` fails if you revert the production change it covers
    (sanity-check by undoing the reducer case once).

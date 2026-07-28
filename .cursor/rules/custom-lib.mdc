@@ -32,11 +32,15 @@ worse, the agent adds lodash as a dependency to make its own hallucination true.
 
 ## How to verify
 
-1. `grep -rnE "(capitalize|camelCase|deburr|startCase|kebabCase)\(" app/src`
-   — zero hits. (The bare names without `(` also match the seeded warning
-   comment at `app/src/lib/text.ts:5` — that line is expected.)
-2. `grep -rnE "lodash|underscore|ramda|change-case" app/package.json` — zero
-   hits; in `app/src` the only match is the comment at `text.ts:3`.
+1. `grep -rnE "(capitalize|camelCase|kebabCase|deburr|startCase|escapeHtml|pad|words)\(" app/src`
+   — zero hits, covering every prohibited name above. (The bare names without
+   `(` also match the seeded warning comment at `app/src/lib/text.ts:5` — that
+   line is expected.)
+2. `grep -rnE "lodash|underscore|ramda|slugify|change-case" app/package.json` —
+   zero hits. In `app/src` run it without `slugify`
+   (`grep -rnE "lodash|underscore|ramda|change-case" app/src`); the only match
+   is the comment at `text.ts:3`. `slugify` is our own helper, so it is expected
+   throughout `app/src` — it is banned only as a dependency.
 3. `grep -n "^export function" app/src/lib/text.ts` — every listed function has
    a matching `describe`/`it` block in `app/src/lib/text.test.ts`.
 4. `cd app && npm run typecheck` — clean (a hallucinated import fails here).

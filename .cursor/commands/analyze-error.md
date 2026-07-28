@@ -2,6 +2,8 @@
 description: "Diagnose a TypeScript or vitest error and fix the cause, not the symptom"
 ---
 
+# Analyze Error
+
 Analyze and fix this error: $ARGUMENTS
 
 The goal is the **root cause**. Silencing the compiler is not a fix.
