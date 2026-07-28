@@ -1,0 +1,26 @@
+---
+description: "TypeScript code style — exports, strictness, immutability, naming"
+globs: "app/**/*.ts"
+alwaysApply: false
+---
+
+# Conventions
+
+## Context
+
+`app/` is strict TypeScript (`noUncheckedIndexedAccess` on) with a few fixed
+style rules that keep the codebase consistent.
+
+## Rule
+
+- Named exports only, no `any`, no `@ts-ignore`.
+- Update state immutably (spread/`map`/`filter`), never mutate it in place
+  (no `push`, `splice`, or direct property assignment on state).
+- Filenames kebab-case; types/interfaces PascalCase.
+
+## How to verify
+
+1. `cd app && npm run typecheck` passes.
+2. `grep -rn "export default" app/src` → no matches.
+3. `grep -rnE "\bany\b|@ts-ignore" app/src` → no matches (typecheck alone
+   won't catch these since explicit `any` and `@ts-ignore` still compile).

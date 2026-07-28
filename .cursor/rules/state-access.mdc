@@ -1,0 +1,24 @@
+---
+description: "Reads go through selectors.ts, writes go through actions.ts"
+globs: "app/src/{selectors,actions}.ts"
+alwaysApply: false
+---
+
+# State access
+
+## Context
+
+`selectors.ts` holds derived reads; `actions.ts` holds dispatchable writes.
+
+## Rule
+
+- Read state via `selectors.ts` functions, not inline `state.tasks` filtering.
+- Write state via an `actions.ts` creator + `store.dispatch(...)`, never a
+  hand-built `{ type, payload }` object elsewhere.
+
+## How to verify
+
+1. `grep -rn "state.tasks.filter|state.tasks.map" app/src` → matches only in
+   `selectors.ts`.
+2. `grep -rn '{ type: "' app/src` → matches only in `actions.ts`/`reducer.ts`/
+   `types.ts`.

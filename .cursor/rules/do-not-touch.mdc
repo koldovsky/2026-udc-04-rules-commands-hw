@@ -1,0 +1,24 @@
+---
+description: "Protected core files that must not change without explicit approval"
+globs: ""
+alwaysApply: true
+---
+
+# Do-not-touch
+
+## Context
+
+`app/src/store.ts` and `app/src/types.ts` are load-bearing core; changes there
+ripple everywhere.
+
+## Rule
+
+- Don't edit `store.ts`, or change existing signatures in `types.ts` or
+  `lib/text.ts`, without explicit user approval.
+- Adding a new `Action` variant is fine; changing an existing one is not.
+
+## How to verify
+
+1. `git diff app/src/store.ts` is empty (unless explicitly approved).
+2. `git diff app/src/types.ts` / `app/src/lib/text.ts` only shows additions,
+   no changed existing signatures.

@@ -1,0 +1,24 @@
+---
+description: "Custom state store architecture — how state changes in app/"
+globs: "app/**"
+alwaysApply: false
+---
+
+# Architecture — custom store, not Redux/Zustand
+
+## Context
+
+`app/src/store.ts` is a custom store, not a library. State changes only via
+`store.dispatch(action)`.
+
+## Rule
+
+- New behavior: add `Action` in `types.ts` → handle in `reducer.ts` → add
+  creator in `actions.ts`.
+- Never add Redux/Zustand/MobX/Jotai or call `reducer()` directly from UI code.
+
+## How to verify
+
+1. `grep -rEi "redux|zustand|mobx|jotai" app/package.json app/src` → no matches.
+2. Every new `Action` variant has a matching `case` in `reducer.ts` and a
+   creator in `actions.ts`.
