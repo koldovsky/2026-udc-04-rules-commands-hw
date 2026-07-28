@@ -99,15 +99,17 @@ Result:
 
 # Difference table
 
-| Aspect                   | Rules ON | Rules OFF                         |
-| ------------------------ | -------- | --------------------------------- |
-| Modified files           | 4        | 6                                 |
-| Architecture preserved   | ✅        | ✅                                 |
-| Used reducer/action flow | ✅        | ✅                                 |
-| Type-safe implementation | ✅        | ✅                                 |
-| New dependencies         | None     | None                              |
-| Minimal implementation   | ✅        | ❌                                 |
-| Extra project changes    | No       | Yes (`index.ts`, `store.test.ts`) |
+| Aspect | Rules ON | Rules OFF |
+| --- | --- | --- |
+| Modified files | `types.ts`, `actions.ts`, `reducer.ts`, `reducer.test.ts` | `types.ts`, `actions.ts`, `reducer.ts`, `reducer.test.ts`, `store.test.ts`, `index.ts` |
+| State change path | Existing `action creator → dispatch() → reducer → new state` flow | Existing `action creator → dispatch() → reducer → new state` flow |
+| State-management library added | No | No |
+| Export style | Named exports | Named exports |
+| Types | Added `priority` to `Task` and introduced a typed priority action | Added `priority` to `Task` and introduced a typed priority action |
+| Protected core | Modified `src/types.ts`; `src/store.ts` unchanged | Modified `src/types.ts`; `src/store.ts` unchanged |
+| Tests | Updated `reducer.test.ts` | Updated `reducer.test.ts`; added `store.test.ts` coverage |
+| New dependencies | None | None |
+| Scope | Focused implementation | Broader implementation (`index.ts`, `store.test.ts`) |
 
 ---
 

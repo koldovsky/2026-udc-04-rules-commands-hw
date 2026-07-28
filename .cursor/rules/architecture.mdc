@@ -25,10 +25,11 @@ Follow the application’s existing state-management flow.
 
 For new behavior:
 
-1. Add or reuse an `Action` variant in `app/src/types.ts`.
-2. Handle the action in `app/src/reducer.ts`.
-3. Add an action creator in `app/src/actions.ts`.
-4. Add or update a colocated `*.test.ts` file.
+1. If the change requires modifying `app/src/types.ts`, explain why the modification is necessary and obtain explicit user approval before editing the file.
+2. After approval, add or reuse an `Action` variant in `app/src/types.ts`.
+3. Handle the action in `app/src/reducer.ts`.
+4. Add an action creator in `app/src/actions.ts`.
+5. Add or update a colocated `*.test.ts` file.
 
 State changes must go through `dispatch`.
 

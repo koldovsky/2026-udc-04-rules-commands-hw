@@ -1,7 +1,7 @@
 ---
 description: Require colocated Vitest coverage for application behavior changes
 globs:
-  - "app/**/*.test.ts"
+  - "app/**/*.ts"
 alwaysApply: false
 ---
 
