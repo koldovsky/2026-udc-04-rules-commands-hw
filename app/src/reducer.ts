@@ -32,6 +32,16 @@ export function reducer(state: AppState, action: Action): AppState {
         tasks: state.tasks.filter((task) => task.id !== action.payload.id),
       };
 
+    case "task/prioritized":
+      return {
+        ...state,
+        tasks: state.tasks.map((task) =>
+          task.id === action.payload.id
+            ? { ...task, priority: action.payload.priority }
+            : task,
+        ),
+      };
+
     case "filter/set":
       return { ...state, filter: action.payload.filter };
 

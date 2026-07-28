@@ -1,6 +1,12 @@
 import { describe, expect, it } from "vitest";
 import { reducer } from "./reducer.js";
-import { addTask, removeTask, setFilter, toggleTask } from "./actions.js";
+import {
+  addTask,
+  removeTask,
+  setFilter,
+  setTaskPriority,
+  toggleTask,
+} from "./actions.js";
 import { initialState, type AppState } from "./types.js";
 
 describe("reducer", () => {
@@ -36,5 +42,43 @@ describe("reducer", () => {
     const state: AppState = { tasks: [{ id: "a", title: "A", done: false }], filter: "all" };
     const next = reducer(state, toggleTask("missing"));
     expect(next.tasks[0]?.done).toBe(false);
+  });
+
+  it("adds a task without an explicit priority (defaults live in selectors)", () => {
+    // Arrange / Act
+    const next = reducer(initialState, addTask("a", "A"));
+    // Assert
+    expect(next.tasks[0]?.priority).toBeUndefined();
+  });
+
+  it("sets a task's priority via the prioritized action", () => {
+    // Arrange
+    const withTask = reducer(initialState, addTask("a", "A"));
+    // Act
+    const prioritized = reducer(withTask, setTaskPriority("a", "high"));
+    // Assert
+    expect(prioritized.tasks[0]?.priority).toBe("high");
+  });
+
+  it("does not mutate the previous state when setting priority", () => {
+    // Arrange
+    const withTask = reducer(initialState, addTask("a", "A"));
+    // Act
+    const prioritized = reducer(withTask, setTaskPriority("a", "low"));
+    // Assert
+    expect(prioritized).not.toBe(withTask);
+    expect(prioritized.tasks[0]).not.toBe(withTask.tasks[0]);
+    expect(withTask.tasks[0]?.priority).toBeUndefined();
+  });
+
+  it("leaves other tasks untouched when prioritizing one", () => {
+    // Arrange
+    const withA = reducer(initialState, addTask("a", "A"));
+    const withB = reducer(withA, addTask("b", "B"));
+    // Act
+    const next = reducer(withB, setTaskPriority("a", "high"));
+    // Assert
+    expect(next.tasks[0]?.priority).toBe("high");
+    expect(next.tasks[1]?.priority).toBeUndefined();
   });
 });

@@ -1,0 +1,33 @@
+---
+description: "In-house text lib — the exact, fixed API of app/src/lib/text.ts"
+globs: "app/src/lib/**"
+alwaysApply: false
+---
+
+# Custom text library (fixed API)
+
+## Context
+
+`app/src/lib/text.ts` is a small in-house library, NOT lodash/underscore. Its
+entire supported surface is exactly three functions. Agents frequently
+hallucinate lodash-style helpers (`capitalize`, `camelCase`, `deburr`) that do
+not exist here — importing them breaks the build.
+
+## Rule
+
+- The complete API of `app/src/lib/text.ts` is exactly:
+  - `slugify(input: string): string`
+  - `truncate(input: string, maxLength: number, suffix?: string): string`
+  - `normalizeSpaces(input: string): string`
+- Do NOT import or call helpers that do not exist (`capitalize`, `camelCase`,
+  `deburr`, `kebabCase`, etc.). They are not in this lib and it is not lodash.
+- If you genuinely need a new helper, add it explicitly to `text.ts` as a named
+  export with a colocated test — do not assume it already exists.
+- Do not change the signatures of the three existing functions; only add.
+
+## How to verify
+
+1. `grep -rn "from \"./lib/text" app/src` (and `lib/text.js`) imports only
+   `slugify` / `truncate` / `normalizeSpaces` (or newly added, real exports).
+2. `cd app && npm run typecheck` passes (a hallucinated import fails here).
+3. `cd app && npm test` is green.

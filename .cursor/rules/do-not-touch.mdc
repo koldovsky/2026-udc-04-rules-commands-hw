@@ -1,0 +1,33 @@
+---
+description: "Protected core files — store.ts and types.ts require explicit approval to edit"
+globs: ""
+alwaysApply: true
+---
+
+# Do not touch the protected core
+
+## Context
+
+`app/src/store.ts` (the dispatch/notify engine) and `app/src/types.ts` (core
+types + the `Action` union) are load-bearing: every other module depends on their
+shapes, so a change ripples through the whole app. Normal feature work extends
+`reducer.ts` / `actions.ts`, not these two files.
+
+## Rule
+
+- Treat `app/src/store.ts` and `app/src/types.ts` as read-only. Do NOT edit them
+  unless the user explicitly approves the change.
+- Do not change the public signature of `createStore` or the `Store` interface
+  (`getState` / `dispatch` / `subscribe`) — only add, never break.
+- Sanctioned exception: when a change request needs new behavior, adding an
+  `Action` variant to the union or a field to `Task` in `types.ts` is expected
+  (that is the golden path). This is additive only — do not alter existing
+  variants or the `initialState` contract without approval.
+
+## How to verify
+
+1. The PR diff shows no changes to `app/src/store.ts`, and only additive changes
+   to `app/src/types.ts` (new union variant / new optional field).
+2. `createStore` / `Store` signatures are unchanged: `git diff app/src/store.ts`
+   is empty.
+3. `cd app && npm test` and `npm run typecheck` stay green.

@@ -1,0 +1,31 @@
+---
+description: "No new npm dependencies without explicit approval"
+globs: "app/**"
+alwaysApply: false
+---
+
+# No new dependencies
+
+## Context
+
+The app is intentionally dependency-light — it ships its own store and its own
+text lib precisely to avoid pulling in libraries. Reaching for an npm package is
+the most common way an agent breaks the exercise (e.g. adding a state library or
+a string util instead of using `app/src/lib/text.ts`).
+
+## Rule
+
+- Do NOT add new runtime or dev dependencies without explicit user approval.
+- Do not edit the `dependencies` / `devDependencies` of `app/package.json`, and
+  do not run `npm install <pkg>`.
+- Solve problems with the TypeScript standard library and the in-house utilities
+  (the custom store, `app/src/lib/text.ts`). If a dependency truly seems needed,
+  ask first and explain why.
+
+## How to verify
+
+1. `git diff app/package.json app/package-lock.json` is empty (unless a specific
+   addition was approved).
+2. `grep -rn "^import" app/src` imports only relative paths and already-listed
+   packages — no new third-party module names.
+3. `cd app && npm test` is green.
