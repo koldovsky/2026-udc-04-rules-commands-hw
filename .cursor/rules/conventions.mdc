@@ -1,0 +1,31 @@
+---
+description: "TypeScript conventions for app/ source — exports, types, immutability, naming"
+globs: "app/**/*.ts"
+alwaysApply: false
+---
+
+# Code conventions
+
+## Context
+
+The seeded `app/` is TypeScript strict (`noUncheckedIndexedAccess` on) and
+consistent about a few conventions. Existing files (`app/src/actions.ts`,
+`app/src/reducer.ts`, `app/src/selectors.ts`) all use named exports and immutable
+updates — new code must match so the codebase stays uniform and type-safe.
+
+## Rule
+
+- Use named exports ONLY. No `export default`.
+- No `any` and no `@ts-ignore` / `@ts-expect-error`. Model types precisely; if a
+  type is missing, add it to `app/src/types.ts` (see the do-not-touch rule).
+- Update state immutably — spread objects/arrays, `map`, `filter`. Never mutate
+  in place (`state.tasks.push(...)`, `task.done = ...`).
+- Filenames are kebab-case (e.g. `lib/text.ts`); types/interfaces are PascalCase
+  (`AppState`, `Task`, `Action`); functions/vars are camelCase.
+
+## How to verify
+
+1. `grep -rnE "export default|: any|@ts-(ignore|expect-error)" app/src` → zero.
+2. `grep -rnE "\.push\(|\.splice\(|\.(done|title|filter) =" app/src` → no direct
+   mutation of state.
+3. `cd app && npm run typecheck` passes.

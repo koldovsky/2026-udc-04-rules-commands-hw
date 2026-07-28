@@ -1,0 +1,29 @@
+---
+description: "Testing conventions — colocated vitest specs in the AAA pattern"
+globs: "app/**/*.test.ts"
+alwaysApply: false
+---
+
+# Testing
+
+## Context
+
+Tests are colocated `*.test.ts` files run with **vitest** (`cd app && npm test`).
+Existing specs (`app/src/reducer.test.ts`, `app/src/store.test.ts`,
+`app/src/lib/text.test.ts`) sit next to the code they cover and stay green. Every
+new action / creator / util needs a test in the same style.
+
+## Rule
+
+- Colocate tests: `foo.ts` → `foo.test.ts` in the same directory.
+- Use vitest APIs (`describe` / `it` / `expect`) — do not add another test runner.
+- Structure each test as AAA: **Arrange** (set up state/input), **Act** (dispatch
+  the action / call the function), **Assert** (`expect` on the result).
+- When adding an `Action` variant + creator, add a reducer test proving the new
+  state transition immutably, and keep all existing tests green.
+
+## How to verify
+
+1. `cd app && npm test` is green.
+2. Each new source file has a sibling `*.test.ts` in the same folder.
+3. New tests use `describe`/`it`/`expect` and read Arrange → Act → Assert.

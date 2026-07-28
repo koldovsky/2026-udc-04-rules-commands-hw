@@ -1,0 +1,30 @@
+---
+description: "Read state through selectors, not by poking at state.tasks directly"
+globs: "app/**/*.ts"
+alwaysApply: false
+---
+
+# Read through selectors
+
+## Context
+
+`app/src/selectors.ts` holds pure read helpers (`visibleTasks`,
+`remainingCount`) so that derived/filter logic lives in one place. Consumers read
+through these instead of re-implementing filtering over `state.tasks`, which
+keeps read logic consistent and testable.
+
+## Rule
+
+- In consumer code (UI, index, new modules), derive views via selectors in
+  `app/src/selectors.ts` — do not filter/reduce `state.tasks` inline.
+- When a feature needs a new derived read, add a pure named selector to
+  `selectors.ts` (with a colocated test) rather than duplicating logic.
+- The reducer (`reducer.ts`) and the selectors themselves legitimately operate on
+  `state.tasks` — this rule targets consumers, not those two files.
+
+## How to verify
+
+1. Outside `reducer.ts` and `selectors.ts`,
+   `grep -rn "state.tasks.filter\|state.tasks.map" app/src` → prefer a selector.
+2. New derived reads appear as named exports in `selectors.ts` with a test.
+3. `cd app && npm test` is green.

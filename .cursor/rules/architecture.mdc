@@ -1,0 +1,34 @@
+---
+description: "Custom store architecture — how state changes and how to extend the app"
+globs: "app/**"
+alwaysApply: false
+---
+
+# Architecture — custom state store
+
+## Context
+
+`app/` is managed by a small in-house store, deliberately NOT a library. State
+changes flow through `app/src/store.ts` (`createStore` → `getState` / `dispatch`
+/ `subscribe`), driven by the pure reducer in `app/src/reducer.ts` and the
+`Action` discriminated union in `app/src/types.ts`. This is the architecture the
+exercise is about — swapping in a state library would erase it.
+
+## Rule
+
+- Change state ONLY via `store.dispatch(action)`. Never mutate `state` directly
+  and never bypass the store.
+- Follow the golden path to add behavior: add an `Action` variant in
+  `app/src/types.ts` → handle it in `app/src/reducer.ts` → add an action creator
+  in `app/src/actions.ts` → add a colocated test.
+- Handle new actions in the reducer's `switch` immutably (spread / `map` /
+  `filter`), returning a new state object.
+- NEVER introduce Redux, Zustand, MobX, Jotai, or any other state library, and
+  do not "modernize" `createStore` into one.
+
+## How to verify
+
+1. `grep -rniE "redux|zustand|mobx|jotai" app/src app/package.json` → zero hits.
+2. A new feature's diff touches `types.ts` / `reducer.ts` / `actions.ts`, not the
+   dispatch/notify engine in `store.ts`.
+3. `cd app && npm test` and `npm run typecheck` stay green.
