@@ -1,0 +1,31 @@
+---
+description: "No new npm dependencies without explicit user approval"
+globs: "app/**"
+alwaysApply: false
+---
+
+# Dependencies — no new packages without approval
+
+## Context
+
+`app/package.json` currently depends only on TypeScript and vitest tooling.
+This is a deliberately small, dependency-free sample app (custom store, custom
+text lib) — pulling in a library to "solve" something the app already does
+itself (state management, string helpers, UUIDs, etc.) works against the
+exercise, per `materials/architecture-brief.md`.
+
+## Rule
+
+- Do NOT add a new entry to `app/package.json` `dependencies` or
+  `devDependencies` unless the user explicitly asks for that package by name
+  in the current request.
+- Prefer solving problems with what's already in `app/src` (the store,
+  reducer, selectors, `lib/text.ts`) or with plain TypeScript/Node built-ins.
+- If a dependency genuinely seems necessary, say so and ask before installing
+  it — don't run `npm install` silently.
+
+## How to verify
+
+1. `git diff app/package.json app/package-lock.json` — empty, unless the user
+   explicitly requested a specific package in this session.
+2. No `npm install <pkg>` was run without the user naming `<pkg>` first.

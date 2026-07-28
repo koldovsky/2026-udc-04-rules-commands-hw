@@ -1,0 +1,34 @@
+---
+description: "Colocated vitest tests, AAA pattern, keep npm test green"
+globs: "app/**/*.test.ts"
+alwaysApply: false
+---
+
+# Testing — colocated vitest, AAA
+
+## Context
+
+Tests live next to the code they cover (e.g. `app/src/reducer.test.ts`,
+`app/src/store.test.ts`) and run via **vitest**, not Jest or Mocha. `cd app &&
+npm test` must stay green.
+
+## Rule
+
+- New tests are colocated: `app/src/<name>.ts` → `app/src/<name>.test.ts`
+  (or under `app/src/lib/` for lib code).
+- Use vitest's `describe`/`it`/`expect` — no other test runner.
+- Follow **Arrange-Act-Assert**: set up state/action, dispatch or call the
+  function under test, assert the result. Keep each test focused on one
+  behavior.
+- Any new `Action` variant or reducer case gets at least one test. Any new
+  `app/src/lib/text.ts` behavior gets a test too.
+- Never delete or weaken an existing test to make it pass; fix the code or
+  ask first.
+
+## How to verify
+
+1. `cd app && npm test` exits 0.
+2. Every new/changed source file under `app/src` has a corresponding
+   `*.test.ts` change or addition alongside it.
+3. `grep -rn "describe\|it(" app/src/**/*.test.ts` shows AAA-shaped tests
+   (setup, action, assertion) rather than one giant assertion blob.

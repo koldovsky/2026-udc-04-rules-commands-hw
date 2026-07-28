@@ -1,0 +1,45 @@
+---
+description: "app/src/lib/text.ts has a fixed API — don't invent helpers that don't exist"
+globs: "app/src/**/*.{js,jsx,ts,tsx}"
+alwaysApply: false
+---
+
+# Custom lib — app/src/lib/text.ts fixed API
+
+## Context
+
+`app/src/lib/text.ts` is an in-house text-helper module, not lodash or
+underscore. Its entire supported surface is exactly three functions:
+
+- `slugify(input: string): string`
+- `truncate(input: string, maxLength: number, suffix?: string): string`
+- `normalizeSpaces(input: string): string`
+
+Functions like `capitalize`, `camelCase`, `deburr`, `kebabCase`, etc. do
+**not** exist here and must not be assumed to exist.
+
+## Rule
+
+- Only import `slugify`, `truncate`, `normalizeSpaces` from
+  `app/src/lib/text.ts` — do not import or call any other name from this
+  module.
+- If new text-processing behavior is needed, add a new named export to
+  `text.ts` explicitly (with a test) rather than assuming a helper already
+  exists or reaching for a new dependency.
+- Do not replace `text.ts` with lodash/underscore or add them as a
+  dependency to get "missing" helpers.
+
+## How to verify
+
+1. Run an AST-based import check so quote style, `.js` specifiers, and local
+   aliases do not hide invalid imports:
+
+   ```bash
+   cd app && node --input-type=module -e 'import fs from "node:fs"; import path from "node:path"; import ts from "typescript"; const allowed = new Set(["slugify", "truncate", "normalizeSpaces"]); const files = fs.readdirSync("src", { recursive: true }).filter((file) => /\.(js|jsx|ts|tsx)$/.test(file) && file !== path.join("lib", "text.ts")).map((file) => path.join("src", file)); let failed = false; for (const file of files) { const source = ts.createSourceFile(file, fs.readFileSync(file, "utf8"), ts.ScriptTarget.Latest, true); ts.forEachChild(source, (node) => { if (!ts.isImportDeclaration(node) || !ts.isStringLiteral(node.moduleSpecifier)) return; const specifier = node.moduleSpecifier.text; if (!/(^|\/)lib\/text(\.js|\.ts)?$/.test(specifier)) return; const clause = node.importClause; if (!clause || clause.name || !clause.namedBindings || !ts.isNamedImports(clause.namedBindings)) { console.error(`${file}: import only named helpers from ${specifier}`); failed = true; return; } for (const element of clause.namedBindings.elements) { const imported = (element.propertyName ?? element.name).text; if (!allowed.has(imported)) { console.error(`${file}: invalid import ${imported} from ${specifier}`); failed = true; } } }); } process.exit(failed ? 1 : 0);'
+   ```
+
+2. If doing a quick text search, limit it to import clauses and exclude
+   comments and `app/src/lib/text.ts`; forbidden helpers such as `capitalize`,
+   `camelCase`, `deburr`, and `kebabCase` must not be imported from the local
+   text module unless they were explicitly added to `text.ts` with a test.
+3. `rg -n '"(lodash|underscore)"' app/package.json` — no dependency match.
