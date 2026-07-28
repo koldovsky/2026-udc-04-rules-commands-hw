@@ -1,0 +1,32 @@
+---
+description: "Code style conventions for TypeScript files in app/"
+globs: "app/**/*.ts"
+alwaysApply: false
+---
+
+# Conventions
+
+## Context
+
+The seeded code (`app/src/*.ts`) is TypeScript-strict
+(`noUncheckedIndexedAccess` on) and follows a consistent style. Keep new code
+indistinguishable from the seeded code.
+
+## Rule
+
+- **Named exports only** — no `export default` anywhere in `app/src`.
+- No `any` and no `@ts-ignore`. If a type genuinely doesn't fit, fix the type,
+  don't suppress the checker.
+- **Immutable** state updates: build new objects/arrays with spread, `map`,
+  `filter`. Never mutate `state`, `state.tasks`, or a `Task` object in place.
+- Files: kebab-case (e.g. `text.ts`, `store.test.ts`). Types/interfaces:
+  PascalCase (`Task`, `AppState`).
+- Tests colocated as `*.test.ts` next to the file they cover.
+
+## How to verify
+
+1. `grep -rn "export default" app/src` → no matches.
+2. `grep -rnE ": any\b|as any\b|@ts-ignore" app/src` → no matches.
+3. `ls app/src` — filenames are kebab-case; no new PascalCase/camelCase file
+   names introduced.
+4. `cd app && npm run typecheck` passes.

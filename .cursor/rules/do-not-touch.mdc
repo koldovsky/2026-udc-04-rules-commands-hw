@@ -1,0 +1,33 @@
+p---
+description: "Protected core files that must not change without explicit approval"
+globs: "app/**"
+alwaysApply: true
+---
+
+# Do-not-touch — protected core
+
+## Context
+
+`app/src/store.ts` (the dispatch/notify engine) and `app/src/types.ts` (the
+core types + `Action` union) are load-bearing — see
+`materials/architecture-brief.md`. Every other file in `app/src` depends on
+their shape. This rule is `alwaysApply: true` because it must hold regardless
+of which other rules are attached.
+
+## Rule
+
+- Do **not** edit `app/src/store.ts` at all unless the user explicitly asks
+  for a store-engine change. Feature work never requires touching it.
+- Do **not** remove or rename existing fields/members of `AppState`, `Task`,
+  or existing `Action` union variants in `app/src/types.ts`. **Additive**
+  changes (a new `Action` variant, a new optional-safe `Task` field with a
+  default) are allowed as part of normal feature work.
+- If a task seems to require breaking either rule, stop and ask instead of
+  proceeding.
+
+## How to verify
+
+1. `git diff -- app/src/store.ts` is empty unless the user explicitly approved
+   a store-engine change.
+2. `git diff -- app/src/types.ts` (if any) only **adds** lines — no existing
+   field or union member was deleted or renamed.

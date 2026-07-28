@@ -1,0 +1,34 @@
+---
+description: "Test conventions for this app"
+globs: "app/**/*.test.ts"
+alwaysApply: false
+---
+
+# Testing
+
+## Context
+
+Existing tests (`app/src/lib/text.test.ts`, `app/src/reducer.test.ts`,
+`app/src/store.test.ts`) are colocated vitest files and are the baseline
+"green" state (`cd app && npm test`).
+
+## Rule
+
+- Tests live **colocated** next to the code they cover, named `*.test.ts`
+  (e.g. a new `app/src/foo.ts` gets `app/src/foo.test.ts`).
+- Use **vitest** (`describe`/`it`/`expect`), matching the style already in
+  `app/src/reducer.test.ts`.
+- Structure each test **Arrange-Act-Assert**: build input state/action, act
+  (dispatch or call the function), assert on the result.
+- Any new `Action` variant gets at least one reducer test (state transition)
+  and, if it has an action creator, a test for the creator's output shape.
+- Never delete or weaken an existing assertion to make a change pass —
+  fix the implementation instead.
+
+## How to verify
+
+1. `cd app && npm test` exits 0.
+2. Every new/changed source file under `app/src` has a corresponding
+   `*.test.ts` that was added or updated in the same change.
+3. Test file names and `describe` blocks match the vitest style already used
+   in the repo (no new test runner/framework introduced).
