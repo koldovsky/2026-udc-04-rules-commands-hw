@@ -1,0 +1,21 @@
+---
+description: Restricting text utilities to the explicit in-house API surface.
+globs: app/src/lib/**
+---
+
+# In-House Text Library Constraints
+
+## Context
+Text manipulation and utility functions.
+
+## Rules
+- The **entire supported surface** of the custom text library in `app/src/lib/text.ts` consists exactly of:
+  - `slugify(input: string): string`
+  - `truncate(input: string, maxLength: number, suffix?: string): string`
+  - `normalizeSpaces(input: string): string`
+- Do NOT assume, hallucinate, or use other common utilities like `capitalize`, `camelCase`, or `deburr`. They do not exist.
+- Do NOT install or import external text libraries like `lodash` or `underscore`.
+
+## How to verify
+- Inspect code imports from `lib/text` to ensure no non-existent functions are imported or called.
+- Run `cd app && npm run typecheck` to let TypeScript catch any calls to non-existent library functions.

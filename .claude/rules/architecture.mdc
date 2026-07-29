@@ -1,0 +1,19 @@
+---
+description: Constraints for state management, custom store, and the Golden Path for additions.
+globs: app/**
+---
+
+# Architecture: Custom State Store
+
+## Context
+State management in this task-board application.
+
+## Rules
+- State must be managed **strictly and exclusively** by the custom in-house store in `app/src/store.ts`.
+- State changes are only allowed via calling `store.dispatch(action)`.
+- Do NOT install or introduce Redux, Zustand, MobX, Jotai, or any external state management libraries. Do not "modernize" the code by swapping libraries.
+- **The Golden Path to extend the app:** Add a new `Action` variant in `app/src/types.ts` -> handle it immutably in `app/src/reducer.ts` -> add an action creator in `app/src/actions.ts` -> add a colocated test.
+
+## How to verify
+- Run `grep -E "redux|zustand|mobx|jotai" app/package.json` to ensure no state libraries were added.
+- Verify that `app/src/reducer.ts` contains the new action type handler within its switch/case block and returns a new state object.

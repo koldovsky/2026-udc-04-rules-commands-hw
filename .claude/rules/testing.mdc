@@ -1,0 +1,18 @@
+---
+description: Unit testing framework requirements and structural patterns.
+globs: app/**/*.test.ts
+---
+
+# Testing Requirements
+
+## Context
+Unit testing for all business logic, reducers, and selectors.
+
+## Rules
+- All tests must be **colocated** alongside the source code in `*.test.ts` files (e.g., `reducer.test.ts` must live in the same folder next to `reducer.ts`).
+- Use **vitest** as the testing framework.
+- Follow the strict **AAA (Arrange-Act-Assert)** pattern inside every test block.
+
+## How to verify
+- Run `cd app && npm test` to ensure all tests execute and pass successfully with zero failures.
+- Inspect the modified test files to verify that code comments or blocks clearly separate the Arrange, Act, and Assert steps.

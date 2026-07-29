@@ -1,62 +1,44 @@
-# AGENTS.md
+# Agent Development Baseline & Project Context
 
-Baseline guidance for an Agentic IDE working in **this homework repo**.
+This document serves as the cross-tool source of truth for all AI agents, code assistants, and LLM engines working on this repository. It defines the project architecture, operational boundaries, and system expectations.
 
-> UDC Workshop 4 homework — rules & commands. Participants build a rule-set
-> (≥6 rules) and commands (≥2) for the seeded task-board app, generalize the
-> thin `app/AGENTS.md` into a cross-tool baseline, and prove the rules work with
-> an A/B test. See `docs/walkthrough.md`.
+## Project Structure & Architecture
 
-## Context
+The application is a minimal task board built around a strict, custom state management architecture.
 
-- `app/` is a tiny TS "task board" with a **custom state store** (deliberately
-  NOT Redux/Zustand). It is the code participants write rules for. Key files:
-  - `app/src/types.ts` — `AppState`, `Task`, `Action` union (PROTECTED core).
-  - `app/src/store.ts` — `createStore` with `dispatch`/`subscribe` (PROTECTED).
-  - `app/src/reducer.ts` — pure reducer; where the domain grows.
-  - `app/src/actions.ts` — action creators. `app/src/selectors.ts` — read helpers.
-  - `app/src/lib/text.ts` — in-house util lib with a fixed API (slugify,
-    truncate, normalizeSpaces).
-  - Tests are colocated `*.test.ts` (vitest); `cd app && npm test` is green.
-- `app/AGENTS.md` (a DIFFERENT file, nested inside `app/`) is deliberately thin
-  and single-tool-flavored — Task B is to generalize it. Do not "fix" it on the
-  participant's behalf unless asked.
-- `materials/architecture-brief.md` is the source of truth for the rules the
-  participant should write; `materials/ab-task.md` is the change request used
-  for the A/B validation (Task D).
-- The homework is graded by CodeRabbit (`.coderabbit.yaml`) against the
-  Definition of Done in `docs/walkthrough.md`.
+*   `app/src/types.ts` — **Protected Core**. Contains `AppState`, `Task`, and the `Action` discriminated union.
+*   `app/src/store.ts` — **Protected Core**. Custom in-house reactive store returning `{ getState, dispatch, subscribe }`.
+*   `app/src/reducer.ts` — Pure state reducer `(state, action) => newState`.
+*   `app/src/actions.ts` — Action creator functions for UI consumption.
+*   `app/src/selectors.ts` — Pure read-helpers and data selectors.
+*   `app/src/lib/text.ts` — In-house custom text utility library with a fixed API surface.
 
-## Conventions
+### Architecture Warning
+This project uses a custom state store. It is **NOT** Redux, Zustand, MobX, or Jotai. Do not attempt to install, import, or refactor the app into any third-party state library.
 
-- Documentation language: Ukrainian or English (participant's choice).
-- Keep deliverables at the agreed paths so auto-review can find them:
-  - `.cursor/rules/*.mdc` — Task A rule-set (≥6)
-  - `.cursor/commands/*.md` — Task C commands (≥2)
-  - `.claude/commands/*.md` — optional cross-tool mirror of the same commands
-    (same Markdown + `$ARGUMENTS` format; bonus, pairs well with Task E)
-  - `app/AGENTS.md` — generalized in place (Task B)
-  - `docs/ab-validation.md` — Task D A/B write-up
-  - `docs/cross-tool-check.md` — Task E (bonus)
-- The seeded app follows: named exports only, no `any`/`@ts-ignore`, immutable
-  state updates, state changes only via `store.dispatch(action)`.
+## Available Commands
 
-## Guardrails
+Execute all developer operations from the `app` directory:
 
-- **NEVER** commit secrets, API keys, or `.env` files. They are gitignored —
-  keep it that way.
-- **NEVER** add real client/NDA-protected business details — `app/` and
-  `materials/` contain only synthetic, generic sample data on purpose.
-- Do not "modernize" the custom store into Redux/Zustand/MobX — that store is
-  the architecture the exercise is about.
-- Do not change the public signatures of `createStore`, the action creators, or
-  the `lib/text.ts` functions when extending the app — only add to them.
-- **Windows + Git Bash:** never use `2>nul` / `>nul` (creates a literal `nul`
-  file). Use `2>/dev/null` / `>/dev/null`. `nul` is gitignored as a net.
+```bash
+cd app
+npm test            # Run unit tests via vitest
+npm run typecheck   # Run static type checking via tsc --noEmit
+```
 
-## How to verify
+*Note on Linting:* Linter configurations (ESLint/Prettier) are **NOT configured** in this sample repository. Do not guess, invent, or execute any lint commands.
 
-Before opening a PR: `cd app && npm test` is green, `.cursor/rules/` has ≥6
-rules each with a "How to verify" section, `.cursor/commands/` has ≥2 commands,
-`app/AGENTS.md` is generalized, and `docs/ab-validation.md` shows a real,
-specific ON-vs-OFF difference (not placeholders).
+## Code Style & Conventions
+
+Agents must strictly adhere to the following 5 development conventions:
+1.  **Named Exports Only:** Use `export const ...`. Default exports (`export default`) are strictly prohibited.
+2.  **Immutability:** Reducer updates must be 100% immutable using array/object spreads, `.map()`, or `.filter()`. Never mutate state arrays or properties in place.
+3.  **Strict TypeScript:** The codebase enforces `noUncheckedIndexedAccess`. Usage of `any` or `@ts-ignore` comments is entirely banned.
+4.  **Naming Patterns:** Files must use `kebab-case` (e.g., `text-utils.ts`). Types and interfaces must use `PascalCase`.
+5.  **Test Colocation:** Unit tests must live immediately next to the implementation file using the `*.test.ts` naming convention.
+
+## Guardrails & Constraints
+
+*   **Protected Engine Core:** Do not modify `app/src/store.ts` or `app/src/types.ts` during normal feature workflows. New behaviors should be built by expanding `reducer.ts` and `actions.ts`.
+*   **No New Dependencies:** Third-party npm packages must not be added to `package.json` without explicit developer instructions.
+*   **Fixed Library Surface:** The custom utility `app/src/lib/text.ts` exposes exactly three functions: `slugify`, `truncate`, and `normalizeSpaces`. No other helpers (e.g., `capitalize`, `camelCase`) exist. Do not hallucinate them.

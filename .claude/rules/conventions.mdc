@@ -1,0 +1,19 @@
+---
+description: Coding style, TypeScript settings, immutability, and naming conventions.
+globs: app/**/*.ts
+---
+
+# Code Conventions
+
+## Context
+TypeScript code standards and paradigms across the application.
+
+## Rules
+- Use **Named exports only** (`export const ...`). Absolutely NO default exports (`export default ...`).
+- Strict TypeScript: `any` and `@ts-ignore` are completely forbidden. Code must fully comply with `noUncheckedIndexedAccess`.
+- State updates in the reducer must be 100% immutable. Use object/array spreads (`...`), `.map()`, and `.filter()`. Never use mutating methods like `.push()`, `.splice()`, or direct assignments.
+- File names must strictly use `kebab-case` (e.g., `text-utils.ts`). TypeScript types and interfaces must use `PascalCase`.
+
+## How to verify
+- Run `cd app && npm run typecheck` to verify that no TypeScript compilation errors exist.
+- Run `grep -r "export default" app/src/` to ensure there are zero default exports in the source code.
