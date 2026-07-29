@@ -36,3 +36,4 @@ nul
 # it's the cross-tool command mirror from Task C.
 .claude/*
 !.claude/commands/
+!.claude/rules/

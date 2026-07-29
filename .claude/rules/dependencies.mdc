@@ -1,0 +1,17 @@
+---
+description: Strict constraints against adding third-party npm packages.
+globs: app/package.json
+---
+
+# Dependency & Package Constraints
+
+## Context
+Project dependencies, package management, and supply chain.
+
+## Rules
+- Do NOT install, add, or update any third-party npm packages or dependencies in `package.json` without explicit approval.
+- The task-board application must run entirely on the pre-seeded dependencies provided in the baseline.
+- Optimization or helper packages must not be added.
+
+## How to verify
+- Run `git diff app/package.json` to verify that no new lines or packages were introduced to the dependencies or devDependencies objects.

@@ -1,0 +1,17 @@
+---
+description: Protection guidelines for core engine infrastructure files.
+alwaysApply: true
+---
+
+# Protected Core Files
+
+## Context
+Core infrastructure and engine code of the app.
+
+## Rules
+- `app/src/store.ts` (the dispatch/notify engine) and `app/src/types.ts` (core types and Action discriminated union) are **protected core files**.
+- Treat them as "do-not-touch without approval".
+- Normal feature work or task implementation must only extend `reducer.ts`, `actions.ts`, or `selectors.ts`. Do NOT alter the core engine files unless explicitly requested.
+
+## How to verify
+- Run `git diff app/src/store.ts app/src/types.ts` before staging or committing changes to verify no unauthorized modifications were made to the core engine.
