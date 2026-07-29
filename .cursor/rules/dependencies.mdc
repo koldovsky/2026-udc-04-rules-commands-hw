@@ -34,8 +34,10 @@ suggestion quietly removes the constraint the rules exist to protect.
 2. `grep -nE "\"(dependencies|devDependencies)\":" app/package.json` — only
    `devDependencies` matches (`dependencies` is absent entirely), and the block
    it opens still lists exactly `typescript` and `vitest`, nothing else.
-3. `grep -rnE "from ['\"][a-z@]" app/src` — catches both quote styles; every
-   bare import resolves to `vitest` or a Node builtin, everything else is
-   relative and ends in `.js`.
+3. `grep -rnE "(from|import)[[:space:]]*['\"][a-z@]" app/src` — catches both
+   quote styles and both forms, `import "pkg"` (side effect) and
+   `import ... from "pkg"`; same matcher shape as
+   `.cursor/rules/architecture.mdc`, step 1. Every bare import resolves to
+   `vitest` or a Node builtin, everything else is relative and ends in `.js`.
 4. No new config files at `app/` root (`.eslintrc*`, `.prettierrc*`,
    `jest.config.*`).

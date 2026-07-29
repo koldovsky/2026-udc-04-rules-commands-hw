@@ -42,10 +42,15 @@ returning new object identities.
 
 ## How to verify
 
-1. `grep -rniE "from \"(redux|@reduxjs|zustand|mobx|jotai|recoil|valtio)" app/src`
-   and the same names in `app/package.json` — zero hits. (A plain
-   case-insensitive search also matches the warning comment in
-   `app/src/store.ts:4`; that one line is expected.)
+1. `grep -rniE "(from|import)[[:space:]]*['\"](redux|@reduxjs|zustand|mobx|jotai|recoil|valtio)" app/src`
+   — zero hits. The `(from|import)` alternation catches both
+   `import "pkg"` (side effect) and `import ... from "pkg"`, in either quote
+   style; same matcher as `.cursor/rules/dependencies.mdc`, step 3. Then check
+   `app/package.json` separately:
+   `grep -nE "(redux|@reduxjs|zustand|mobx|jotai|recoil|valtio)" app/package.json`
+   — also zero hits. (A bare case-insensitive name search over `app/src`
+   additionally matches the warning comment in `app/src/store.ts:4`; the
+   anchored matcher above does not, so any hit is real.)
 2. `git diff --stat app/src` for a feature change touches `types.ts`,
    `reducer.ts`, `actions.ts` and a test — not `store.ts`.
 3. Every new action `type` string in `types.ts` has a matching `case` in

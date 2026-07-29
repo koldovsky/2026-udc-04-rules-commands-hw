@@ -8,9 +8,11 @@ Analyze and fix this error: $ARGUMENTS
 
 The goal is the **root cause**. Silencing the compiler is not a fix.
 
-1. **Reproduce.** Run `cd app && npm run typecheck` and `npm test` and quote the
-   actual message, file, and line. If it does not reproduce, say so and ask for
-   the exact command and output — do not guess from the message alone.
+1. **Reproduce.** Run `cd app && npm run typecheck && npm test` — both scripts
+   are defined in `app/package.json`, so run them from `app/`, not the repo
+   root — and quote the actual message, file, and line. If it does not
+   reproduce, say so and ask for the exact command and output — do not guess
+   from the message alone.
 2. **Locate.** Read the failing file and the modules it imports. Trace which
    layer the fault is in: `types.ts` (union/shape), `reducer.ts` (a missing
    `case` or a mutation), `actions.ts` (payload mismatch), `selectors.ts` (read
