@@ -1,0 +1,46 @@
+---
+description: "app/src/lib/text.ts — the real API surface, and what does not exist"
+globs: "app/src/lib/**"
+alwaysApply: false
+---
+
+# In-house text lib — fixed API
+
+## Context
+
+`app/src/lib/text.ts` is a custom library, not lodash. Its supported surface is
+exactly three functions. Agents habitually call `capitalize`, `camelCase`, or
+`deburr` because those exist in lodash — the import then fails at typecheck, or
+worse, the agent adds lodash as a dependency to make its own hallucination true.
+
+## Rule
+
+- The complete API is:
+  - `slugify(input: string): string` — `"Buy Milk!"` → `"buy-milk"`
+  - `truncate(input: string, maxLength: number, suffix = "…"): string` —
+    `maxLength` INCLUDES the suffix; input that already fits is returned as-is
+  - `normalizeSpaces(input: string): string` — trim + collapse internal runs
+- These DO NOT exist: `capitalize`, `camelCase`, `kebabCase`, `deburr`,
+  `startCase`, `escapeHtml`, `pad`, `words`. NEVER import or call them.
+- Need a helper that is not on the list? Add it to `text.ts` as a named export
+  with a JSDoc line and a test in `text.test.ts` — in the same change, before
+  using it. Do not stub it, do not inline a private copy in another module.
+- NEVER add `lodash`, `underscore`, `ramda`, `slugify`, or `change-case` as a
+  dependency. This lib is the answer.
+- Existing signatures are frozen: add optional trailing parameters if you must,
+  never reorder or retype existing ones.
+
+## How to verify
+
+1. `grep -rnE "(capitalize|camelCase|kebabCase|deburr|startCase|escapeHtml|pad|words)\(" app/src`
+   — zero hits, covering every prohibited name above. (The bare names without
+   `(` also match the seeded warning comment at `app/src/lib/text.ts:5` — that
+   line is expected.)
+2. `grep -rnE "lodash|underscore|ramda|slugify|change-case" app/package.json` —
+   zero hits. In `app/src` run it without `slugify`
+   (`grep -rnE "lodash|underscore|ramda|change-case" app/src`); the only match
+   is the comment at `text.ts:3`. `slugify` is our own helper, so it is expected
+   throughout `app/src` — it is banned only as a dependency.
+3. `grep -n "^export function" app/src/lib/text.ts` — every listed function has
+   a matching `describe`/`it` block in `app/src/lib/text.test.ts`.
+4. `cd app && npm run typecheck` — clean (a hallucinated import fails here).

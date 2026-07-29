@@ -1,0 +1,59 @@
+---
+description: "Custom store architecture — how state changes and how the app grows"
+globs: "app/**"
+alwaysApply: false
+---
+
+# Architecture — custom store, not a state library
+
+## Context
+
+`app/` manages state with an in-house store (`app/src/store.ts` →
+`createStore()` returning `{ getState, dispatch, subscribe }`). This is a
+deliberate design decision, not a gap waiting to be filled with Redux/Zustand.
+Agents routinely "help" by introducing a state library or by mutating state
+directly — both break the `subscribe` contract, which relies on the reducer
+returning new object identities.
+
+## Rule
+
+- State changes ONLY through `store.dispatch(action)`. Never assign to
+  `state.x`, never call a setter, never expose a mutation helper.
+- The golden path to add behavior, in this order:
+  1. add a variant to the `Action` union in `app/src/types.ts`
+     (`{ type: "<domain>/<verb>"; payload: {...} }`)
+  2. handle it in the `switch` in `app/src/reducer.ts`, immutably
+  3. add an action creator in `app/src/actions.ts`
+  4. add a colocated `*.test.ts`
+- Action `type` strings are `<domain>/<verb>`, and the verb follows the existing
+  set: **past tense** for something that happened to an entity (`task/added`,
+  `task/toggled`, `task/removed`), and the established exception **`filter/set`**
+  — an imperative — for setting a state-level value. A new action on `Task` uses
+  past tense; a new state-level setter may follow `filter/set`. Same wording in
+  `.cursor/commands/add-action.md`, step 1.
+- The reducer stays pure: no `Date.now()`, no `Math.random()`, no `fetch`, no
+  logging. IDs and timestamps arrive via the action payload.
+- Reads go through `app/src/selectors.ts`, not through `state.tasks` at the
+  call site.
+- NEVER install or import `redux`, `@reduxjs/toolkit`, `zustand`, `mobx`,
+  `jotai`, `recoil`, `valtio`, or a React `useState` replacement for this store.
+- DO NOT edit the dispatch/notify engine in `store.ts` to add features — it is
+  already generic; features live in the reducer.
+
+## How to verify
+
+1. `grep -rniE "(from|import)[[:space:]]*['\"](redux|@reduxjs|zustand|mobx|jotai|recoil|valtio)" app/src`
+   — zero hits. The `(from|import)` alternation catches both
+   `import "pkg"` (side effect) and `import ... from "pkg"`, in either quote
+   style; same matcher as `.cursor/rules/dependencies.mdc`, step 3. Then check
+   `app/package.json` separately:
+   `grep -nE "(redux|@reduxjs|zustand|mobx|jotai|recoil|valtio)" app/package.json`
+   — also zero hits. (A bare case-insensitive name search over `app/src`
+   additionally matches the warning comment in `app/src/store.ts:4`; the
+   anchored matcher above does not, so any hit is real.)
+2. `git diff --stat app/src` for a feature change touches `types.ts`,
+   `reducer.ts`, `actions.ts` and a test — not `store.ts`.
+3. Every new action `type` string in `types.ts` has a matching `case` in
+   `reducer.ts` and a creator in `actions.ts`.
+4. `cd app && npm run typecheck && npm test` — both green (an unhandled union
+   variant surfaces here).

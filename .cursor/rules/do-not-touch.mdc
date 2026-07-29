@@ -1,0 +1,56 @@
+---
+description: "Protected core — store.ts and types.ts require explicit approval"
+alwaysApply: true
+---
+
+# Protected core — ask before editing
+
+## Context
+
+`app/src/store.ts` (the dispatch/notify engine) and `app/src/types.ts` (the
+`AppState`/`Task` shapes and the `Action` union) are load-bearing: the reducer,
+action creators, selectors and every test depend on them. A silent change here
+ripples through the whole app, and the seeded comments in both files say so.
+
+## Rule
+
+Three distinct cases. Find the one that matches before editing:
+
+1. **`app/src/store.ts` — never, without approval.** The `Store` interface, the
+   `createStore` signature and the dispatch/notify loop are frozen. Stop, say
+   what you want to change and why the reducer/actions layer cannot absorb it,
+   and wait for a yes. This includes "harmless" edits — comments and formatting.
+2. **`app/src/types.ts`, additive — allowed, but announce it.** Adding an
+   `Action` variant, a field on `Task`, or a new exported type needs NO
+   approval: proceed. You MUST then list every addition in your reply, naming
+   the file — e.g. "types.ts: added `Priority` type, added required `priority`
+   to `Task`, added the `task/prioritized` variant". Silently extending
+   `types.ts` violates this rule even when the change itself was fine.
+3. **`app/src/types.ts`, non-additive — stop and ask.** Renaming, removing,
+   retyping or narrowing an existing member, or making an existing optional
+   field required, is NOT additive. Wait for a yes.
+
+Adding a **required** field to `Task` is case 2, but it breaks every existing
+object literal — call that out explicitly and list the test fixtures you had to
+update, or propose the optional-field alternative instead.
+
+Regardless of which case applies:
+
+- NEVER change the public signatures of `createStore`, the action creators in
+  `app/src/actions.ts`, or the functions in `app/src/lib/text.ts`. Extend, do
+  not redefine.
+- If a request seems to need a protected edit, propose the additive version
+  first (new action variant + reducer case) — that covers almost every feature.
+
+## How to verify
+
+1. `git diff --name-only` — if `app/src/store.ts` appears, an explicit approval
+   for it exists in the conversation.
+2. `git diff app/src/types.ts` shows only added lines / added union members —
+   no removed or renamed existing members.
+3. If `app/src/types.ts` was touched at all, the reply that accompanied the
+   change names the file and lists each addition. No such list = rule violated,
+   even if the diff itself is clean.
+4. `grep -n "export function createStore" app/src/store.ts` still reads
+   `createStore(preloaded: AppState = initialState): Store`.
+5. `cd app && npm test` — the seeded `store.test.ts` passes unmodified.

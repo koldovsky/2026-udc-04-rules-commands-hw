@@ -1,0 +1,41 @@
+---
+description: "TypeScript conventions — named exports, no any, immutable updates, file naming"
+globs: "app/**/*.ts"
+alwaysApply: false
+---
+
+# TypeScript conventions
+
+## Context
+
+`app/tsconfig.json` runs strict TS with `noUncheckedIndexedAccess`, and every
+existing module in `app/src/` uses named exports and `.js` extensions on
+relative imports (ESM, `"type": "module"`). Code that ignores this compiles
+locally in an agent's head but fails `npm run typecheck`.
+
+## Rule
+
+- Named exports only. NEVER `export default`.
+- Relative imports carry the `.js` extension, and type-only imports use
+  `import type`: `import type { Action, AppState } from "./types.js";`
+- NEVER use `any`, `as any`, `@ts-ignore`, or `@ts-expect-error` to silence the
+  compiler. Narrow the type, add the union variant, or widen the signature
+  honestly.
+- `noUncheckedIndexedAccess` is on: `state.tasks[0]` is `Task | undefined`.
+  Guard it, or use `.find()`/`.at()` with an explicit check — do not assert
+  with `!`.
+- Immutable updates only: `{ ...state, tasks: state.tasks.map(...) }`. NEVER
+  `push`, `splice`, `sort` in place, or assign to a property of existing state.
+- File names kebab-case (`text.ts`, `ab-validation.md`); types and interfaces
+  PascalCase; functions and variables camelCase.
+- Comments explain *why*, not *what*. Match the density of the surrounding file
+  — do not narrate every line.
+
+## How to verify
+
+1. `grep -rnE "\bany\b|@ts-ignore|@ts-expect-error|export default" app/src`
+   — zero hits.
+2. `grep -rnE "\.(push|splice|unshift|pop)\(|state\.[a-z]+ =" app/src/reducer.ts`
+   — zero hits.
+3. `cd app && npm run typecheck` — clean, with no suppressions added.
+4. Every new `.ts` file's exports are importable by name from a test.

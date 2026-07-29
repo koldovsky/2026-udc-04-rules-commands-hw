@@ -18,9 +18,10 @@ Baseline guidance for an Agentic IDE working in **this homework repo**.
   - `app/src/lib/text.ts` — in-house util lib with a fixed API (slugify,
     truncate, normalizeSpaces).
   - Tests are colocated `*.test.ts` (vitest); `cd app && npm test` is green.
-- `app/AGENTS.md` (a DIFFERENT file, nested inside `app/`) is deliberately thin
-  and single-tool-flavored — Task B is to generalize it. Do not "fix" it on the
-  participant's behalf unless asked.
+- `app/AGENTS.md` (a DIFFERENT file, nested inside `app/`) was the Task B
+  target: a thin, single-tool stub, now generalized into a tool-neutral baseline
+  (stack, structure, commands, code style, architecture, guardrails). Treat it
+  as authoritative for work inside `app/`; `app/CLAUDE.md` is a pointer to it.
 - `materials/architecture-brief.md` is the source of truth for the rules the
   participant should write; `materials/ab-task.md` is the change request used
   for the A/B validation (Task D).
