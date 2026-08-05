@@ -1,0 +1,42 @@
+---
+description: "Custom in-house store architecture: state changes only via store.dispatch(action); extend via Action union -> reducer"
+globs: "app/**"
+alwaysApply: false
+---
+
+# Architecture — custom state store
+
+## Context
+
+`app/` uses a small in-house store (`app/src/store.ts`, `createStore()` →
+`{ getState, dispatch, subscribe }`). It is deliberately NOT Redux, Zustand,
+MobX or Jotai. Agents often "modernize" such code by pulling in a state
+library or by mutating `state` directly — both break the architecture that
+`app/src/reducer.ts` and `subscribe` depend on.
+
+## Rule
+
+- Change state ONLY through `store.dispatch(action)`. Never assign to
+  `state.*` or to the object returned by `store.getState()`.
+- The golden path to add behavior: add a variant to the `Action` union in
+  `app/src/types.ts` → handle it in `app/src/reducer.ts` → add an action
+  creator in `app/src/actions.ts` → add a colocated `*.test.ts`.
+- Keep `reducer` pure: no I/O, no `Date.now()`/`Math.random()`/`fetch` inside
+  it. Generate ids/timestamps in the caller and pass them in the payload.
+- Reducer must return a new object/array for every handled action and return
+  the incoming `state` unchanged in `default:`.
+- NEVER add `redux`, `@reduxjs/toolkit`, `zustand`, `mobx`, `jotai`, `recoil`
+  or any other state library.
+- NEVER dispatch ad-hoc object literals whose `type` is not part of the
+  `Action` union.
+
+## How to verify
+
+1. `grep -rnE "redux|zustand|mobx|jotai|recoil" app/src app/package.json` →
+   zero matches.
+2. `grep -rnE "getState\(\)\.[A-Za-z]+ *=|state\.[A-Za-z]+ *=|\.push\(|\.splice\(|\.sort\(" app/src`
+   → zero matches (no in-place mutation of state).
+3. Every `case "..."` in `app/src/reducer.ts` corresponds to a variant of the
+   `Action` union in `app/src/types.ts`, and vice versa.
+4. `cd app && npm run typecheck && npm test` — both green.
+

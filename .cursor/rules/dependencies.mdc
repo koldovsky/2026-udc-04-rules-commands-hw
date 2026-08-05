@@ -1,0 +1,43 @@
+---
+description: "No new npm dependencies, no new tooling/config, no build-setup changes without explicit approval"
+globs: "app/**"
+alwaysApply: false
+---
+
+# Dependencies & tooling — ask before adding
+
+## Context
+
+`app/package.json` has exactly two devDependencies (`typescript`, `vitest`)
+and three scripts (`test`, `test:watch`, `typecheck`). A lint step is
+intentionally NOT configured. Adding packages or config files silently changes
+the exercise's architecture and the reviewer's environment.
+
+## Rule
+
+- NEVER run `npm install <pkg>` / add entries to `dependencies` or
+  `devDependencies` without explicit approval in the conversation. Propose the
+  package, the reason, and a zero-dependency alternative first.
+- Prefer the standard library and the existing in-house helpers
+  (`app/src/lib/text.ts`) over any package (uuid, lodash, date-fns, immer,
+  slugify, …).
+- NEVER add new tooling/config files (`.eslintrc*`, `eslint.config.*`,
+  `.prettierrc*`, `vitest.config.*`, `jest.config.*`, bundler configs) or new
+  npm scripts without approval.
+- Do not invent commands that do not exist: the available ones are
+  `cd app && npm test`, `npm run test:watch`, `npm run typecheck`. There is NO
+  lint script — say so instead of running or documenting one.
+- Do not change `app/tsconfig.json` (strict, `noUncheckedIndexedAccess`) to
+  make code compile — fix the code instead.
+
+## How to verify
+
+1. `git diff app/package.json app/package-lock.json app/tsconfig.json` → empty
+   unless the addition was explicitly approved.
+2. `git status --porcelain app` → no new `*.config.*` / `.eslintrc*` /
+   `.prettierrc*` files.
+3. `grep -rn "from \"" app/src | grep -vE "\./|vitest"` → zero third-party
+   imports.
+4. `cd app && npm test && npm run typecheck` — green with the existing
+   toolchain only.
+
