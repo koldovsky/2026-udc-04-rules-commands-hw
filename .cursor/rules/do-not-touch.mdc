@@ -21,6 +21,12 @@ whole app and are the most expensive mistakes an agent can make here.
 - NEVER edit a protected file without explicit approval in the current
   conversation. If a task seems to require it, STOP and ask first, showing the
   exact proposed diff and why `reducer.ts`/`actions.ts` are not enough.
+  If asking is impossible (non-interactive run), choose the least invasive
+  additive option — e.g. an OPTIONAL field (`priority?: Priority`) so existing
+  code and test fixtures keep compiling — and flag it in the final report.
+- Keep the diff of a protected file MINIMAL: add lines only. NEVER reformat,
+  re-align or reorder existing declarations (e.g. column-aligning the `Action`
+  union) while adding a variant.
 - The ONLY routinely allowed change to `types.ts` is ADDING a new variant to
   the `Action` union (or adding an optional field to an existing interface) —
   and only when the user asked for that feature. Never change or remove
@@ -35,7 +41,8 @@ whole app and are the most expensive mistakes an agent can make here.
 1. `git diff --name-only` → `app/src/store.ts` does not appear unless the user
    explicitly approved it in this session.
 2. `git diff app/src/types.ts` → shows only additive lines (a new `Action`
-   variant / optional field); no removed or renamed existing members.
+   variant / optional field); no removed or renamed existing members, and
+   `git diff --numstat app/src/types.ts` shows `0` deletions.
 3. `git diff app/package.json` → empty unless approved.
 4. `cd app && npm test` → all pre-existing tests still pass unchanged.
 
