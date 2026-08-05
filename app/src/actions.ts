@@ -14,6 +14,10 @@ export function toggleTask(id: TaskId): Action {
   return { type: "task/toggled", payload: { id } };
 }
 
+export function renameTask(id: TaskId, title: string): Action {
+  return { type: "task/renamed", payload: { id, title } };
+}
+
 export function removeTask(id: TaskId): Action {
   return { type: "task/removed", payload: { id } };
 }

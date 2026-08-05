@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { reducer } from "./reducer.js";
-import { addTask, removeTask, setFilter, toggleTask } from "./actions.js";
+import { addTask, removeTask, renameTask, setFilter, toggleTask } from "./actions.js";
 import { initialState, type AppState } from "./types.js";
 
 describe("reducer", () => {
@@ -36,5 +36,28 @@ describe("reducer", () => {
     const state: AppState = { tasks: [{ id: "a", title: "A", done: false }], filter: "all" };
     const next = reducer(state, toggleTask("missing"));
     expect(next.tasks[0]?.done).toBe(false);
+  });
+
+  it("renames a task by id", () => {
+    // Arrange
+    const withTask = reducer(initialState, addTask("a", "A"));
+    // Act
+    const renamed = reducer(withTask, renameTask("a", "A renamed"));
+    // Assert
+    expect(renamed.tasks[0]?.title).toBe("A renamed");
+    expect(renamed.tasks[0]?.done).toBe(false);
+  });
+
+  it("does not mutate the previous state when renaming", () => {
+    const withTask = reducer(initialState, addTask("a", "A"));
+    const renamed = reducer(withTask, renameTask("a", "A renamed"));
+    expect(renamed).not.toBe(withTask);
+    expect(withTask.tasks[0]?.title).toBe("A");
+  });
+
+  it("leaves tasks unchanged when renaming an unknown id", () => {
+    const withTask = reducer(initialState, addTask("a", "A"));
+    const renamed = reducer(withTask, renameTask("missing", "Nope"));
+    expect(renamed.tasks).toEqual(withTask.tasks);
   });
 });

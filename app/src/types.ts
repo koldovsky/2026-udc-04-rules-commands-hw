@@ -27,6 +27,7 @@ export interface AppState {
 export type Action =
   | { type: "task/added"; payload: { id: TaskId; title: string } }
   | { type: "task/toggled"; payload: { id: TaskId } }
+  | { type: "task/renamed"; payload: { id: TaskId; title: string } }
   | { type: "task/removed"; payload: { id: TaskId } }
   | { type: "filter/set"; payload: { filter: Filter } };
 

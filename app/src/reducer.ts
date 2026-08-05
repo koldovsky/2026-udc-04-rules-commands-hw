@@ -26,6 +26,16 @@ export function reducer(state: AppState, action: Action): AppState {
         ),
       };
 
+    case "task/renamed":
+      return {
+        ...state,
+        tasks: state.tasks.map((task) =>
+          task.id === action.payload.id
+            ? { ...task, title: action.payload.title }
+            : task,
+        ),
+      };
+
     case "task/removed":
       return {
         ...state,
