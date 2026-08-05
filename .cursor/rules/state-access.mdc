@@ -1,0 +1,44 @@
+---
+description: "Reads go through selectors.ts, writes through action creators in actions.ts — no hand-built action objects, no raw state.tasks access"
+globs: "app/src/{selectors,actions,index}.ts"
+alwaysApply: false
+---
+
+# State access — selectors for reads, action creators for writes
+
+## Context
+
+`app/src/actions.ts` owns action payload shapes; `app/src/selectors.ts` owns
+derived reads (`visibleTasks`, `remainingCount`). Consumers such as
+`app/src/index.ts` never build action objects by hand and never filter
+`state.tasks` inline — otherwise the same logic drifts into several places.
+
+## Rule
+
+- Writes: consumers call an action creator from `app/src/actions.ts` and pass
+  the result to `store.dispatch(...)` — e.g.
+  `store.dispatch(toggleTask(id))`. NEVER write
+  `store.dispatch({ type: "task/toggled", payload: { id } })` outside
+  `actions.ts`.
+- Every new `Action` variant gets a matching creator in `actions.ts`, named in
+  camelCase after the intent (`addTask` for `"task/added"`), with the return
+  type annotated as `Action`.
+- Reads: derived/filtered data comes from a selector in
+  `app/src/selectors.ts`. NEVER inline `state.tasks.filter(...)` /
+  `.find(...)` in consumers or tests-of-behavior — add or reuse a selector.
+- Selectors are pure `(state: AppState, ...args) => T`: no dispatching, no
+  mutation, no caching side effects.
+- Action creators contain no logic beyond building the payload (no id
+  generation, no validation) — pass values in.
+
+## How to verify
+
+1. `grep -rn "dispatch({" app/src` → zero matches (all dispatches go through
+   creators).
+2. Every `type:` string literal in `app/src` appears only in `types.ts`,
+   `reducer.ts` and `actions.ts`:
+   `grep -rn "\"task/\|\"filter/" app/src` confirms it.
+3. `grep -rnE "state\.tasks\.(filter|find|some|reduce)" app/src` → matches
+   only inside `selectors.ts` and `reducer.ts`.
+4. `cd app && npm run typecheck && npm test` — green.
+

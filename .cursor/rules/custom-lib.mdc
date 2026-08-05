@@ -1,0 +1,40 @@
+---
+description: "app/src/lib/text.ts is an in-house lib with a fixed API — only slugify, truncate, normalizeSpaces exist"
+globs: "app/src/lib/**"
+alwaysApply: false
+---
+
+# In-house text lib — fixed API
+
+## Context
+
+`app/src/lib/text.ts` is a CUSTOM library, not lodash/underscore. Agents
+routinely hallucinate lodash-style helpers on it. Its entire supported surface
+is exactly three functions.
+
+## Rule
+
+- The complete API of `app/src/lib/text.ts` is:
+  - `slugify(input: string): string`
+  - `truncate(input: string, maxLength: number, suffix?: string): string` —
+    `maxLength` INCLUDES the suffix
+  - `normalizeSpaces(input: string): string`
+- NEVER import or call anything else from it. Helpers such as `capitalize`,
+  `camelCase`, `deburr`, `titleCase`, `pad`, `escapeHtml` DO NOT EXIST.
+- If a helper is genuinely needed: add it to `app/src/lib/text.ts` as a named
+  export with explicit types, a one-line JSDoc, and cases in
+  `app/src/lib/text.test.ts` — in the same call, before using it.
+- NEVER change the existing signatures or behavior of the three functions
+  (`app/src/lib/text.test.ts` pins them); extend only by adding new exports.
+- NEVER add `lodash`, `slugify`, `voca` or similar packages — implement in
+  this file instead.
+
+## How to verify
+
+1. `grep -rn "lib/text.js" app/src` → every imported name is exported by
+   `app/src/lib/text.ts` (`grep -n "^export function" app/src/lib/text.ts`).
+2. `grep -rnE "capitalize|camelCase|deburr|titleCase" app/src` → zero matches.
+3. `cd app && npm run typecheck` → no "has no exported member" errors.
+4. `cd app && npm test` → `text.test.ts` still green, including any newly
+   added helper.
+

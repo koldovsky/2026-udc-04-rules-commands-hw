@@ -1,0 +1,42 @@
+---
+description: "Testing rules: colocated *.test.ts, vitest, AAA pattern, cover reducer immutability"
+globs: "app/**/*.test.ts"
+alwaysApply: false
+---
+
+# Testing — vitest, colocated, AAA
+
+## Context
+
+Tests live next to the code they cover: `app/src/reducer.test.ts`,
+`app/src/store.test.ts`, `app/src/lib/text.test.ts`. They run with vitest
+(`cd app && npm test`). There is no `__tests__` folder, no jest, no
+`tests/` directory — don't invent one.
+
+## Rule
+
+- Put a test at `<file>.test.ts` next to `<file>.ts`. NEVER create
+  `__tests__/`, `test/`, or `*.spec.ts`.
+- Import explicitly from vitest: `import { describe, expect, it } from "vitest";`
+  — no globals, no jest APIs (`jest.fn`, `beforeAll` from jest).
+- Follow AAA: Arrange (build state via `initialState` + action creators),
+  Act (call `reducer`/selector/`store.dispatch`), Assert (`expect(...)`).
+- Build test state through action creators from `app/src/actions.ts` and
+  `reducer`, not by hand-writing action objects.
+- Every new `Action` variant needs at least two tests: the happy path AND an
+  immutability check (`expect(next).not.toBe(prev)` / previous state
+  unchanged).
+- Test names describe behavior ("toggles a task's done flag"), not
+  implementation.
+
+## How to verify
+
+1. `cd app && npm test` → green, and the new test file appears in the vitest
+   output.
+2. `ls app/src app/src/lib` → each new `*.ts` with logic has a sibling
+   `*.test.ts`; `find app -name "*.spec.ts" -o -name "__tests__" -not -path "*/node_modules/*"`
+   → empty.
+3. `grep -rn "from \"vitest\"" app/src/*.test.ts` → present in every test file.
+4. Temporarily break the reducer case → the new test fails (the test is real,
+   not a tautology). Restore afterwards.
+

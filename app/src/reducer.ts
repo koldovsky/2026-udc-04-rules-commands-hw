@@ -14,7 +14,7 @@ export function reducer(state: AppState, action: Action): AppState {
         ...state,
         tasks: [
           ...state.tasks,
-          { id: action.payload.id, title: action.payload.title, done: false },
+          { id: action.payload.id, title: action.payload.title, done: false, priority: "normal" },
         ],
       };
 
@@ -26,10 +26,30 @@ export function reducer(state: AppState, action: Action): AppState {
         ),
       };
 
+    case "task/renamed":
+      return {
+        ...state,
+        tasks: state.tasks.map((task) =>
+          task.id === action.payload.id
+            ? { ...task, title: action.payload.title }
+            : task,
+        ),
+      };
+
     case "task/removed":
       return {
         ...state,
         tasks: state.tasks.filter((task) => task.id !== action.payload.id),
+      };
+
+    case "task/prioritized":
+      return {
+        ...state,
+        tasks: state.tasks.map((task) =>
+          task.id === action.payload.id
+            ? { ...task, priority: action.payload.priority }
+            : task,
+        ),
       };
 
     case "filter/set":

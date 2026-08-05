@@ -1,0 +1,42 @@
+---
+description: "TypeScript conventions for app/: named exports, no any/@ts-ignore, immutable updates, kebab-case files, .js import specifiers"
+globs: "app/**/*.ts"
+alwaysApply: false
+---
+
+# Code conventions
+
+## Context
+
+`app/` is TypeScript strict (`noUncheckedIndexedAccess` on) and ESM
+(`"type": "module"`). Existing files — `app/src/actions.ts`,
+`app/src/selectors.ts`, `app/src/lib/text.ts` — all follow the same shape:
+named exports, explicit types, relative imports ending in `.js`. New code must
+be indistinguishable from it.
+
+## Rule
+
+- Named exports only. NEVER use `export default`.
+- NEVER use `any`, `as any`, `@ts-ignore`, `@ts-expect-error`, or
+  non-null-assertion `!` to silence the compiler. With
+  `noUncheckedIndexedAccess`, handle `undefined` from index access explicitly
+  (`tasks[0]?.done`, or a guard).
+- Immutable updates only: spread, `map`, `filter`, `concat`. NEVER `push`,
+  `splice`, `sort`, or direct property assignment on state.
+- Relative imports MUST use the `.js` extension (`from "./types.js"`), and
+  type-only imports use `import type { ... }`.
+- File names are kebab-case (`text.ts`, `task-utils.ts`); types/interfaces are
+  PascalCase; functions/variables camelCase; action `type` strings use the
+  `domain/event` form (`"task/added"`).
+- Every exported function has explicit parameter and return types.
+
+## How to verify
+
+1. `grep -rn "export default" app/src` → zero matches.
+2. `grep -rnE ":\s*any\b|as any|@ts-ignore|@ts-expect-error" app/src` → zero
+   matches.
+3. `grep -rnE "from \"\./[^\"]*\"" app/src | grep -v "\.js\"" ` → zero matches
+   (all relative imports carry `.js`).
+4. `ls app/src app/src/lib` → every filename is lower-case kebab-case.
+5. `cd app && npm run typecheck` → no errors (no suppressions used).
+
