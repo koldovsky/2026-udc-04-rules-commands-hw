@@ -1,0 +1,34 @@
+---
+description: "In-house text lib API — only slugify, truncate, normalizeSpaces exist"
+globs: "app/src/lib/**"
+alwaysApply: false
+---
+
+# Custom lib — `app/src/lib/text.ts`
+
+## Context
+
+`app/src/lib/text.ts` is a small **in-house** util, not lodash/underscore. Its
+entire supported surface is fixed. Agents often invent helpers that are not
+there; this rule documents the real API so call sites stay correct.
+
+## Rule
+
+- The **only** supported functions are:
+  - `slugify(input: string): string`
+  - `truncate(input: string, maxLength: number, suffix?: string): string`
+  - `normalizeSpaces(input: string): string`
+- Import and call these by name from `./text.js` (or the project’s existing
+  relative import style) — named exports only
+- DO NOT assume helpers like `capitalize`, `camelCase`, `deburr`, `trim`,
+  `kebabCase`, or lodash methods exist on this module
+- If a new helper is truly needed: add it **explicitly** to `text.ts` with a
+  typed signature and a colocated test — do not pretend it already exists
+
+## How to verify
+
+1. Grep call sites for non-existent imports from `text` (`capitalize`,
+   `camelCase`, `deburr`, etc.) — zero matches
+2. `app/src/lib/text.ts` exports only the documented surface (or newly added,
+   explicitly implemented helpers with tests)
+3. `cd app && npm test` — `text.test.ts` stays green

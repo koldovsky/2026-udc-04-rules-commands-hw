@@ -1,6 +1,4 @@
-// Selectors — pure read helpers derived from state. UI reads state through
-// selectors instead of poking at `state.tasks` directly, so filtering logic
-// lives in one place.
+
 
 import type { AppState, Task } from "./types.js";
 

@@ -1,9 +1,4 @@
-// Pure reducer: (state, action) -> new state.
-//
-// This is where the domain grows: to support a new action, add a variant to
-// the `Action` union in types.ts, then handle it here. The reducer NEVER
-// mutates `state` in place — it always returns a new object/array. That
-// immutability is what lets `subscribe` listeners detect real changes.
+
 
 import type { Action, AppState } from "./types.js";
 
@@ -14,7 +9,12 @@ export function reducer(state: AppState, action: Action): AppState {
         ...state,
         tasks: [
           ...state.tasks,
-          { id: action.payload.id, title: action.payload.title, done: false },
+          {
+            id: action.payload.id,
+            title: action.payload.title,
+            done: false,
+            priority: "normal",
+          },
         ],
       };
 
@@ -30,6 +30,16 @@ export function reducer(state: AppState, action: Action): AppState {
       return {
         ...state,
         tasks: state.tasks.filter((task) => task.id !== action.payload.id),
+      };
+
+    case "task/priority-set":
+      return {
+        ...state,
+        tasks: state.tasks.map((task) =>
+          task.id === action.payload.id
+            ? { ...task, priority: action.payload.priority }
+            : task,
+        ),
       };
 
     case "filter/set":
