@@ -1,0 +1,29 @@
+---
+description: "TypeScript code conventions for app/ — named exports, strict typing, immutability, naming"
+globs: "app/**/*.ts"
+alwaysApply: false
+---
+
+# Code conventions
+
+## Context
+
+`app/tsconfig.json` enables `strict` and `noUncheckedIndexedAccess`; the reducer
+relies on immutable updates so `subscribe` listeners see new references. See
+[materials/architecture-brief.md](../../materials/architecture-brief.md) (Conventions).
+
+## Rule
+
+- Use named exports only (`export function`, `export const`, `export type`); NEVER `export default`.
+- NEVER use `any`, `as any`, `@ts-ignore`, or `@ts-expect-error`; use `unknown` + narrowing or a precise type.
+- Handle `noUncheckedIndexedAccess`: treat `arr[i]` as `T | undefined` (use `?.`, guards, or `find`), not the `!` non-null assertion.
+- Update state immutably: spread (`{ ...state }`, `[...state.tasks, x]`), `map`, `filter`; NEVER `push`, `splice`, `sort()` in place, or property assignment on state.
+- Import types with `import type { ... }` and use the `.js` extension in relative imports (e.g. `"./types.js"`), as existing files do.
+- Name files in kebab-case (`text-utils.ts`, `task-board.test.ts`); name types/interfaces in PascalCase (`AppState`, `Task`); functions and variables in camelCase.
+
+## How to verify
+
+1. `git grep -nE "export default" -- app/src` — expect no matches.
+2. `git grep -nE ":\s*any\b|as any|<any>|@ts-ignore|@ts-expect-error" -- app/src` — expect no matches.
+3. `Get-ChildItem app/src -Recurse -File | Where-Object { $_.Name -cmatch '[A-Z_ ]' }` — expect no output (kebab-case files).
+4. `cd app; npm run typecheck` — passes.

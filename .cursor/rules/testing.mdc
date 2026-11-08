@@ -1,0 +1,31 @@
+---
+description: "Testing conventions for app/ — vitest, colocated tests, AAA, reducer purity"
+globs: "app/**/*.test.ts"
+alwaysApply: false
+---
+
+# Testing
+
+## Context
+
+Tests use vitest (`app/package.json` → `"test": "vitest run"`) and live next to
+their source, e.g. `app/src/reducer.test.ts`, `app/src/lib/text.test.ts`. The
+reducer's purity is part of the architecture, so tests must guard it. See
+[materials/architecture-brief.md](../../materials/architecture-brief.md).
+
+## Rule
+
+- Use vitest only: `import { describe, expect, it } from "vitest";` — NEVER jest, mocha, or chai.
+- Place each test as `<name>.test.ts` in the same folder as `<name>.ts`; NEVER create `__tests__/` or a separate `test/` tree.
+- Structure each `it` as Arrange-Act-Assert; one behavior per `it`, named by the behavior ("adds a task as not done").
+- Build actions with creators from `app/src/actions.ts` and start from `initialState` in `app/src/types.ts`.
+- For every new reducer case, assert purity: the input state is unchanged and the result is a new reference (`expect(next).not.toBe(prev)`).
+- Respect `noUncheckedIndexedAccess` in assertions: `next.tasks[0]?.done`, not `next.tasks[0]!.done`.
+- Run tests with `cd app; npm test` before finishing; do not leave `it.only` / `it.skip`.
+
+## How to verify
+
+1. `cd app; npm test` — all tests pass.
+2. `git grep -nE "from .(jest|@jest|mocha|chai)|\.only\(|\.skip\(" -- app/src` — expect no matches.
+3. `Get-ChildItem app/src -Recurse -Filter *.test.ts | Where-Object { -not (Test-Path ($_.FullName -replace '\.test\.ts$', '.ts')) }` — expect no output (every test has a sibling source).
+4. `git grep -n "not.toBe(" -- app/src/reducer.test.ts` — expect at least one purity assertion.

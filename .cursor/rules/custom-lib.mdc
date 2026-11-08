@@ -1,0 +1,30 @@
+---
+description: "Exact API of the in-house text library app/src/lib/text.ts — not lodash; do not invent helpers"
+globs: "app/src/lib/**"
+alwaysApply: false
+---
+
+# Custom lib — app/src/lib/text.ts
+
+## Context
+
+`app/src/lib/text.ts` is a small in-house library with a fixed API. It is NOT
+lodash/underscore, and agents tend to hallucinate helpers that don't exist. See
+[materials/architecture-brief.md](../../materials/architecture-brief.md) (In-house library).
+
+## Rule
+
+- The entire supported API is exactly these three functions (import from `"./lib/text.js"` or a relative equivalent):
+  - `slugify(input: string): string` — `"Buy Milk!"` → `"buy-milk"`
+  - `truncate(input: string, maxLength: number, suffix = "…"): string` — result length includes the suffix
+  - `normalizeSpaces(input: string): string` — `"  a   b "` → `"a b"`
+- These helpers do NOT exist — never call them: `capitalize`, `camelCase`, `kebabCase`, `snakeCase`, `startCase`, `deburr`, `trim`, `pad`, `words`.
+- If you need a new helper, add it explicitly to `app/src/lib/text.ts` as a named export with a colocated test in `app/src/lib/text.test.ts`; do not change the three existing signatures.
+- NEVER import `lodash`, `lodash-es`, `lodash/*`, or `underscore`; use the functions above or plain `String` methods.
+
+## How to verify
+
+1. `git grep -n "^export function" -- app/src/lib/text.ts` — expect exactly the three signatures listed above (plus any explicitly added helpers).
+2. `git grep -nwE "capitalize|camelCase|kebabCase|snakeCase|startCase|deburr" -- app/src ':!app/src/lib/text.ts'` — expect no matches.
+3. `git grep -nE "from .(lodash|underscore)" -- app/src` — expect no matches.
+4. `cd app; npm test` — `app/src/lib/text.test.ts` passes.

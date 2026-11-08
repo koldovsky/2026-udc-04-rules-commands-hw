@@ -1,0 +1,28 @@
+---
+description: "No new npm dependencies in app/ without explicit approval — prefer existing code and lib/text.ts"
+globs: "app/package.json, app/src/**"
+alwaysApply: false
+---
+
+# No new dependencies
+
+## Context
+
+`app/package.json` has no `dependencies` and only two `devDependencies`:
+`typescript` and `vitest`. The app is intentionally self-contained; utilities
+live in `app/src/lib/text.ts`. See
+[materials/architecture-brief.md](../../materials/architecture-brief.md).
+
+## Rule
+
+- Do NOT add any `dependencies` or `devDependencies` (no `npm install <pkg>`, no manual edits to `app/package.json`) without explicit user approval in the current conversation.
+- Before reaching for a package, use existing code: `app/src/lib/text.ts`, `app/src/selectors.ts`, or built-in JS/TS APIs.
+- If a helper is missing, add it to the codebase (e.g. `app/src/lib/text.ts`) instead of installing a library.
+- If a dependency truly seems necessary, stop and propose it (name, reason, size, alternative) instead of installing.
+- NEVER import a module in `app/src/**` that is not a relative path, `vitest`, or a Node built-in.
+
+## How to verify
+
+1. `git diff --exit-code -- app/package.json app/package-lock.json` — exit code 0 (no dependency changes).
+2. `cd app; npm ls --depth=0` — lists only `typescript` and `vitest`.
+3. `git grep -nE "^import .* from .[^./]" -- app/src` — only `vitest` imports appear.

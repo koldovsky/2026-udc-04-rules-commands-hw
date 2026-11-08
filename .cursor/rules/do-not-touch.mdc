@@ -1,0 +1,27 @@
+---
+description: "Protected core files and public signatures — require explicit user approval before changing"
+alwaysApply: true
+---
+
+# Do not touch — protected core
+
+## Context
+
+`app/src/store.ts` (dispatch/notify engine) and `app/src/types.ts` (`AppState`,
+`Task`, `Action` union) are load-bearing: every other module depends on them.
+Normal feature work extends `app/src/reducer.ts` and `app/src/actions.ts`. See
+[materials/architecture-brief.md](../../materials/architecture-brief.md) (Protected core).
+
+## Rule
+
+- Do NOT edit `app/src/store.ts` without explicit user approval in the current conversation; if a task seems to need it, stop and ask first.
+- Edit `app/src/types.ts` only additively and only when the task requires it: a new `Action` variant or a new field. NEVER rename, remove, or retype existing types, fields, or variants.
+- NEVER change public signatures (name, parameters, order, return type) of `createStore`, the action creators in `app/src/actions.ts`, or `slugify` / `truncate` / `normalizeSpaces` in `app/src/lib/text.ts`. Add new functions instead.
+- When you do touch a protected file with approval, state which lines changed and why in your reply.
+
+## How to verify
+
+1. `git diff --stat -- app/src/store.ts` — expect no output unless the user approved it.
+2. `git diff -U0 -- app/src/types.ts | Select-String '^-[^-]'` — expect no output (additions only).
+3. `git diff -U0 -- app/src/store.ts app/src/actions.ts app/src/lib/text.ts | Select-String '^-export'` — expect no output (no public signature removed or changed).
+4. `cd app; npm test; npm run typecheck` — both pass.

@@ -1,0 +1,34 @@
+---
+description: "Custom store architecture of the task-board app — apply when adding or changing behavior, state, or data flow in app/"
+globs: "app/**"
+alwaysApply: false
+---
+
+# Architecture — custom state store
+
+## Context
+
+`app/` uses an in-house store, not a state library. `createStore()` in
+`app/src/store.ts` returns `{ getState, dispatch, subscribe }` and runs the pure
+`reducer` from `app/src/reducer.ts`. Source of truth:
+[materials/architecture-brief.md](../../materials/architecture-brief.md).
+
+## Rule
+
+- Change state ONLY via `store.dispatch(action)`; never assign to or mutate the object returned by `getState()`.
+- Build actions with creators from `app/src/actions.ts` (`addTask`, `toggleTask`, `removeTask`, `setFilter`); do not hand-write action objects in consumers.
+- Read state through selectors in `app/src/selectors.ts` (`visibleTasks`, `remainingCount`); add a new selector instead of filtering `state.tasks` inline.
+- Extend the app via the golden path, in this order:
+  1. add an `Action` variant to the union in `app/src/types.ts` (`type: "domain/pastTense"`);
+  2. handle it as a new `case` in `app/src/reducer.ts`, returning a new object;
+  3. add its creator in `app/src/actions.ts`;
+  4. add a colocated test (e.g. `app/src/reducer.test.ts`).
+- Keep `reducer` pure: no I/O, no `Date.now()`/`Math.random()`, no side effects — pass such values in the payload.
+- NEVER introduce Redux, Redux Toolkit, Zustand, MobX, Jotai, or any other state library, and never wrap or replace `createStore`.
+
+## How to verify
+
+1. `git grep -nE "from .(redux|@reduxjs|zustand|mobx|jotai)" -- app/src` — expect no matches.
+2. `git grep -nE "getState\(\)\.[a-zA-Z]+\s*(=[^=]|\.push|\.splice)" -- app/src` — expect no matches (no direct mutation).
+3. `git grep -nE "type: .[a-z]+/" -- app/src ':!app/src/types.ts' ':!app/src/actions.ts' ':!app/src/reducer.ts'` — expect no matches (actions built only in `actions.ts`).
+4. `cd app; npm test; npm run typecheck` — both pass.
